@@ -6,15 +6,19 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "parse": "tsx src/parser/cli.ts",
+    "test:parser": "tsx --test src/parser/**/*.test.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.9.16",
     "@supabase/supabase-js": "^2.118.0",
+    "ignore": "7.0.12",
     "next": "16.4.1",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "server-only": "^0.0.1"
+    "server-only": "^0.0.1",
+    "ts-morph": "28.0.0"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
@@ -24,6 +28,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.4.1",
     "tailwindcss": "^4",
+    "tsx": "4.23.15",
     "typescript": "^5"
   },
   "packageManager": "pnpm@10.27.0"
