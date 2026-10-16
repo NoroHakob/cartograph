@@ -6,9 +6,14 @@ import { NextResponse } from "next/server";
 
 const isPublicRoute = createRouteMatcher(["/sign-in(.*)", "/sign-up(.*)"]);
 
+// The map preview renders checked-in parser output with no account. It only
+// exists in development; the page itself 404s in production.
+const isPreviewRoute = createRouteMatcher(["/preview(.*)"]);
+
 export default clerkMiddleware(
   async (auth, req) => {
     if (isPublicRoute(req)) return;
+    if (process.env.NODE_ENV !== "production" && isPreviewRoute(req)) return;
 
     // Signed-out visitors are redirected to sign-in here, before any route
     // renders, so protected HTML is never sent.

@@ -32,6 +32,9 @@
   --accent-fg: #ffffff;
   --danger: #b4232c;
   --ring: rgb(15 110 102 / 0.35);
+  /* Edges into and out of a selected file. */
+  --edge-in: #2e8b3e;
+  --edge-out: #c17d0b;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -47,6 +50,8 @@
     --accent-fg: #06201d;
     --danger: #f2707a;
     --ring: rgb(60 194 180 / 0.4);
+    --edge-in: #5cc46d;
+    --edge-out: #e8a83a;
   }
 }
 
@@ -62,6 +67,8 @@
   --accent-fg: #06201d;
   --danger: #f2707a;
   --ring: rgb(60 194 180 / 0.4);
+  --edge-in: #5cc46d;
+  --edge-out: #e8a83a;
 }
 
 @theme inline {
@@ -77,6 +84,16 @@
   --color-ring: var(--ring);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+}
+
+/* React Flow ships light-theme defaults; the map takes the app's tokens instead. */
+.cartograph-map {
+  --xy-background-color: transparent;
+  --xy-attribution-background-color: transparent;
+  color: var(--fg);
+}
+.cartograph-map .react-flow__attribution a {
+  color: var(--fg-muted);
 }
 
 body {
