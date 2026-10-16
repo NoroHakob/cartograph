@@ -5,6 +5,7 @@ import { createContext, use, useEffect, useRef, type CSSProperties, type MouseEv
 import { CATEGORY_COLORS } from "@/map/categories";
 import { PANEL_HEADER_HEIGHT, PANEL_ROW_HEIGHT } from "@/map/layout";
 import type { Highlight, Selection } from "@/map/selection";
+import type { Language } from "@/parser/types";
 import {
   ABOVE_IN,
   ABOVE_OUT,
@@ -49,6 +50,8 @@ export type NodeData = {
   node: ViewNode;
   highlight: Highlight | null;
   selection: Selection | null;
+  /** The rail's chosen category, or null when every file is at full strength. */
+  category: Language | null;
 };
 
 export type FolderNodeType = Node<NodeData, "folder">;
@@ -60,6 +63,25 @@ const hiddenHandle: CSSProperties = { opacity: 0, width: 1, height: 1, minWidth:
 const DIM = "opacity-25";
 /** Something hovered in the detail pane, shown on the map. */
 const HOVER_RING = "ring-2 ring-accent";
+
+/** How many of a folder's files are in the category, or null with no category chosen. */
+function matchCount(node: ViewNode, category: Language | null): number | null {
+  if (category === null) return null;
+  return node.stats.languages.find((l) => l.language === category)?.count ?? 0;
+}
+
+/**
+ * How many of a folder's files are in the chosen category, in its colour.
+ * Folded nodes are narrow, so they say "3 of 10"; panels say "3 match".
+ */
+function MatchCount({ count, total, category }: { count: number; total?: number; category: Language }) {
+  return (
+    <span className="inline-flex items-center gap-1 font-medium text-fg" title={`${count} of ${total ?? "its"} files in this folder are .${category}`}>
+      <span aria-hidden className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: CATEGORY_COLORS[category] }} />
+      {total === undefined ? `${count} match` : `${count} of ${total}`}
+    </span>
+  );
+}
 
 function LanguageBar({ node }: { node: ViewNode }) {
   return (
@@ -73,9 +95,10 @@ function LanguageBar({ node }: { node: ViewNode }) {
 
 /** A folded folder. Clicking opens it; the map handles that through onNodeClick. */
 export function FolderNode({ data }: NodeProps<FolderNodeType>) {
-  const { node, highlight, selection } = data;
+  const { node, highlight, selection, category } = data;
   const selected = selection?.kind === "node" && selection.id === node.id;
-  const dim = highlight !== null && !highlight.nodes.has(node.id);
+  const matched = matchCount(node, category);
+  const dim = (highlight !== null && !highlight.nodes.has(node.id)) || matched === 0;
   const hovered = use(MapHoverContext)?.node === node.id;
   return (
     <div
@@ -87,7 +110,13 @@ export function FolderNode({ data }: NodeProps<FolderNodeType>) {
       <Handle type="target" position={Position.Left} id={FOLDED_IN} style={hiddenHandle} isConnectable={false} />
       <div className="min-w-0">
         <div className="truncate text-[13px] leading-5 font-medium">{node.label}</div>
-        <div className="text-[11px] leading-4 text-fg-muted tabular-nums">{node.stats.fileCount} files</div>
+        <div className="text-[11px] leading-4 text-fg-muted tabular-nums">
+          {matched !== null && category !== null ? (
+            <MatchCount count={matched} total={node.stats.fileCount} category={category} />
+          ) : (
+            `${node.stats.fileCount} files`
+          )}
+        </div>
       </div>
       <LanguageBar node={node} />
       <Handle type="source" position={Position.Right} id={FOLDED_OUT} style={hiddenHandle} isConnectable={false} />
@@ -103,14 +132,15 @@ export function FolderNode({ data }: NodeProps<FolderNodeType>) {
  * header (above) or the footer (below).
  */
 export function PanelNode({ id, data }: NodeProps<PanelNodeType>) {
-  const { node, highlight, selection } = data;
+  const { node, highlight, selection, category } = data;
   const { close, select, scroll, hover } = useMapActions();
+  const matched = matchCount(node, category);
   const hovering = use(MapHoverContext);
   const listRef = useRef<HTMLUListElement>(null);
   const updateNodeInternals = useUpdateNodeInternals();
   const whole = highlight === null || highlight.nodes.has(node.id);
-  const dimFrame = !whole && !highlight.frames.has(node.id);
-  const dimRow = (path: string) => !whole && !highlight.rows.has(path);
+  const dimFrame = (!whole && !highlight.frames.has(node.id)) || matched === 0;
+  const dimRow = (path: string, language: Language) => (!whole && !highlight.rows.has(path)) || (category !== null && language !== category);
   const dimAbove = !whole && !highlight.above.has(node.id);
   const dimBelow = !whole && !highlight.below.has(node.id);
   const selected = selection?.kind === "node" && selection.id === node.id;
@@ -168,6 +198,7 @@ export function PanelNode({ id, data }: NodeProps<PanelNodeType>) {
         <span className="truncate text-[13px] leading-4 font-semibold">{node.label}</span>
         <span className="flex items-center gap-2 text-[11px] leading-4 text-fg-muted tabular-nums">
           <span>{node.stats.fileCount} files</span>
+          {matched !== null && category !== null && <MatchCount count={matched} category={category} />}
           <span aria-hidden>·</span>
           <span title="Files outside this folder that import it">in {node.stats.fanIn}</span>
           <span title="Files outside this folder it imports">out {node.stats.fanOut}</span>
@@ -195,7 +226,7 @@ export function PanelNode({ id, data }: NodeProps<PanelNodeType>) {
                 aria-pressed={rowSelected}
                 className={`flex h-full w-full items-center gap-2 px-3 text-left transition-opacity hover:bg-surface-muted ${
                   rowSelected ? "bg-accent/12" : ""
-                } ${hoveredRow === row.path ? "bg-accent/20 ring-2 ring-accent ring-inset" : dimRow(row.path) ? DIM : ""}`}
+                } ${hoveredRow === row.path ? "bg-accent/20 ring-2 ring-accent ring-inset" : dimRow(row.path, row.language) ? DIM : ""}`}
               >
                 <span aria-hidden className="size-2 shrink-0 rounded-sm" style={{ backgroundColor: CATEGORY_COLORS[row.language] }} />
                 <span className="min-w-0 flex-1 truncate font-mono text-[12px]">{row.label}</span>

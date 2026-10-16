@@ -12,10 +12,40 @@ import {
   type DetailFile,
   type RepoFacts,
 } from "@/map/detail";
+import {
+  graphIndex,
+  INSIGHT_ORDER,
+  INSIGHT_SENTENCES,
+  insights,
+  reach,
+  REACH_DEPTH,
+  type Direction,
+  type GraphIndex,
+  type InsightKind,
+  type Insights,
+} from "@/map/graph";
 import { nodeId, type MapEdge } from "@/map/view";
 import type { MapController } from "./dependency-map";
 
 export type DetailTab = "structure" | "explanation";
+
+/** Which walk the file view is showing: the blast radius or the dependency chain. */
+export type ReachMode = Direction;
+
+const REACH_LABELS: Record<ReachMode, { button: string; hint: string; empty: string }> = {
+  dependents: {
+    button: "Blast radius",
+    hint: "What could break if this file changes: files that import it, and files that import those",
+    empty: "Nothing in the repository imports it, so a change here reaches no other file.",
+  },
+  dependencies: {
+    button: "Dependency chain",
+    hint: "What this file needs: files it imports, and files those import",
+    empty: "It imports nothing in the repository.",
+  },
+};
+
+const DEPTH_LABELS: Record<number, string> = { 1: "Directly", 2: "Two steps away" };
 
 /** Ranked lists show this many rows until asked for the rest. */
 const RANKED_PREVIEW = 8;
@@ -28,6 +58,9 @@ interface DetailPaneProps {
   /** Lives above the pane so it survives the selection changing. */
   tab: DetailTab;
   onTab: (tab: DetailTab) => void;
+  /** Also lives above the pane: an open walk stays open as the selection moves. */
+  reachMode: ReachMode | null;
+  onReachMode: (mode: ReachMode | null) => void;
 }
 
 /**
@@ -35,11 +68,13 @@ interface DetailPaneProps {
  * that is its resting state. A selected file or folder gets Structure and
  * Explanation tabs. Everything comes from data already in the browser.
  */
-export function DetailPane({ map, files, edges, facts, tab, onTab }: DetailPaneProps) {
+export function DetailPane({ map, files, edges, facts, tab, onTab, reachMode, onReachMode }: DetailPaneProps) {
   const fileByPath = useMemo(() => new Map(files.map((f) => [f.path, f])), [files]);
   const known = useMemo(() => conventions(facts), [facts]);
   const neighboursOf = useMemo(() => neighbourIndex(edges), [edges]);
   const summary = useMemo(() => repoSummary(files, edges, known), [files, edges, known]);
+  const index = useMemo(() => graphIndex(edges), [edges]);
+  const found = useMemo(() => insights(files, index, known), [files, index, known]);
   const { selection, hover, fold, view } = map;
 
   // A pane row is lit when the map hovers its file, or the folder holding it.
@@ -48,7 +83,7 @@ export function DetailPane({ map, files, edges, facts, tab, onTab }: DetailPaneP
   const rowProps = { fileByPath, lit, onSelect: map.focusFile, onHover: map.setHover };
 
   if (selection === null) {
-    return <RepoView facts={facts} summary={summary} rowProps={rowProps} />;
+    return <RepoView facts={facts} summary={summary} insights={found} rowProps={rowProps} />;
   }
 
   const back = (
@@ -66,7 +101,7 @@ export function DetailPane({ map, files, edges, facts, tab, onTab }: DetailPaneP
     const file = fileByPath.get(selection.path);
     if (!file) return null;
     const { imports, importedBy } = neighboursOf(file.path);
-    const found = known.of(file.path);
+    const roles = known.of(file.path);
     return (
       <Frame back={back} kicker="File" title={file.path} tab={tab} onTab={onTab}>
         <Section>
@@ -78,11 +113,11 @@ export function DetailPane({ map, files, edges, facts, tab, onTab }: DetailPaneP
             </dd>
             <dt className="text-fg-muted">Role</dt>
             <dd className="min-w-0">
-              {found.length === 0 ? (
+              {roles.length === 0 ? (
                 <span className="text-fg-muted">No convention identifies it</span>
               ) : (
                 <ul className="flex flex-col gap-0.5">
-                  {found.map((c) => (
+                  {roles.map((c) => (
                     <li key={`${c.id}:${c.detail ?? ""}`}>
                       {c.label}
                       {c.detail && <span className="ml-1.5 font-mono text-xs break-all text-fg-muted">{c.detail}</span>}
@@ -101,6 +136,7 @@ export function DetailPane({ map, files, edges, facts, tab, onTab }: DetailPaneP
             <Stat value={importedBy.length} label="depend on it" />
           </div>
         </Section>
+        <ReachSection path={file.path} index={index} mode={reachMode} onMode={onReachMode} rowProps={rowProps} />
         <FileList title="Imports" hint="Files this one imports" files={imports} rowProps={rowProps} empty="Imports nothing in the repository." />
         <FileList title="Imported by" hint="Files that import this one" files={importedBy} rowProps={rowProps} empty="Nothing in the repository imports it." />
       </Frame>
@@ -139,7 +175,17 @@ export function DetailPane({ map, files, edges, facts, tab, onTab }: DetailPaneP
   );
 }
 
-function RepoView({ facts, summary, rowProps }: { facts: RepoFacts; summary: ReturnType<typeof repoSummary>; rowProps: RowProps }) {
+function RepoView({
+  facts,
+  summary,
+  insights,
+  rowProps,
+}: {
+  facts: RepoFacts;
+  summary: ReturnType<typeof repoSummary>;
+  insights: Insights;
+  rowProps: RowProps;
+}) {
   return (
     <div className="flex flex-col">
       <header className="border-b border-border px-4 pt-4 pb-3">
@@ -183,7 +229,207 @@ function RepoView({ facts, summary, rowProps }: { facts: RepoFacts; summary: Ret
         </p>
         <p className="mt-1 text-xs text-fg-muted">Not a route, entry point, test or config file.</p>
       </Section>
+      <InsightsPanel insights={insights} rowProps={rowProps} />
     </div>
+  );
+}
+
+/**
+ * Blast radius and dependency chain: the same walk over the edge list in
+ * opposite directions, two levels deep. Computed in the browser on click.
+ */
+function ReachSection({
+  path,
+  index,
+  mode,
+  onMode,
+  rowProps,
+}: {
+  path: string;
+  index: GraphIndex;
+  mode: ReachMode | null;
+  onMode: (mode: ReachMode | null) => void;
+  rowProps: RowProps;
+}) {
+  const reached = useMemo(() => (mode === null ? [] : reach(index, path, mode)), [index, path, mode]);
+  const levels = Array.from({ length: REACH_DEPTH }, (_, i) => ({ depth: i + 1, files: reached.filter((r) => r.depth === i + 1) }));
+  return (
+    <Section>
+      <div className="grid grid-cols-2 gap-2">
+        {(["dependents", "dependencies"] as const).map((id) => (
+          <button
+            key={id}
+            type="button"
+            aria-pressed={mode === id}
+            onClick={() => onMode(mode === id ? null : id)}
+            title={REACH_LABELS[id].hint}
+            className={`rounded-md border px-2.5 py-1.5 text-sm font-medium ${
+              mode === id ? "border-accent bg-accent/12 text-fg" : "border-border hover:border-fg-muted hover:bg-surface-muted"
+            }`}
+          >
+            {REACH_LABELS[id].button}
+          </button>
+        ))}
+      </div>
+      {mode !== null && (
+        <div className="mt-3">
+          <h3 className="text-xs font-medium tracking-wide text-fg-muted uppercase">
+            {REACH_LABELS[mode].button} · {reached.length}
+          </h3>
+          <p className="mt-0.5 text-xs text-fg-muted">{REACH_LABELS[mode].hint}. Two levels deep.</p>
+          {reached.length === 0 ? (
+            <p className="mt-2 text-sm text-fg-muted">{REACH_LABELS[mode].empty}</p>
+          ) : (
+            levels
+              .filter((level) => level.files.length > 0)
+              .map((level) => (
+                <div key={level.depth} className="mt-2">
+                  <p className="text-[11px] text-fg-muted">
+                    {DEPTH_LABELS[level.depth] ?? `${level.depth} steps away`} · {level.files.length}
+                  </p>
+                  <ul className="-mx-1.5 mt-1 flex flex-col">
+                    {level.files.map((r) => (
+                      <FileRow key={r.path} path={r.path} rowProps={rowProps} />
+                    ))}
+                  </ul>
+                </div>
+              ))
+          )}
+        </div>
+      )}
+    </Section>
+  );
+}
+
+const INSIGHT_TITLES: Record<InsightKind, string> = {
+  unimported: "Nothing imports",
+  hub: "Heavily imported",
+  cycle: "Import cycles",
+  oversized: "Long files",
+};
+
+/**
+ * The four insights, under one header that starts collapsed. This pane
+ * explains a repository before it says anything that reads like a verdict,
+ * so the panel is never open by default and files nothing imports lead.
+ */
+function InsightsPanel({ insights, rowProps }: { insights: Insights; rowProps: RowProps }) {
+  const [open, setOpen] = useState(false);
+  const counts: Record<InsightKind, number> = {
+    unimported: insights.unimported.length,
+    hub: insights.hubs.length,
+    cycle: insights.cycles.length,
+    oversized: insights.oversized.length,
+  };
+  return (
+    <section className="border-b border-border last:border-b-0">
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls="insights-panel"
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center gap-2 px-4 py-3 text-left hover:bg-surface-muted"
+      >
+        <span aria-hidden className={`text-[10px] text-fg-muted transition-transform ${open ? "rotate-90" : ""}`}>
+          ▶
+        </span>
+        <span className="flex-1 text-xs font-medium tracking-wide text-fg-muted uppercase">Insights</span>
+        <span className="text-[11px] text-fg-muted">{open ? "Hide" : "Show"}</span>
+      </button>
+      {open && (
+        <div id="insights-panel" className="flex flex-col">
+          {INSIGHT_ORDER.map((kind) => (
+            <div key={kind} className="border-t border-border px-4 py-3">
+              <h3 className="text-xs font-medium tracking-wide text-fg-muted uppercase">
+                {INSIGHT_TITLES[kind]} · {counts[kind]}
+              </h3>
+              <p className="mt-0.5 text-xs text-fg-muted">{INSIGHT_SENTENCES[kind]}</p>
+              <div className="mt-2">
+                {kind === "unimported" && (
+                  <PreviewList
+                    files={insights.unimported}
+                    rowProps={rowProps}
+                    empty="Every file is imported, or reached some other known way."
+                    trailing={(f) => <Trailing title={`Imports ${f.fanOut} files`}>→{f.fanOut}</Trailing>}
+                  />
+                )}
+                {kind === "hub" && (
+                  <>
+                    <p className="mb-1 text-[11px] text-fg-muted">Imported by {insights.hubThreshold} or more files.</p>
+                    <PreviewList
+                      files={insights.hubs}
+                      rowProps={rowProps}
+                      empty="No file is imported by that many."
+                      trailing={(f) => <Trailing title={`${f.fanIn} files import it`}>{f.fanIn}</Trailing>}
+                    />
+                  </>
+                )}
+                {kind === "cycle" &&
+                  (insights.cycles.length === 0 ? (
+                    <p className="text-sm text-fg-muted">No file imports its way back to itself.</p>
+                  ) : (
+                    <ol className="flex flex-col gap-2">
+                      {insights.cycles.map((cycle) => (
+                        <li key={cycle[0]}>
+                          <p className="text-[11px] text-fg-muted">{cycle.length === 1 ? "Imports itself" : `${cycle.length} files`}</p>
+                          <PreviewList files={cycle.map((p) => rowProps.fileByPath.get(p)!)} rowProps={rowProps} empty="" />
+                        </li>
+                      ))}
+                    </ol>
+                  ))}
+                {kind === "oversized" && (
+                  <PreviewList
+                    files={insights.oversized}
+                    rowProps={rowProps}
+                    empty="No file is that long."
+                    trailing={(f) => <Trailing title={`${f.lineCount.toLocaleString()} lines`}>{f.lineCount.toLocaleString()}</Trailing>}
+                  />
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function Trailing({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <span className="font-mono text-[11px] text-fg-muted tabular-nums" title={title}>
+      {children}
+    </span>
+  );
+}
+
+/** A file list that shows RANKED_PREVIEW rows until asked for the rest. */
+function PreviewList({
+  files,
+  rowProps,
+  empty,
+  trailing,
+}: {
+  files: readonly DetailFile[];
+  rowProps: RowProps;
+  empty: string;
+  trailing?: (file: DetailFile) => ReactNode;
+}) {
+  const [all, setAll] = useState(false);
+  if (files.length === 0) return <p className="text-sm text-fg-muted">{empty}</p>;
+  const shown = all ? files : files.slice(0, RANKED_PREVIEW);
+  return (
+    <>
+      <ul className="-mx-1.5 flex flex-col">
+        {shown.map((f) => (
+          <FileRow key={f.path} path={f.path} rowProps={rowProps} trailing={trailing?.(f)} />
+        ))}
+      </ul>
+      {files.length > RANKED_PREVIEW && (
+        <button type="button" onClick={() => setAll(!all)} className="mt-1.5 text-xs text-accent hover:underline">
+          {all ? "Show fewer" : `Show all ${files.length}`}
+        </button>
+      )}
+    </>
   );
 }
 

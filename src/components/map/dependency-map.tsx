@@ -13,6 +13,7 @@ import {
 } from "@xyflow/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { fold, type Fold } from "@/map/fold";
+import type { Language } from "@/parser/types";
 import { layoutView, type MapLayout } from "@/map/layout";
 import { onScreen, refitToInclude, unionOf } from "@/map/refit";
 import { highlightFor, type Highlight, type Selection } from "@/map/selection";
@@ -47,6 +48,9 @@ export interface MapController {
   highlight: Highlight | null;
   selection: Selection | null;
   hover: HoverTarget | null;
+  /** The rail's chosen category. Files outside it dim; nothing is removed. */
+  category: Language | null;
+  setCategory: (category: Language | null) => void;
   actions: MapActions;
   /** Opens the folder holding `path`, scrolls its row into view and selects it. */
   focusFile: (path: string) => void;
@@ -68,6 +72,7 @@ export function useMapController(files: readonly MapFile[], edges: readonly MapE
   const [selection, setSelection] = useState<Selection | null>(null);
   const [scroll, setScroll] = useState<ReadonlyMap<string, number>>(() => new Map());
   const [hoverState, setHover] = useState<Hover | null>(null);
+  const [category, setCategory] = useState<Language | null>(null);
 
   const view = useMemo(
     () => computeView(folded, stats, files, edges, open, rootName, scroll),
@@ -169,12 +174,19 @@ export function useMapController(files: readonly MapFile[], edges: readonly MapE
 
   const deselect = useCallback(() => setSelection(null), []);
 
-  return { fold: folded, view, layout, highlight, selection, hover, actions, focusFile, deselect, setHover, onNodeClick };
+  return { fold: folded, view, layout, highlight, selection, hover, category, setCategory, actions, focusFile, deselect, setHover, onNodeClick };
 }
 
 /** The canvas. All state comes from the controller. */
-export function DependencyMap({ map }: { map: MapController }) {
-  const { view, layout, highlight, selection, hover, actions, deselect, setHover, onNodeClick } = map;
+export function DependencyMap({ map, files }: { map: MapController; files: readonly MapFile[] }) {
+  const { view, layout, highlight, selection, hover, category, actions, deselect, setHover, onNodeClick } = map;
+
+  // An edge stays in the chosen category when a file at either end is in it.
+  const inCategory = useMemo(() => {
+    if (category === null) return null;
+    const matching = new Set(files.filter((f) => f.language === category).map((f) => f.path));
+    return (edge: MapView["edges"][number]) => edge.sourceFiles.some((p) => matching.has(p)) || edge.targetFiles.some((p) => matching.has(p));
+  }, [files, category]);
 
   const nodes = useMemo(
     () =>
@@ -186,13 +198,13 @@ export function DependencyMap({ map }: { map: MapController }) {
           position: { x: box.x, y: box.y },
           width: box.width,
           height: box.height,
-          data: { node, highlight, selection },
+          data: { node, highlight, selection, category },
           // Panels sit above every edge, lit ones included, so lines pass
           // beneath an open folder and never across its rows.
           zIndex: node.open ? PANEL_Z : 0,
         };
       }),
-    [view, layout, highlight, selection],
+    [view, layout, highlight, selection, category],
   );
 
   const flowEdges = useMemo(
@@ -200,7 +212,7 @@ export function DependencyMap({ map }: { map: MapController }) {
       view.edges.map((edge): Edge => {
         const direction = highlight?.edges.get(edge.id);
         const lit = direction !== undefined;
-        const dim = highlight !== null && !lit;
+        const dim = (highlight !== null && !lit) || (inCategory !== null && !inCategory(edge));
         // A selected file shows which way each import runs: green for files
         // that import it, amber for files it imports.
         const litStroke = selection?.kind !== "row" ? "var(--accent)" : direction === "in" ? "var(--edge-in)" : "var(--edge-out)";
@@ -220,7 +232,7 @@ export function DependencyMap({ map }: { map: MapController }) {
           },
         };
       }),
-    [view, highlight, selection],
+    [view, highlight, selection, inCategory],
   );
 
   return (

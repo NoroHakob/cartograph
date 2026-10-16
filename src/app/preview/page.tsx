@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { CategoryRail } from "@/components/map/category-rail";
 import { MapWorkspace } from "@/components/map/map-workspace";
 import { categoriesOf } from "@/map/categories";
 import type { RepoFacts } from "@/map/detail";
@@ -30,5 +29,5 @@ export default function PreviewPage() {
     entryPoints: result.entryPoints.flatMap(({ path, origin }) => (path === null ? [] : [{ path, origin }])),
   };
 
-  return <MapWorkspace rail={<CategoryRail categories={categoriesOf(result.files)} />} files={files} edges={edges} facts={facts} />;
+  return <MapWorkspace categories={categoriesOf(result.files)} files={files} edges={edges} facts={facts} />;
 }
