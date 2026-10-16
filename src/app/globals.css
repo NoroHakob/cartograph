@@ -1,26 +1,86 @@
+/* Clerk's styles sit in their own layer so Tailwind utilities can override them. */
+@layer theme, base, clerk, components, utilities;
 @import "tailwindcss";
 
+/*
+ * Theme: <html data-theme="system | light | dark">.
+ * Tokens key off that attribute. "system" (and a missing attribute, if the
+ * inline theme script never ran) follows prefers-color-scheme; "light" and
+ * "dark" win over it.
+ */
+
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      @slot;
+    }
+  }
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+  --bg: #f7f7f5;
+  --surface: #ffffff;
+  --surface-muted: #efefec;
+  --fg: #1a1c1e;
+  --fg-muted: #61656b;
+  --border: #e1e1dc;
+  --accent: #0f6e66;
+  --accent-fg: #ffffff;
+  --danger: #b4232c;
+  --ring: rgb(15 110 102 / 0.35);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0e1012;
+    --surface: #16191c;
+    --surface-muted: #1e2226;
+    --fg: #e8eaec;
+    --fg-muted: #9aa0a6;
+    --border: #2a2f34;
+    --accent: #3cc2b4;
+    --accent-fg: #06201d;
+    --danger: #f2707a;
+    --ring: rgb(60 194 180 / 0.4);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0e1012;
+  --surface: #16191c;
+  --surface-muted: #1e2226;
+  --fg: #e8eaec;
+  --fg-muted: #9aa0a6;
+  --border: #2a2f34;
+  --accent: #3cc2b4;
+  --accent-fg: #06201d;
+  --danger: #f2707a;
+  --ring: rgb(60 194 180 / 0.4);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-danger: var(--danger);
+  --color-ring: var(--ring);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 }

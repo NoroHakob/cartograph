@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
+import { assertEnv } from "./src/env/required";
+
+// Next has loaded .env* by the time this file runs, so this crashes on boot
+// when configuration is missing.
+assertEnv();
 
 const nextConfig: NextConfig = {
-  /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {
