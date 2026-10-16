@@ -140,7 +140,7 @@ export function shortestUniqueLabels(paths: readonly string[]): Map<string, stri
 }
 
 /** Rows in the order a panel lists them: most depended-on first, then by path. */
-function rowOrder(a: MapFile, b: MapFile) {
+export function rowOrder(a: MapFile, b: MapFile) {
   return b.fanIn - a.fanIn || byPath(a.path, b.path);
 }
 

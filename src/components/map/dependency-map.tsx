@@ -5,7 +5,6 @@ import {
   Background,
   BackgroundVariant,
   ReactFlow,
-  ReactFlowProvider,
   useReactFlow,
   useStore,
   type Edge,
@@ -13,12 +12,21 @@ import {
   type NodeTypes,
 } from "@xyflow/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { fold } from "@/map/fold";
-import { layoutView } from "@/map/layout";
+import { fold, type Fold } from "@/map/fold";
+import { layoutView, type MapLayout } from "@/map/layout";
 import { onScreen, refitToInclude, unionOf } from "@/map/refit";
-import { highlightFor, type Selection } from "@/map/selection";
-import { computeView, groupStats, nodeId, type MapEdge, type MapFile } from "@/map/view";
-import { FolderNode, MapActionsContext, PanelNode, type FolderNodeType, type MapActions, type PanelNodeType } from "./map-nodes";
+import { highlightFor, type Highlight, type Selection } from "@/map/selection";
+import { computeView, groupStats, nodeId, PANEL_ROW_LIMIT, rowOrder, type MapEdge, type MapFile, type MapView } from "@/map/view";
+import {
+  FolderNode,
+  MapActionsContext,
+  MapHoverContext,
+  PanelNode,
+  type FolderNodeType,
+  type HoverTarget,
+  type MapActions,
+  type PanelNodeType,
+} from "./map-nodes";
 
 const nodeTypes: NodeTypes = { folder: FolderNode, panel: PanelNode };
 
@@ -29,28 +37,37 @@ const MAX_ZOOM = 2;
 const LIT_EDGE_Z = 1;
 const PANEL_Z = 2;
 
-interface DependencyMapProps {
-  files: MapFile[];
-  edges: MapEdge[];
-  /** Shown as the root folder's label. */
-  rootName: string;
+/** Something the pointer is over, on the map or in the detail pane. */
+export type Hover = { kind: "node"; id: string } | { kind: "file"; path: string };
+
+export interface MapController {
+  fold: Fold;
+  view: MapView;
+  layout: MapLayout;
+  highlight: Highlight | null;
+  selection: Selection | null;
+  hover: HoverTarget | null;
+  actions: MapActions;
+  /** Opens the folder holding `path`, scrolls its row into view and selects it. */
+  focusFile: (path: string) => void;
+  deselect: () => void;
+  setHover: (hover: Hover | null) => void;
+  onNodeClick: NodeMouseHandler;
 }
 
-export function DependencyMap(props: DependencyMapProps) {
-  return (
-    <ReactFlowProvider>
-      <MapCanvas {...props} />
-    </ReactFlowProvider>
-  );
-}
-
-function MapCanvas({ files, edges, rootName }: DependencyMapProps) {
+/**
+ * Everything the map knows about what is open, selected and hovered. It lives
+ * above the canvas so the detail pane reads and drives the same state. Must
+ * be called inside a ReactFlowProvider.
+ */
+export function useMapController(files: readonly MapFile[], edges: readonly MapEdge[], rootName: string): MapController {
   const folded = useMemo(() => fold(files), [files]);
   const stats = useMemo(() => groupStats(folded, files, edges), [folded, files, edges]);
 
   const [open, setOpen] = useState<ReadonlySet<string>>(() => new Set());
   const [selection, setSelection] = useState<Selection | null>(null);
   const [scroll, setScroll] = useState<ReadonlyMap<string, number>>(() => new Map());
+  const [hoverState, setHover] = useState<Hover | null>(null);
 
   const view = useMemo(
     () => computeView(folded, stats, files, edges, open, rootName, scroll),
@@ -58,6 +75,106 @@ function MapCanvas({ files, edges, rootName }: DependencyMapProps) {
   );
   const layout = useMemo(() => layoutView(view), [view]);
   const highlight = useMemo(() => highlightFor(view, selection), [view, selection]);
+
+  // A hovered file resolves to the node holding it, so a folded folder can
+  // light up for a file it hides.
+  const hover = useMemo<HoverTarget | null>(() => {
+    if (hoverState === null) return null;
+    if (hoverState.kind === "node") return { node: hoverState.id, file: null };
+    const dir = folded.groupOf.get(hoverState.path);
+    return dir === undefined ? null : { node: nodeId(dir), file: hoverState.path };
+  }, [hoverState, folded]);
+
+  // Opening relayouts the whole map. The refit runs after the render that
+  // carries the new layout, so it fits the panel where it is now, not where
+  // the folder was. Nodes that were on screen before the click are tracked by
+  // id and kept on screen too, wherever the relayout moved them. A request
+  // that changes no layout still bumps `fitRequest`, so it never goes stale.
+  const pendingFit = useRef<{ panel: string; keep: string[] } | null>(null);
+  const [fitRequest, setFitRequest] = useState(0);
+  const { getViewport, setViewport } = useReactFlow();
+  const screenWidth = useStore((s) => s.width);
+  const screenHeight = useStore((s) => s.height);
+  useEffect(() => {
+    const pending = pendingFit.current;
+    if (pending === null) return;
+    pendingFit.current = null;
+    const boxes = [pending.panel, ...pending.keep].map((id) => layout.boxes.get(id)).filter((b) => b !== undefined);
+    if (boxes.length === 0 || screenWidth === 0 || screenHeight === 0) return;
+    const next = refitToInclude(getViewport(), { width: screenWidth, height: screenHeight }, unionOf(boxes), MIN_ZOOM);
+    if (next) void setViewport(next, { duration: 250 });
+  }, [layout, fitRequest, getViewport, setViewport, screenWidth, screenHeight]);
+
+  const requestFit = useCallback(
+    (panel: string) => {
+      pendingFit.current = { panel, keep: onScreen(getViewport(), { width: screenWidth, height: screenHeight }, layout.boxes) };
+      setFitRequest((n) => n + 1);
+    },
+    [layout, getViewport, screenWidth, screenHeight],
+  );
+
+  const onNodeClick = useCallback<NodeMouseHandler>(
+    (_, node) => {
+      if (node.type !== "folder") return; // panels handle their own clicks
+      const dir = (node as FolderNodeType).data.node.dir;
+      requestFit(node.id);
+      setOpen((current) => new Set(current).add(dir));
+      setSelection({ kind: "node", id: node.id });
+    },
+    [requestFit],
+  );
+
+  const fileByPath = useMemo(() => new Map(files.map((f) => [f.path, f])), [files]);
+  const focusFile = useCallback(
+    (path: string) => {
+      const dir = folded.groupOf.get(path);
+      if (dir === undefined) return;
+      const id = nodeId(dir);
+      // Rows sit in panel order; move the window only if the row is outside it.
+      const rows = folded.groups.find((g) => g.dir === dir)!.files.map((p) => fileByPath.get(p)!).sort(rowOrder);
+      const index = rows.findIndex((f) => f.path === path);
+      const start = open.has(dir) ? (view.nodes.find((n) => n.id === id)?.windowStart ?? 0) : 0;
+      if (index < start || index >= start + PANEL_ROW_LIMIT) {
+        setScroll((current) => new Map(current).set(dir, Math.max(0, index - Math.floor(PANEL_ROW_LIMIT / 2))));
+      }
+      requestFit(id);
+      setOpen((current) => (current.has(dir) ? current : new Set(current).add(dir)));
+      setSelection({ kind: "row", node: id, path });
+    },
+    [folded, fileByPath, open, view, requestFit],
+  );
+
+  const actions = useMemo<MapActions>(
+    () => ({
+      close: (dir) => {
+        setOpen((current) => {
+          const next = new Set(current);
+          next.delete(dir);
+          return next;
+        });
+        // A selected row goes away with its panel, and it reopens at the top.
+        setSelection((current) => (current?.kind === "row" && current.node === nodeId(dir) ? null : current));
+        setScroll((current) => {
+          const next = new Map(current);
+          next.delete(dir);
+          return next;
+        });
+      },
+      select: setSelection,
+      scroll: (dir, start) => setScroll((current) => new Map(current).set(dir, start)),
+      hover: setHover,
+    }),
+    [],
+  );
+
+  const deselect = useCallback(() => setSelection(null), []);
+
+  return { fold: folded, view, layout, highlight, selection, hover, actions, focusFile, deselect, setHover, onNodeClick };
+}
+
+/** The canvas. All state comes from the controller. */
+export function DependencyMap({ map }: { map: MapController }) {
+  const { view, layout, highlight, selection, hover, actions, deselect, setHover, onNodeClick } = map;
 
   const nodes = useMemo(
     () =>
@@ -106,77 +223,34 @@ function MapCanvas({ files, edges, rootName }: DependencyMapProps) {
     [view, highlight, selection],
   );
 
-  // Opening relayouts the whole map. The refit runs after the render that
-  // carries the new layout, so it fits the panel where it is now, not where
-  // the folder was. Nodes that were on screen before the click are tracked by
-  // id and kept on screen too, wherever the relayout moved them.
-  const pendingFit = useRef<{ panel: string; keep: string[] } | null>(null);
-  const { getViewport, setViewport } = useReactFlow();
-  const screenWidth = useStore((s) => s.width);
-  const screenHeight = useStore((s) => s.height);
-  useEffect(() => {
-    const pending = pendingFit.current;
-    if (pending === null) return;
-    pendingFit.current = null;
-    const boxes = [pending.panel, ...pending.keep].map((id) => layout.boxes.get(id)).filter((b) => b !== undefined);
-    if (boxes.length === 0 || screenWidth === 0 || screenHeight === 0) return;
-    const next = refitToInclude(getViewport(), { width: screenWidth, height: screenHeight }, unionOf(boxes), MIN_ZOOM);
-    if (next) void setViewport(next, { duration: 250 });
-  }, [layout, getViewport, setViewport, screenWidth, screenHeight]);
-
-  const onNodeClick = useCallback<NodeMouseHandler>(
-    (_, node) => {
-      if (node.type !== "folder") return; // panels handle their own clicks
-      const dir = (node as FolderNodeType).data.node.dir;
-      const keep = onScreen(getViewport(), { width: screenWidth, height: screenHeight }, layout.boxes);
-      pendingFit.current = { panel: node.id, keep };
-      setOpen((current) => new Set(current).add(dir));
-      setSelection({ kind: "node", id: node.id });
-    },
-    [layout, getViewport, screenWidth, screenHeight],
-  );
-
-  const actions = useMemo<MapActions>(
-    () => ({
-      close: (dir) => {
-        setOpen((current) => {
-          const next = new Set(current);
-          next.delete(dir);
-          return next;
-        });
-        // A selected row goes away with its panel, and it reopens at the top.
-        setSelection((current) => (current?.kind === "row" && current.node === nodeId(dir) ? null : current));
-        setScroll((current) => {
-          const next = new Map(current);
-          next.delete(dir);
-          return next;
-        });
-      },
-      select: setSelection,
-      scroll: (dir, start) => setScroll((current) => new Map(current).set(dir, start)),
-    }),
-    [],
-  );
-
   return (
     <MapActionsContext value={actions}>
-      <ReactFlow
-        nodes={nodes}
-        edges={flowEdges}
-        nodeTypes={nodeTypes}
-        onNodeClick={onNodeClick}
-        onPaneClick={() => setSelection(null)}
-        nodesDraggable={false}
-        nodesConnectable={false}
-        elementsSelectable={false}
-        fitView
-        fitViewOptions={{ padding: 0.08 }}
-        minZoom={MIN_ZOOM}
-        maxZoom={MAX_ZOOM}
-        className="cartograph-map"
-      >
-        <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="var(--border)" />
-      </ReactFlow>
+      <MapHoverContext value={hover}>
+        <ReactFlow
+          nodes={nodes}
+          edges={flowEdges}
+          nodeTypes={nodeTypes}
+          onNodeClick={onNodeClick}
+          // Panels report hover per row and header themselves.
+          onNodeMouseEnter={(_, node) => {
+            if (node.type === "folder") setHover({ kind: "node", id: node.id });
+          }}
+          onNodeMouseLeave={(_, node) => {
+            if (node.type === "folder") setHover(null);
+          }}
+          onPaneClick={deselect}
+          nodesDraggable={false}
+          nodesConnectable={false}
+          elementsSelectable={false}
+          fitView
+          fitViewOptions={{ padding: 0.08 }}
+          minZoom={MIN_ZOOM}
+          maxZoom={MAX_ZOOM}
+          className="cartograph-map"
+        >
+          <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="var(--border)" />
+        </ReactFlow>
+      </MapHoverContext>
     </MapActionsContext>
   );
 }

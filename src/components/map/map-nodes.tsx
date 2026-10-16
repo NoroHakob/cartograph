@@ -1,7 +1,7 @@
 "use client";
 
 import { Handle, Position, useUpdateNodeInternals, type Node, type NodeProps } from "@xyflow/react";
-import { createContext, use, useEffect, type CSSProperties, type MouseEvent, type UIEvent } from "react";
+import { createContext, use, useEffect, useRef, type CSSProperties, type MouseEvent, type UIEvent } from "react";
 import { CATEGORY_COLORS } from "@/map/categories";
 import { PANEL_HEADER_HEIGHT, PANEL_ROW_HEIGHT } from "@/map/layout";
 import type { Highlight, Selection } from "@/map/selection";
@@ -23,9 +23,21 @@ export interface MapActions {
   select: (selection: Selection) => void;
   /** An open panel's list scrolled so `start` is its first fully visible row. */
   scroll: (dir: string, start: number) => void;
+  /** The pointer moved onto a folder or a file, or off everything (null). */
+  hover: (hover: { kind: "node"; id: string } | { kind: "file"; path: string } | null) => void;
 }
 
 export const MapActionsContext = createContext<MapActions | null>(null);
+
+/** What the pointer is over, here or in the detail pane, resolved to a node. */
+export interface HoverTarget {
+  /** The node holding the hovered thing. */
+  node: string;
+  /** The hovered file, or null when a whole folder is hovered. */
+  file: string | null;
+}
+
+export const MapHoverContext = createContext<HoverTarget | null>(null);
 
 function useMapActions(): MapActions {
   const actions = use(MapActionsContext);
@@ -46,6 +58,8 @@ export type PanelNodeType = Node<NodeData, "panel">;
 const hiddenHandle: CSSProperties = { opacity: 0, width: 1, height: 1, minWidth: 0, minHeight: 0, border: 0 };
 
 const DIM = "opacity-25";
+/** Something hovered in the detail pane, shown on the map. */
+const HOVER_RING = "ring-2 ring-accent";
 
 function LanguageBar({ node }: { node: ViewNode }) {
   return (
@@ -62,12 +76,13 @@ export function FolderNode({ data }: NodeProps<FolderNodeType>) {
   const { node, highlight, selection } = data;
   const selected = selection?.kind === "node" && selection.id === node.id;
   const dim = highlight !== null && !highlight.nodes.has(node.id);
+  const hovered = use(MapHoverContext)?.node === node.id;
   return (
     <div
       title={`${node.dir} · ${node.stats.fileCount} files · ${node.stats.fanIn} depend on it`}
       className={`flex h-full w-full cursor-pointer flex-col justify-between rounded-lg border bg-surface px-3.5 py-2 transition-opacity hover:border-fg-muted ${
         selected ? "border-accent ring-2 ring-ring" : "border-border"
-      } ${dim ? DIM : ""}`}
+      } ${hovered ? `${HOVER_RING} opacity-100` : dim ? DIM : ""}`}
     >
       <Handle type="target" position={Position.Left} id={FOLDED_IN} style={hiddenHandle} isConnectable={false} />
       <div className="min-w-0">
@@ -89,7 +104,9 @@ export function FolderNode({ data }: NodeProps<FolderNodeType>) {
  */
 export function PanelNode({ id, data }: NodeProps<PanelNodeType>) {
   const { node, highlight, selection } = data;
-  const { close, select, scroll } = useMapActions();
+  const { close, select, scroll, hover } = useMapActions();
+  const hovering = use(MapHoverContext);
+  const listRef = useRef<HTMLUListElement>(null);
   const updateNodeInternals = useUpdateNodeInternals();
   const whole = highlight === null || highlight.nodes.has(node.id);
   const dimFrame = !whole && !highlight.frames.has(node.id);
@@ -99,6 +116,11 @@ export function PanelNode({ id, data }: NodeProps<PanelNodeType>) {
   const selected = selection?.kind === "node" && selection.id === node.id;
   const scrollable = node.rows.length > PANEL_ROW_LIMIT;
   const windowEnd = node.windowStart + PANEL_ROW_LIMIT;
+  const hoveredRow = hovering?.node === node.id ? hovering.file : null;
+  // The panel rings when it is hovered whole, or for a row scrolled out of view.
+  const hoveredFrame =
+    hovering?.node === node.id &&
+    (hoveredRow === null || !node.rows.slice(node.windowStart, windowEnd).some((r) => r.path === hoveredRow));
   const stop = (fn: () => void) => (event: MouseEvent) => {
     event.stopPropagation();
     fn();
@@ -109,6 +131,15 @@ export function PanelNode({ id, data }: NodeProps<PanelNodeType>) {
   useEffect(() => {
     updateNodeInternals(id);
   }, [id, node.windowStart, updateNodeInternals]);
+
+  // The window can move without the list scrolling, when a file is focused
+  // from the detail pane. Bring the list to it.
+  useEffect(() => {
+    const list = listRef.current;
+    if (list && Math.round(list.scrollTop / PANEL_ROW_HEIGHT) !== node.windowStart) {
+      list.scrollTop = node.windowStart * PANEL_ROW_HEIGHT;
+    }
+  }, [node.windowStart]);
 
   const onScroll = (event: UIEvent<HTMLUListElement>) => {
     const start = Math.round(event.currentTarget.scrollTop / PANEL_ROW_HEIGHT);
@@ -121,11 +152,13 @@ export function PanelNode({ id, data }: NodeProps<PanelNodeType>) {
       onClick={() => select({ kind: "node", id: node.id })}
       className={`flex h-full w-full cursor-default flex-col overflow-hidden rounded-lg border bg-surface shadow-sm transition-opacity ${
         selected ? "border-accent ring-2 ring-ring" : "border-fg-muted/50"
-      } ${dimFrame ? DIM : ""}`}
+      } ${hoveredFrame ? HOVER_RING : ""} ${dimFrame && !hoveredFrame ? DIM : ""}`}
     >
       <button
         type="button"
         onClick={stop(() => close(node.dir))}
+        onMouseEnter={() => hover({ kind: "node", id: node.id })}
+        onMouseLeave={() => hover(null)}
         title={`Close ${node.dir}`}
         style={{ height: PANEL_HEADER_HEIGHT }}
         className="relative flex shrink-0 flex-col justify-center gap-1 border-b border-border bg-surface-muted px-3 text-left hover:bg-border/60"
@@ -141,6 +174,7 @@ export function PanelNode({ id, data }: NodeProps<PanelNodeType>) {
         </span>
       </button>
       <ul
+        ref={listRef}
         onScroll={scrollable ? onScroll : undefined}
         // nowheel: the wheel scrolls the list instead of zooming the map.
         className={`flex shrink-0 flex-col scrollbar-thin ${scrollable ? "nowheel snap-y snap-mandatory overflow-y-auto overscroll-contain" : ""}`}
@@ -155,11 +189,13 @@ export function PanelNode({ id, data }: NodeProps<PanelNodeType>) {
               <button
                 type="button"
                 onClick={stop(() => select({ kind: "row", node: node.id, path: row.path }))}
+                onMouseEnter={() => hover({ kind: "file", path: row.path })}
+                onMouseLeave={() => hover(null)}
                 title={`${row.path} · ${row.fanIn} files import it`}
                 aria-pressed={rowSelected}
                 className={`flex h-full w-full items-center gap-2 px-3 text-left transition-opacity hover:bg-surface-muted ${
                   rowSelected ? "bg-accent/12" : ""
-                } ${dimRow(row.path) ? DIM : ""}`}
+                } ${hoveredRow === row.path ? "bg-accent/20 ring-2 ring-accent ring-inset" : dimRow(row.path) ? DIM : ""}`}
               >
                 <span aria-hidden className="size-2 shrink-0 rounded-sm" style={{ backgroundColor: CATEGORY_COLORS[row.language] }} />
                 <span className="min-w-0 flex-1 truncate font-mono text-[12px]">{row.label}</span>

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CategoryRail } from "@/components/map/category-rail";
-import { DependencyMap } from "@/components/map/dependency-map";
-import { MapShell } from "@/components/map/map-shell";
+import { MapWorkspace } from "@/components/map/map-workspace";
 import { categoriesOf } from "@/map/categories";
+import type { RepoFacts } from "@/map/detail";
 import { FIXTURE_REPOSITORY, loadFixture } from "./fixture";
 
 export const metadata: Metadata = {
@@ -17,15 +17,18 @@ export default function PreviewPage() {
   if (process.env.NODE_ENV === "production") notFound();
 
   const result = loadFixture();
-  // The client gets only the fields the map reads, in the parser's own shape.
-  const files = result.files.map(({ path, folder, language, fanIn, fanOut }) => ({ path, folder, language, fanIn, fanOut }));
+  // The client gets only the fields the map and the detail pane read, in the
+  // parser's own shape. Everything the pane shows is in this payload, so
+  // selecting something never goes back to the server.
+  const files = result.files.map(({ path, folder, language, lineCount, fanIn, fanOut }) => ({ path, folder, language, lineCount, fanIn, fanOut }));
   const edges = result.edges.map(({ source, target, typeOnly }) => ({ source, target, typeOnly }));
-  const rootName = FIXTURE_REPOSITORY.split("/").pop()!;
+  const facts: RepoFacts = {
+    name: FIXTURE_REPOSITORY.split("/").pop()!,
+    framework: result.adapter.name,
+    importCount: result.imports.length,
+    routes: result.routes,
+    entryPoints: result.entryPoints.flatMap(({ path, origin }) => (path === null ? [] : [{ path, origin }])),
+  };
 
-  return (
-    <MapShell
-      rail={<CategoryRail categories={categoriesOf(result.files)} />}
-      canvas={<DependencyMap files={files} edges={edges} rootName={rootName} />}
-    />
-  );
+  return <MapWorkspace rail={<CategoryRail categories={categoriesOf(result.files)} />} files={files} edges={edges} facts={facts} />;
 }
