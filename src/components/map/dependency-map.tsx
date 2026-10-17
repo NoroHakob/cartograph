@@ -13,7 +13,7 @@ import {
 } from "@xyflow/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { fold, type Fold } from "@/map/fold";
-import type { Language } from "@/parser/types";
+import type { RoleId } from "@/parser/taxonomy";
 import { layoutView, type MapLayout } from "@/map/layout";
 import { onScreen, refitToInclude, unionOf } from "@/map/refit";
 import { highlightFor, type Highlight, type Selection } from "@/map/selection";
@@ -49,8 +49,8 @@ export interface MapController {
   selection: Selection | null;
   hover: HoverTarget | null;
   /** The rail's chosen category. Files outside it dim; nothing is removed. */
-  category: Language | null;
-  setCategory: (category: Language | null) => void;
+  category: RoleId | null;
+  setCategory: (category: RoleId | null) => void;
   actions: MapActions;
   /** Opens the folder holding `path`, scrolls its row into view and selects it. */
   focusFile: (path: string) => void;
@@ -72,7 +72,7 @@ export function useMapController(files: readonly MapFile[], edges: readonly MapE
   const [selection, setSelection] = useState<Selection | null>(null);
   const [scroll, setScroll] = useState<ReadonlyMap<string, number>>(() => new Map());
   const [hoverState, setHover] = useState<Hover | null>(null);
-  const [category, setCategory] = useState<Language | null>(null);
+  const [category, setCategory] = useState<RoleId | null>(null);
 
   const view = useMemo(
     () => computeView(folded, stats, files, edges, open, rootName, scroll),
@@ -184,7 +184,7 @@ export function DependencyMap({ map, files }: { map: MapController; files: reado
   // An edge stays in the chosen category when a file at either end is in it.
   const inCategory = useMemo(() => {
     if (category === null) return null;
-    const matching = new Set(files.filter((f) => f.language === category).map((f) => f.path));
+    const matching = new Set(files.filter((f) => f.role === category).map((f) => f.path));
     return (edge: MapView["edges"][number]) => edge.sourceFiles.some((p) => matching.has(p)) || edge.targetFiles.some((p) => matching.has(p));
   }, [files, category]);
 

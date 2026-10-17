@@ -1,20 +1,44 @@
+import type { RoleId } from "../taxonomy.ts";
+import { FRAMEWORKS } from "../taxonomy.ts";
 import type { EntryPoint } from "../types.ts";
 import type { Adapter, RepoContext } from "./adapter.ts";
+import { isConfigFile, isTestFile } from "./conventions.ts";
 
 /**
  * The fallback: assumes no framework at all. Entry points come only from what
- * package.json declares, which is Node's packaging, not a framework's. There
- * are no routes, because without a framework nothing turns a file into one.
+ * package.json declares, which is Node's packaging, not a framework's. Roles
+ * are the generic ones every toolchain shares. There are no routes, because
+ * without a framework nothing turns a file into one.
  */
 export const noFrameworkAdapter: Adapter = {
   id: "none",
-  name: "No framework",
+  name: FRAMEWORKS.none.name,
   detect: () => true,
   entryPoints: (repo) => repo.modules.flatMap((mod) => packageEntryPoints(repo, mod.dir)),
+  roles: (repo, entryPoints) => {
+    const entries = entryPaths(entryPoints);
+    return new Map(repo.files.map((f) => [f.path, genericRole(f.path, entries) ?? "source"]));
+  },
   routes: () => [],
 };
 
-function packageEntryPoints(repo: RepoContext, dir: string): EntryPoint[] {
+/** The nodes entry points resolved to. */
+export function entryPaths(entryPoints: readonly EntryPoint[]): Set<string> {
+  return new Set(entryPoints.flatMap((e) => (e.path === null ? [] : [e.path])));
+}
+
+/**
+ * Roles any repository can have, in precedence order: a test is a test even
+ * when package.json points at it. Undefined when none applies.
+ */
+export function genericRole(file: string, entries: ReadonlySet<string>): RoleId | undefined {
+  if (isTestFile(file)) return "test";
+  if (isConfigFile(file)) return "config";
+  if (entries.has(file)) return "entry";
+  return undefined;
+}
+
+export function packageEntryPoints(repo: RepoContext, dir: string): EntryPoint[] {
   const pkg = repo.packageJsons.get(dir);
   if (!pkg) return [];
   const where = dir === "." ? "package.json" : `${dir}/package.json`;

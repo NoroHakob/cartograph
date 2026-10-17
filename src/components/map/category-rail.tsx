@@ -1,24 +1,28 @@
 import type { FileCategory } from "@/map/categories";
-import type { Language } from "@/parser/types";
+import type { RoleId } from "@/parser/taxonomy";
 
 /**
- * The left rail: one row per category of file. Choosing one dims every file
+ * The left rail: one row per role the framework adapter assigned, in the
+ * framework's fixed reading order. Choosing one dims every file
  * outside it on the map, without removing anything, and each folder says how
  * many of its files matched. Choosing it again, or Clear, undoes that.
  */
 export function CategoryRail({
+  framework,
   categories,
   active,
   onSelect,
 }: {
+  /** The framework the adapter detected, which decides what the categories are. */
+  framework: string;
   categories: FileCategory[];
-  active: Language | null;
-  onSelect: (category: Language | null) => void;
+  active: RoleId | null;
+  onSelect: (category: RoleId | null) => void;
 }) {
   return (
     <div className="flex flex-col gap-2 p-3">
       <div className="flex items-baseline justify-between px-1">
-        <h2 className="text-xs font-medium tracking-wide text-fg-muted uppercase">Categories</h2>
+        <h2 className="text-xs font-medium tracking-wide text-fg-muted uppercase">{framework}</h2>
         {active !== null && (
           <button type="button" onClick={() => onSelect(null)} className="text-xs text-accent hover:underline">
             Clear

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import path from "node:path";
 import { describe, test } from "node:test";
 import { readParseResult } from "../parser/output";
+import { FRAMEWORKS } from "../parser/taxonomy";
 import { categoriesOf } from "./categories";
 import { fold, foldAt, MAX_READABLE_NODES } from "./fold";
 import { layoutView } from "./layout";
@@ -11,7 +12,7 @@ import { ABOVE_IN, BELOW_IN, computeView, groupStats, nodeId, PANEL_ROW_LIMIT, r
 
 const file = (p: string, fanIn = 0): MapFile => {
   const slash = p.lastIndexOf("/");
-  return { path: p, folder: slash < 0 ? "." : p.slice(0, slash), language: "ts", fanIn, fanOut: 0 };
+  return { path: p, folder: slash < 0 ? "." : p.slice(0, slash), language: "ts", role: "source", fanIn, fanOut: 0 };
 };
 
 const dirsOf = (files: MapFile[], threshold: number) => foldAt(files, threshold).groups.map((g) => `${g.dir}:${g.files.length}`);
@@ -199,7 +200,13 @@ describe("the hono fixture", () => {
     assert.deepEqual([...once.boxes], [...twice.boxes]);
   });
 
-  test("categories cover every file", () => {
-    assert.equal(categoriesOf(result.files).reduce((n, c) => n + c.fileCount, 0), result.files.length);
+  test("categories cover every file, in the framework's fixed order", () => {
+    const categories = categoriesOf(result.adapter.id, result.files);
+    assert.equal(categories.reduce((n, c) => n + c.fileCount, 0), result.files.length);
+    const order = FRAMEWORKS[result.adapter.id].roles;
+    assert.deepEqual(
+      categories.map((c) => c.id),
+      order.filter((id) => categories.some((c) => c.id === id)),
+    );
   });
 });

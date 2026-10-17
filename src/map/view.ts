@@ -1,7 +1,7 @@
 // What is on screen for a given fold and set of open folders. Everything here
 // is derived from the parser's files and edges; nothing is added or renamed.
 
-import type { Edge, FileNode, Language } from "@/parser/types";
+import type { Edge, FileNode, Language, RoleId } from "@/parser/types";
 import type { Fold } from "./fold";
 
 /**
@@ -10,7 +10,7 @@ import type { Fold } from "./fold";
  */
 export const PANEL_ROW_LIMIT = 12;
 
-export type MapFile = Pick<FileNode, "path" | "folder" | "language" | "fanIn" | "fanOut">;
+export type MapFile = Pick<FileNode, "path" | "folder" | "language" | "role" | "fanIn" | "fanOut">;
 export type MapEdge = Pick<Edge, "source" | "target" | "typeOnly">;
 
 export interface GroupStats {
@@ -22,12 +22,15 @@ export interface GroupStats {
   fanOut: number;
   /** File count per extension, largest first. */
   languages: { language: Language; count: number }[];
+  /** File count per role, largest first. */
+  roles: { role: RoleId; count: number }[];
 }
 
 export interface ViewRow {
   path: string;
   label: string;
   language: Language;
+  role: RoleId;
   fanIn: number;
   fanOut: number;
 }
@@ -94,11 +97,16 @@ export function groupStats(fold: Fold, files: readonly MapFile[], edges: readonl
     fanOut.set(from, (fanOut.get(from) ?? new Set()).add(edge.target));
   }
 
-  const language = new Map(files.map((f) => [f.path, f.language]));
+  const fileByPath = new Map(files.map((f) => [f.path, f]));
   const stats = new Map<string, GroupStats>();
   for (const group of fold.groups) {
     const counts = new Map<Language, number>();
-    for (const file of group.files) counts.set(language.get(file)!, (counts.get(language.get(file)!) ?? 0) + 1);
+    const roles = new Map<RoleId, number>();
+    for (const path of group.files) {
+      const file = fileByPath.get(path)!;
+      counts.set(file.language, (counts.get(file.language) ?? 0) + 1);
+      roles.set(file.role, (roles.get(file.role) ?? 0) + 1);
+    }
     stats.set(group.dir, {
       dir: group.dir,
       fileCount: group.files.length,
@@ -107,6 +115,9 @@ export function groupStats(fold: Fold, files: readonly MapFile[], edges: readonl
       languages: [...counts]
         .map(([language, count]) => ({ language, count }))
         .sort((a, b) => b.count - a.count || byPath(a.language, b.language)),
+      roles: [...roles]
+        .map(([role, count]) => ({ role, count }))
+        .sort((a, b) => b.count - a.count || byPath(a.role, b.role)),
     });
   }
   return stats;
@@ -186,7 +197,7 @@ export function computeView(
       label: group.dir === "." ? rootName : labels.get(group.dir)!,
       open: open.has(group.dir),
       stats: stats.get(group.dir)!,
-      rows: rows.map((f) => ({ path: f.path, label: labels.get(f.path)!, language: f.language, fanIn: f.fanIn, fanOut: f.fanOut })),
+      rows: rows.map((f) => ({ path: f.path, label: labels.get(f.path)!, language: f.language, role: f.role, fanIn: f.fanIn, fanOut: f.fanOut })),
       windowStart: start,
       hiddenAbove: start,
       hiddenBelow: Math.max(0, rows.length - start - PANEL_ROW_LIMIT),

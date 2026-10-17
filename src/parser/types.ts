@@ -1,7 +1,12 @@
 // The parser's output contract. Everything built after the parser reads this
 // shape, so changes here are breaking changes: bump PARSE_RESULT_VERSION.
 
-export const PARSE_RESULT_VERSION = 1;
+import type { FrameworkId, RoleId } from "./taxonomy.ts";
+
+export type { FrameworkId, RoleId } from "./taxonomy.ts";
+
+/** 2: files carry a role, routes carry a line, the adapter id is a FrameworkId. */
+export const PARSE_RESULT_VERSION = 2;
 
 /** Matches the `language` check on the `files` table. */
 export type Language = "ts" | "tsx" | "js" | "jsx" | "mjs" | "cjs" | "mts" | "cts";
@@ -19,6 +24,8 @@ export interface FileNode {
   module: string;
   fanIn: number;
   fanOut: number;
+  /** What the adapter says the file is, from its path, name or directives. One per file. */
+  role: RoleId;
 }
 
 /**
@@ -138,11 +145,19 @@ export interface EntryPoint {
 /** Matches the `kind` check on the `routes` table. */
 export type RouteKind = "page" | "layout" | "route_handler" | "middleware" | "api";
 
+/**
+ * A route the framework serves. Adapters emit one only when both the method
+ * and the full path pattern are read straight from syntax or file paths; a
+ * route that would need guessing is left out, never approximated.
+ */
 export interface Route {
   file: string;
+  /** The full pattern in the framework's own syntax, e.g. "/users/:id" or "/blog/[slug]". */
   path: string;
   kind: RouteKind;
   methods: string[];
+  /** 1-based line of the code that declares it; null when the file's path alone declares it. */
+  line: number | null;
 }
 
 export interface ConfigNote {
@@ -155,7 +170,7 @@ export interface ParseResult {
   version: typeof PARSE_RESULT_VERSION;
   /** Absolute path that was parsed. Informational only. */
   root: string;
-  adapter: { id: string; name: string };
+  adapter: { id: FrameworkId; name: string };
   modules: Module[];
   files: FileNode[];
   excludedFiles: ExcludedFile[];

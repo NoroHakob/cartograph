@@ -1,33 +1,32 @@
-// Categories of file. For now a file's category is its extension, which the
-// parser already records as `language`. Role-based categories come later.
+// Categories of file: the roles the parser's framework adapter assigned. The
+// names and order come from the taxonomy, which is plain data, so this file
+// pulls nothing of the parser into the browser bundle.
 
-import type { FileNode, Language } from "@/parser/types";
+import { FRAMEWORKS, ROLES, type FrameworkId, type RoleId } from "@/parser/taxonomy";
+import type { FileNode } from "@/parser/types";
 
 export interface FileCategory {
-  id: Language;
-  /** What the rail shows, e.g. ".tsx". */
+  id: RoleId;
+  /** What the rail shows: the concrete role, e.g. "Controllers". */
   name: string;
-  /** Mid-tone colours that read on both the light and the dark surface. */
   color: string;
   fileCount: number;
 }
 
-export const CATEGORY_COLORS: Record<Language, string> = {
-  ts: "#3b82c4",
-  tsx: "#16a3a8",
-  js: "#d0a12a",
-  jsx: "#e07a3a",
-  mjs: "#9b6ad6",
-  cjs: "#b5664f",
-  mts: "#5b6fe0",
-  cts: "#7d8a99",
-};
+/** A role's colour, the same on the rail, the map and the detail pane. */
+export function roleColor(role: RoleId): string {
+  return ROLES[role].color;
+}
 
-/** One entry per extension present, largest first, ties by name. */
-export function categoriesOf(files: readonly Pick<FileNode, "language">[]): FileCategory[] {
-  const counts = new Map<Language, number>();
-  for (const file of files) counts.set(file.language, (counts.get(file.language) ?? 0) + 1);
-  return [...counts]
-    .map(([id, fileCount]) => ({ id, name: `.${id}`, color: CATEGORY_COLORS[id], fileCount }))
-    .sort((a, b) => b.fileCount - a.fileCount || (a.id < b.id ? -1 : 1));
+/**
+ * One entry per role present, in the framework's fixed reading order: never
+ * re-sorted by count, so a repository's categories always sit in the same
+ * places. Roles no file has are left out. The counts add up to the file count.
+ */
+export function categoriesOf(framework: FrameworkId, files: readonly Pick<FileNode, "role">[]): FileCategory[] {
+  const counts = new Map<RoleId, number>();
+  for (const file of files) counts.set(file.role, (counts.get(file.role) ?? 0) + 1);
+  return FRAMEWORKS[framework].roles
+    .filter((id) => counts.has(id))
+    .map((id) => ({ id, name: ROLES[id].name, color: ROLES[id].color, fileCount: counts.get(id)! }));
 }

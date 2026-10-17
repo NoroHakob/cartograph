@@ -4,7 +4,9 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { rerunAnalysis } from "../../actions";
+import { loadRouteTable } from "./explorer-data";
 import { AnalysisProgress } from "./progress";
+import { RoutesTable } from "./routes-table";
 
 export const metadata: Metadata = {
   title: "Analysis · Cartograph",
@@ -73,8 +75,28 @@ async function Analysis({ params }: { params: PageProps<"/o/[slug]/analyses/[id]
         loadedAt={loadedAt}
         rerun={rerunAnalysis.bind(null, analysis.id)}
       />
+
+      {analysis.status === "complete" && (
+        <>
+          <Link
+            href={`/o/${slug}/analyses/${analysis.id}/map`}
+            className="mt-8 inline-flex h-9 items-center rounded-md bg-accent px-4 text-sm font-medium text-accent-fg outline-none transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            Open the map
+          </Link>
+          <Suspense fallback={<div aria-hidden className="mt-12 h-32 rounded-lg bg-surface-muted" />}>
+            <Routes analysisId={analysis.id} />
+          </Suspense>
+        </>
+      )}
     </>
   );
+}
+
+async function Routes({ analysisId }: { analysisId: string }) {
+  const table = await loadRouteTable(analysisId);
+  if (!table) return null;
+  return <RoutesTable routes={table.routes} framework={table.framework} />;
 }
 
 // As the signed-in user: another organization's analysis isn't hidden here,

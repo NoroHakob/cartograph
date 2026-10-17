@@ -33,7 +33,7 @@ function Workspace({ categories, files, edges, facts }: MapWorkspaceProps) {
   const [reachMode, setReachMode] = useState<ReachMode | null>(null);
   return (
     <MapShell
-      rail={<CategoryRail categories={categories} active={map.category} onSelect={map.setCategory} />}
+      rail={<CategoryRail framework={facts.framework} categories={categories} active={map.category} onSelect={map.setCategory} />}
       canvas={<DependencyMap map={map} files={files} />}
       detail={
         <DetailPane map={map} files={files} edges={edges} facts={facts} tab={tab} onTab={setTab} reachMode={reachMode} onReachMode={setReachMode} />

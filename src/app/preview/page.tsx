@@ -19,7 +19,7 @@ export default function PreviewPage() {
   // The client gets only the fields the map and the detail pane read, in the
   // parser's own shape. Everything the pane shows is in this payload, so
   // selecting something never goes back to the server.
-  const files = result.files.map(({ path, folder, language, lineCount, fanIn, fanOut }) => ({ path, folder, language, lineCount, fanIn, fanOut }));
+  const files = result.files.map(({ path, folder, language, role, lineCount, fanIn, fanOut }) => ({ path, folder, language, role, lineCount, fanIn, fanOut }));
   const edges = result.edges.map(({ source, target, typeOnly }) => ({ source, target, typeOnly }));
   const facts: RepoFacts = {
     name: FIXTURE_REPOSITORY.split("/").pop()!,
@@ -29,5 +29,9 @@ export default function PreviewPage() {
     entryPoints: result.entryPoints.flatMap(({ path, origin }) => (path === null ? [] : [{ path, origin }])),
   };
 
-  return <MapWorkspace categories={categoriesOf(result.files)} files={files} edges={edges} facts={facts} />;
+  return (
+    <div className="h-dvh">
+      <MapWorkspace categories={categoriesOf(result.adapter.id, result.files)} files={files} edges={edges} facts={facts} />
+    </div>
+  );
 }

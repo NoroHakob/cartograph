@@ -1,7 +1,8 @@
 import { statSync } from "node:fs";
 import path from "node:path";
+import { Project, ts, type SourceFile } from "ts-morph";
 import { selectAdapter, type Adapter, type RepoContext } from "./adapters/index.ts";
-import { createImportReader } from "./imports.ts";
+import { createImportReader, SCRIPT_KIND } from "./imports.ts";
 import { createResolver } from "./resolve.ts";
 import { loadConfigs } from "./tsconfig.ts";
 import {
@@ -13,6 +14,7 @@ import {
   type ImportExample,
   type ImportKind,
   type ImportRecord,
+  type Language,
   type ParseResult,
 } from "./types.ts";
 import { assignModules, walkRepository } from "./walk.ts";
@@ -20,6 +22,7 @@ import { assignModules, walkRepository } from "./walk.ts";
 export type * from "./types.ts";
 export { PARSE_RESULT_VERSION } from "./types.ts";
 export type { Adapter, RepoContext } from "./adapters/index.ts";
+export { FRAMEWORKS, ROLES } from "./taxonomy.ts";
 
 export interface ParseOptions {
   /** Examples kept per coverage bucket. Every import is still in `imports`. */
@@ -74,7 +77,7 @@ export function parseRepository(dir: string, options: ParseOptions = {}): ParseR
     fanIn.set(edge.target, (fanIn.get(edge.target) ?? 0) + 1);
   }
 
-  const files: FileNode[] = walked.files.map((f) => ({
+  const unlabelled: Omit<FileNode, "role">[] = walked.files.map((f) => ({
     path: f.path,
     folder: f.folder,
     language: f.language,
@@ -85,9 +88,11 @@ export function parseRepository(dir: string, options: ParseOptions = {}): ParseR
     fanOut: fanOut.get(f.path) ?? 0,
   }));
 
+  const walkedByPath = new Map(walked.files.map((f) => [f.path, f]));
+  const syntax = createSyntaxCache((p) => walkedByPath.get(p));
   const repo: RepoContext = {
     root,
-    files,
+    files: unlabelled,
     edges,
     modules,
     packageJsons: walked.packageJsons,
@@ -96,8 +101,21 @@ export function parseRepository(dir: string, options: ParseOptions = {}): ParseR
       const candidates = [p, ...SOURCE_EXTENSIONS.map((e) => p + e), ...SOURCE_EXTENSIONS.map((e) => `${p}/index${e}`)];
       return candidates.find((c) => nodes.has(c)) ?? null;
     },
+    text: (p) => {
+      const file = walkedByPath.get(p);
+      if (!file) throw new Error(`not a node: ${p}`);
+      return file.text;
+    },
+    syntax,
   };
   const adapter = selectAdapter(repo, options.adapters);
+  const entryPoints = adapter.entryPoints(repo);
+  const roles = adapter.roles(repo, entryPoints);
+  const files: FileNode[] = unlabelled.map((f) => {
+    const role = roles.get(f.path);
+    if (role === undefined) throw new Error(`adapter ${adapter.id} gave ${f.path} no role`);
+    return { ...f, role };
+  });
 
   return {
     version: PARSE_RESULT_VERSION,
@@ -109,10 +127,33 @@ export function parseRepository(dir: string, options: ParseOptions = {}): ParseR
     imports,
     edges,
     coverage: summarise(imports, options.examplesPerBucket ?? 10),
-    entryPoints: adapter.entryPoints(repo),
+    entryPoints,
     routes: adapter.routes(repo),
     configNotes: configs.notes,
     stats: { durationMs: Math.round(performance.now() - started), duplicateImportsCollapsed: collapsed },
+  };
+}
+
+/**
+ * Parses a node's text on first request and keeps the tree: adapters ask for
+ * the same few files (configs, controllers, route handlers) more than once.
+ * Syntax only, in memory, like the import reader.
+ */
+function createSyntaxCache(lookup: (p: string) => { text: string; language: Language } | undefined): (p: string) => SourceFile {
+  const project = new Project({
+    useInMemoryFileSystem: true,
+    skipLoadingLibFiles: true,
+    compilerOptions: { allowJs: true, jsx: ts.JsxEmit.Preserve },
+  });
+  const parsed = new Map<string, SourceFile>();
+  return (p) => {
+    const cached = parsed.get(p);
+    if (cached) return cached;
+    const file = lookup(p);
+    if (!file) throw new Error(`not a node: ${p}`);
+    const source = project.createSourceFile(`/${p}`, file.text, { overwrite: true, scriptKind: SCRIPT_KIND[file.language] });
+    parsed.set(p, source);
+    return source;
   };
 }
 

@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState, type ReactNode } from "react";
-import { CATEGORY_COLORS } from "@/map/categories";
+import { roleColor } from "@/map/categories";
+import { ROLES } from "@/parser/taxonomy";
 import {
   CONVENTION_LABELS,
   conventions,
@@ -106,9 +107,13 @@ export function DetailPane({ map, files, edges, facts, tab, onTab, reachMode, on
       <Frame back={back} kicker="File" title={file.path} tab={tab} onTab={onTab}>
         <Section>
           <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-sm">
-            <dt className="text-fg-muted">Kind</dt>
+            <dt className="text-fg-muted">Category</dt>
             <dd className="flex min-w-0 items-center gap-1.5">
-              <Swatch color={CATEGORY_COLORS[file.language]} />
+              <Swatch color={roleColor(file.role)} />
+              {ROLES[file.role].name}
+            </dd>
+            <dt className="text-fg-muted">Kind</dt>
+            <dd className="min-w-0">
               {LANGUAGE_NAMES[file.language]} <span className="font-mono text-xs text-fg-muted">.{file.language}</span>
             </dd>
             <dt className="text-fg-muted">Role</dt>
@@ -155,10 +160,17 @@ export function DetailPane({ map, files, edges, facts, tab, onTab, reachMode, on
           <Stat value={node.stats.fanOut} label="it imports" title="Files outside this folder that something in it imports" />
         </div>
       </Section>
+      <Section title="Categories">
+        <ul className="flex flex-col gap-1 text-sm">
+          {node.stats.roles.map(({ role, count }) => (
+            <CountRow key={role} swatch={roleColor(role)} label={ROLES[role].name} count={count} />
+          ))}
+        </ul>
+      </Section>
       <Section title="Kinds of file">
         <ul className="flex flex-col gap-1 text-sm">
           {folder.languages.map(({ language, count }) => (
-            <CountRow key={language} swatch={CATEGORY_COLORS[language]} label={LANGUAGE_NAMES[language]} sub={`.${language}`} count={count} />
+            <CountRow key={language} label={LANGUAGE_NAMES[language]} sub={`.${language}`} count={count} />
           ))}
         </ul>
       </Section>
@@ -556,7 +568,7 @@ function FileRow({ path, trailing, rowProps }: { path: string; trailing?: ReactN
         title={path}
         className={`flex w-full items-center gap-2 rounded px-1.5 py-1 text-left hover:bg-surface-muted ${lit(path) ? "bg-accent/15 ring-1 ring-accent ring-inset" : ""}`}
       >
-        {file && <Swatch color={CATEGORY_COLORS[file.language]} />}
+        {file && <Swatch color={roleColor(file.role)} />}
         <span className="flex min-w-0 flex-1 items-baseline font-mono text-[12px]">
           <span className="min-w-0 shrink truncate text-fg-muted" dir="rtl">
             {/* rtl truncates from the left, keeping the end of the directory; the bdi keeps slashes in order. */}

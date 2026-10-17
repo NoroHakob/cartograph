@@ -8,7 +8,7 @@ import type { MapEdge } from "./view";
 
 const file = (p: string, fanIn = 0, fanOut = 0): DetailFile => {
   const slash = p.lastIndexOf("/");
-  return { path: p, folder: slash < 0 ? "." : p.slice(0, slash), language: "ts", lineCount: 10, fanIn, fanOut };
+  return { path: p, folder: slash < 0 ? "." : p.slice(0, slash), language: "ts", role: "source", lineCount: 10, fanIn, fanOut };
 };
 const edge = (source: string, target: string, typeOnly = false): MapEdge => ({ source, target, typeOnly });
 const none = conventions({ routes: [], entryPoints: [] });
@@ -16,7 +16,7 @@ const none = conventions({ routes: [], entryPoints: [] });
 describe("conventions", () => {
   test("routes and entry points come from the parser; tests and configs from their names", () => {
     const known = conventions({
-      routes: [{ file: "app/page.tsx", path: "/", kind: "page", methods: [] }],
+      routes: [{ file: "app/page.tsx", path: "/", kind: "page", methods: ["GET"], line: null }],
       entryPoints: [{ path: "src/index.ts", origin: "package.json#main" }],
     });
     assert.deepEqual(known.of("app/page.tsx").map((c) => c.id), ["route"]);

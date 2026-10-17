@@ -1,6 +1,6 @@
 {
-  "version": 1,
-  "root": "C:\\Users\\noroh\\AppData\\Local\\Temp\\claude\\c--Users-noroh-OneDrive-Desktop-Projects-autumn-2026-october-works-cartograph\\a3c9e1d4-9443-42d6-8645-c7b88ac88457\\scratchpad\\repos\\hono",
+  "version": 2,
+  "root": "C:\\Users\\noroh\\AppData\\Local\\Temp\\claude\\c--Users-noroh-OneDrive-Desktop-Projects-autumn-2026-october-works-cartograph\\2a1d0f19-e034-4208-a366-24bac810b819\\scratchpad\\repos\\hono",
   "adapter": {
     "id": "none",
     "name": "No framework"
@@ -100,7 +100,8 @@
       "hash": "a6dbff46776107482272348702e6876d15257b6a01374babc301402b0b80de49",
       "module": "adapters/aws-lambda",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "adapters/aws-lambda/src/conninfo.ts",
@@ -110,7 +111,8 @@
       "hash": "c9806bb1d8f969fc1246ca7e33a7cf67d95a7739e2e232bb5313592496680b57",
       "module": "adapters/aws-lambda",
       "fanIn": 2,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "adapters/aws-lambda/src/handler.test.ts",
@@ -120,7 +122,8 @@
       "hash": "582602cc548f4879f9f294ebf73b6a82372c1e47527c56778ef37b536c6aa8c5",
       "module": "adapters/aws-lambda",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "adapters/aws-lambda/src/handler.ts",
@@ -130,7 +133,8 @@
       "hash": "9982083f12d99c2509138b120afd5f51f62aa24c7406ea8c6ab8338d587c097f",
       "module": "adapters/aws-lambda",
       "fanIn": 7,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "adapters/aws-lambda/src/index.ts",
@@ -140,7 +144,8 @@
       "hash": "4dae2d00d99edcc4f057f6c3c2364a748e2f944a632f6ff7d2d1d391d7e2d7f8",
       "module": "adapters/aws-lambda",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "adapters/aws-lambda/src/types.ts",
@@ -150,7 +155,8 @@
       "hash": "4cf75b45a4d6d8be33618d3e2d08cc177cbd8b0dc4a06a25a651e2ade050f011",
       "module": "adapters/aws-lambda",
       "fanIn": 9,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "adapters/aws-lambda/test/index.test.ts",
@@ -160,7 +166,8 @@
       "hash": "295551a74c66eb46fc5e20ac89d40b4fa65018fd041b0ca61355e8ddf38d6d7d",
       "module": "adapters/aws-lambda",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "adapters/aws-lambda/test/mock.ts",
@@ -170,7 +177,8 @@
       "hash": "266f2e37ec5edcb82b9441fba0d77b583f099a8935b133c6cfddad7a730d9ab2",
       "module": "adapters/aws-lambda",
       "fanIn": 1,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "adapters/aws-lambda/test/stream-backpressure.test.ts",
@@ -180,7 +188,8 @@
       "hash": "fe380803e5ba16133f48309378ac1fee72cba7ce7d3cb9c1b7f7afbd51d681af",
       "module": "adapters/aws-lambda",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "adapters/aws-lambda/test/stream-mock.ts",
@@ -190,7 +199,8 @@
       "hash": "f53d799bd3db212d519b9ce39388c77d059369153b808f38b7deed74640e7d73",
       "module": "adapters/aws-lambda",
       "fanIn": 1,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "adapters/aws-lambda/test/stream.test.ts",
@@ -200,7 +210,8 @@
       "hash": "db4ee528c6f98f4fddd81dea4b661359d19f140abcf14437b364c79e5c1270c8",
       "module": "adapters/aws-lambda",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "adapters/aws-lambda/vite.config.ts",
@@ -210,7 +221,8 @@
       "hash": "7aa9557c0f3c3dd65bdf13e30fa380a7d123e6b76ea769e90a7bd0b87c3b683e",
       "module": "adapters/aws-lambda",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "config"
     },
     {
       "path": "adapters/bun/src/conninfo.test.ts",
@@ -220,7 +232,8 @@
       "hash": "9c785c2d667e6d77f182031563b97f2e9acdc425adfd69b013725d4d439290b4",
       "module": "adapters/bun",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "adapters/bun/src/conninfo.ts",
@@ -230,7 +243,8 @@
       "hash": "03b84b06ce74ae9cf1d7e2248ad624ccb870aa44030ea1cea7a820738c1ed883",
       "module": "adapters/bun",
       "fanIn": 2,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "adapters/bun/src/index.ts",
@@ -240,7 +254,8 @@
       "hash": "2dccb88ae4990dfc1b63008f942445df0180374484209ef59deb925194010fbd",
       "module": "adapters/bun",
       "fanIn": 1,
-      "fanOut": 5
+      "fanOut": 5,
+      "role": "source"
     },
     {
       "path": "adapters/bun/src/serve-static.ts",
@@ -250,7 +265,8 @@
       "hash": "bdb117548297b3e5b86501341b136611194d095ab319ea630c294357b0731199",
       "module": "adapters/bun",
       "fanIn": 1,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "adapters/bun/src/server.test.ts",
@@ -260,7 +276,8 @@
       "hash": "92fd9d5dc865fcab50d29bfd5854a2aa743d618f06b657ab09bf8ef208bf81fb",
       "module": "adapters/bun",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "adapters/bun/src/server.ts",
@@ -270,7 +287,8 @@
       "hash": "54c8b604c74520f00d5bd385f4450e0e7dac8518e9a9fa7b214504db55dc8a96",
       "module": "adapters/bun",
       "fanIn": 4,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "adapters/bun/src/ssg.ts",
@@ -280,7 +298,8 @@
       "hash": "a689ac430086a91b9e6aac5ead77ec707be5c2c804fda45544c5dea8156b6554",
       "module": "adapters/bun",
       "fanIn": 1,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "adapters/bun/src/websocket.test.ts",
@@ -290,7 +309,8 @@
       "hash": "a9faf8754642eb459d409b3cd5c310d2913265b090b0822f693492778f9b7d29",
       "module": "adapters/bun",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "adapters/bun/src/websocket.ts",
@@ -300,7 +320,8 @@
       "hash": "a7cd2f445e77b8e5285342cd6ec1d0f102e06425ef14c7d8d54ff29426f71382",
       "module": "adapters/bun",
       "fanIn": 2,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "adapters/bun/test/index.test.ts",
@@ -310,7 +331,8 @@
       "hash": "1edef860ceb530a10fc42aae27e99159bef2847d78721e4b1fd6b850b323a306",
       "module": "adapters/bun",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "adapters/bun/vite.config.ts",
@@ -320,7 +342,8 @@
       "hash": "a43fa772a61f7f60243ea08b0113ef528b0055baa563ce36a6f8a37f5c16482d",
       "module": "adapters/bun",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "config"
     },
     {
       "path": "adapters/cloudflare-workers/src/conninfo.test.ts",
@@ -330,7 +353,8 @@
       "hash": "4218e5b69702c02aa99c3127188a8b459e6ea37a925dfe07c03214808e8083b2",
       "module": "adapters/cloudflare-workers",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "adapters/cloudflare-workers/src/conninfo.ts",
@@ -340,7 +364,8 @@
       "hash": "5ac965219bc9a88af654747f094ac5e1a0d597ab67291295a54a7d8d6a3c68ef",
       "module": "adapters/cloudflare-workers",
       "fanIn": 2,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "adapters/cloudflare-workers/src/index.ts",
@@ -350,7 +375,8 @@
       "hash": "20d8d14d17a7efd6e2f0debd62213304355fd6b5e845fed689196b73e45c2b59",
       "module": "adapters/cloudflare-workers",
       "fanIn": 2,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "adapters/cloudflare-workers/src/serve-static-module.ts",
@@ -360,7 +386,8 @@
       "hash": "acb75fd71a53f8134a168a6309f501fa3a03c1af3ff98cf1903a262baca94ab0",
       "module": "adapters/cloudflare-workers",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "adapters/cloudflare-workers/src/serve-static.test.ts",
@@ -370,7 +397,8 @@
       "hash": "dd2cc7cd27e9a714d70031f569bcdb5bbcf502a7839099dc757468c698b1d705",
       "module": "adapters/cloudflare-workers",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "adapters/cloudflare-workers/src/serve-static.ts",
@@ -380,7 +408,8 @@
       "hash": "ee3f059e1168accea41d3ebb52a9ed24b6725550970039a37a85e5f4d4a3ce04",
       "module": "adapters/cloudflare-workers",
       "fanIn": 2,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "adapters/cloudflare-workers/src/utils.test.ts",
@@ -390,7 +419,8 @@
       "hash": "6e1880bbea905ae01cb9164a8c64c3ab744f8245f75dc1f55ac750f31a31dbd9",
       "module": "adapters/cloudflare-workers",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "adapters/cloudflare-workers/src/utils.ts",
@@ -400,7 +430,8 @@
       "hash": "2fd585d81dad9544072c898c53cabfef47a802fd8004c33c9a0f34bc26d4b95b",
       "module": "adapters/cloudflare-workers",
       "fanIn": 2,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "adapters/cloudflare-workers/src/websocket.test.ts",
@@ -410,7 +441,8 @@
       "hash": "ea5397cb94e4edab595e636f5290f80c37d1349631a399dca3bec1e0f41a4427",
       "module": "adapters/cloudflare-workers",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "adapters/cloudflare-workers/src/websocket.ts",
@@ -420,7 +452,8 @@
       "hash": "043618f919184a874d3ad3a24c06fdb03665d5b82566692e900794e59d0e917d",
       "module": "adapters/cloudflare-workers",
       "fanIn": 1,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "adapters/cloudflare-workers/test/websocket.test.ts",
@@ -430,7 +463,8 @@
       "hash": "dba09856017e942453e2ec957921e674716e7a45c011b022e505569584444ada",
       "module": "adapters/cloudflare-workers",
       "fanIn": 0,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "test"
     },
     {
       "path": "adapters/cloudflare-workers/test/worker.ts",
@@ -440,7 +474,8 @@
       "hash": "d23d6d8d09ec2d27442166096d5a70e684b767bcf35698401a1ef61f09388e81",
       "module": "adapters/cloudflare-workers",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "adapters/cloudflare-workers/vite.config.ts",
@@ -450,7 +485,8 @@
       "hash": "7aa9557c0f3c3dd65bdf13e30fa380a7d123e6b76ea769e90a7bd0b87c3b683e",
       "module": "adapters/cloudflare-workers",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "config"
     },
     {
       "path": "adapters/deno/src/conninfo.test.ts",
@@ -460,7 +496,8 @@
       "hash": "f9ad17ad654386ec016634807bd1dd29552048ad7ae6229e91c72ed38ec88d1f",
       "module": "adapters/deno",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "adapters/deno/src/conninfo.ts",
@@ -470,7 +507,8 @@
       "hash": "d7ce9fd0ef4f532884fa1ac83010b263b8d91913e2fcf49080867101d19566ae",
       "module": "adapters/deno",
       "fanIn": 2,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "adapters/deno/src/index.ts",
@@ -480,7 +518,8 @@
       "hash": "5daebf492cff033bb3b67ffa6a058ddd177977aef443210b54995b8088ebcf16",
       "module": "adapters/deno",
       "fanIn": 2,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "source"
     },
     {
       "path": "adapters/deno/src/serve-static.ts",
@@ -490,7 +529,8 @@
       "hash": "eb5f888577be401ba30610183675a86ba5cda669ea3d68ed25a6faeb44c45cde",
       "module": "adapters/deno",
       "fanIn": 1,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "adapters/deno/src/ssg.ts",
@@ -500,7 +540,8 @@
       "hash": "f3dcad5bd2df5ca019e000b413f747d908448be5252110b9556cb58bee2da8e7",
       "module": "adapters/deno",
       "fanIn": 1,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "adapters/deno/src/websocket.test.ts",
@@ -510,7 +551,8 @@
       "hash": "2917c7f63cd40ac0fda49e139115a74e98a992e766e16cf223bd4ba56858b984",
       "module": "adapters/deno",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "adapters/deno/src/websocket.ts",
@@ -520,7 +562,8 @@
       "hash": "b8ca07d156eb190025236274aa42d5abfabf10d560d930778118da4cf28ce055",
       "module": "adapters/deno",
       "fanIn": 2,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "adapters/deno/test/assert.ts",
@@ -530,7 +573,8 @@
       "hash": "3a729248e9ba98bfaf0027a0eec81cc9e1eb7d66ea00c519e6a786a9102a529a",
       "module": "adapters/deno",
       "fanIn": 2,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "test"
     },
     {
       "path": "adapters/deno/test/serve-static.test.ts",
@@ -540,7 +584,8 @@
       "hash": "1a142bc21c740cd255b10716c4af169977a0a4265460d5203f1b713bed89c2b6",
       "module": "adapters/deno",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "adapters/deno/test/ssg.test.ts",
@@ -550,7 +595,8 @@
       "hash": "13933eb1b3ec82222d72c56d2be6ab60ba21bf46e3084db547b1d332eb27d015",
       "module": "adapters/deno",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "adapters/deno/vite.config.ts",
@@ -560,7 +606,8 @@
       "hash": "e0efc900db99b4b79d7919bdc6e2c62c098d7c74889f50dfedd2190149d5fe79",
       "module": "adapters/deno",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "config"
     },
     {
       "path": "adapters/lambda-edge/src/conninfo.test.ts",
@@ -570,7 +617,8 @@
       "hash": "233297216c88732fd44faf207e817045c83afb89aeaf382e5dc96a68a01eb171",
       "module": "adapters/lambda-edge",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "adapters/lambda-edge/src/conninfo.ts",
@@ -580,7 +628,8 @@
       "hash": "a02c306dd8426dfe7c0191de362ccdc0fdffb7f92590897902fec1ed98357209",
       "module": "adapters/lambda-edge",
       "fanIn": 2,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "adapters/lambda-edge/src/handler.test.ts",
@@ -590,7 +639,8 @@
       "hash": "b92b6cbe1e06305e642f8e83ba02d7189337a9013b46ed8c32202bad4b73b305",
       "module": "adapters/lambda-edge",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "adapters/lambda-edge/src/handler.ts",
@@ -600,7 +650,8 @@
       "hash": "ba2cef24052e2be14cda88dabdbdb9bd3a9cf15a6b795e9343e43584fd03389b",
       "module": "adapters/lambda-edge",
       "fanIn": 5,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "adapters/lambda-edge/src/index.ts",
@@ -610,7 +661,8 @@
       "hash": "9df8f899ec64db587f81c6ae01451a6c8e82f0c1d8cb1b7645a50b5d95321666",
       "module": "adapters/lambda-edge",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "adapters/lambda-edge/test/index.test.ts",
@@ -620,7 +672,8 @@
       "hash": "7796268649c9e61662b05b03990dfbe51ca9576f29dda12638e2be8205de0232",
       "module": "adapters/lambda-edge",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "adapters/lambda-edge/vite.config.ts",
@@ -630,7 +683,8 @@
       "hash": "7aa9557c0f3c3dd65bdf13e30fa380a7d123e6b76ea769e90a7bd0b87c3b683e",
       "module": "adapters/lambda-edge",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "config"
     },
     {
       "path": "adapters/netlify/src/conninfo.test.ts",
@@ -640,7 +694,8 @@
       "hash": "5f632f5a37ce81eaf5bd6f1a52841e517f4b0358853d42b781a2bf847eba7850",
       "module": "adapters/netlify",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "adapters/netlify/src/conninfo.ts",
@@ -650,7 +705,8 @@
       "hash": "459cd49920a6d11f8c0dd321f3e2eb566d764dae4df0c0fb4bf5cc8dd9b146a1",
       "module": "adapters/netlify",
       "fanIn": 2,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "adapters/netlify/src/handler.ts",
@@ -660,7 +716,8 @@
       "hash": "94238ea253a03fcd54e78076c403d54ca496bfd57ed93171f0f6b5e90d3876e7",
       "module": "adapters/netlify",
       "fanIn": 1,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "adapters/netlify/src/index.ts",
@@ -670,7 +727,8 @@
       "hash": "ef8fda539a2dbfbd137a4d071cf4168a045982de5c9c6ba0c194dda80f583b37",
       "module": "adapters/netlify",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "adapters/netlify/src/mod.ts",
@@ -680,7 +738,8 @@
       "hash": "61df89f51ebe080a7443588051c4eae35745dc30fd21e4bc7d891ad8a5a3d84a",
       "module": "adapters/netlify",
       "fanIn": 1,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "adapters/netlify/vite.config.ts",
@@ -690,7 +749,8 @@
       "hash": "7aa9557c0f3c3dd65bdf13e30fa380a7d123e6b76ea769e90a7bd0b87c3b683e",
       "module": "adapters/netlify",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "config"
     },
     {
       "path": "adapters/service-worker/src/handler.test.ts",
@@ -700,7 +760,8 @@
       "hash": "0678ce86cb52061abef3a741d082c43f29e9a546dd9931c1276652d163b2b272",
       "module": "adapters/service-worker",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "adapters/service-worker/src/handler.ts",
@@ -710,7 +771,8 @@
       "hash": "6ae3fdf19aef84d79a8c39935de6e16be7f424e14cba110bfcbde2e2a5d77b25",
       "module": "adapters/service-worker",
       "fanIn": 2,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "adapters/service-worker/src/index.ts",
@@ -720,7 +782,8 @@
       "hash": "ab50b93e7dde47d4be439117113898b44da0bab777e33e4e6048b0d752a73593",
       "module": "adapters/service-worker",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "adapters/service-worker/src/types.ts",
@@ -730,7 +793,8 @@
       "hash": "371281c3619a1e9ae4b14c65d161ca4eefc30f96e3e166d832bc6e7edae36f85",
       "module": "adapters/service-worker",
       "fanIn": 2,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "adapters/service-worker/vite.config.ts",
@@ -740,7 +804,8 @@
       "hash": "7aa9557c0f3c3dd65bdf13e30fa380a7d123e6b76ea769e90a7bd0b87c3b683e",
       "module": "adapters/service-worker",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "config"
     },
     {
       "path": "adapters/vercel/src/conninfo.test.ts",
@@ -750,7 +815,8 @@
       "hash": "b7343a613b129d9a7b7293ddf61c3fc4a2deee1d6d5e93d5b77b48abc1d89fa0",
       "module": "adapters/vercel",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "adapters/vercel/src/conninfo.ts",
@@ -760,7 +826,8 @@
       "hash": "637cea10602ba8177b1b79cb573321760021a38d36750ce4b881a076dcb1ed13",
       "module": "adapters/vercel",
       "fanIn": 2,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "adapters/vercel/src/handler.test.ts",
@@ -770,7 +837,8 @@
       "hash": "7d41da4e32c0258a89d11aff8e4531d7f2a20ed89458d09c2f5d00769eae9308",
       "module": "adapters/vercel",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "adapters/vercel/src/handler.ts",
@@ -780,7 +848,8 @@
       "hash": "d986554050c27b51773738ce9c0df8a5c2e38d36d9c7e78c82887cab11a0bd52",
       "module": "adapters/vercel",
       "fanIn": 2,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "adapters/vercel/src/index.ts",
@@ -790,7 +859,8 @@
       "hash": "229fbb1a92756bef737bb85f4a80d4931bf3cfc47b6197793ddfb57537333b06",
       "module": "adapters/vercel",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "adapters/vercel/vite.config.ts",
@@ -800,7 +870,8 @@
       "hash": "7aa9557c0f3c3dd65bdf13e30fa380a7d123e6b76ea769e90a7bd0b87c3b683e",
       "module": "adapters/vercel",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "config"
     },
     {
       "path": "benchmarks/fetch/bench.mts",
@@ -810,7 +881,8 @@
       "hash": "5564a6717c49c44ffdd05983566bb25fdc47ed25b4ec46d18b39f99792af5370",
       "module": "benchmarks/fetch",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "benchmarks/fetch/summarize.mts",
@@ -820,7 +892,8 @@
       "hash": "a799432e3b78ba53972ff300285f6a255b2de307b7be78102eb8ae142e6e452b",
       "module": "benchmarks/fetch",
       "fanIn": 0,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "benchmarks/fetch/ts-resolve.mjs",
@@ -830,7 +903,8 @@
       "hash": "a7978b038218d2ffe30cd14626c235be98ca668d299f109db071eee85daca88a",
       "module": "benchmarks/fetch",
       "fanIn": 1,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "benchmarks/http-server/benchmark.ts",
@@ -840,7 +914,8 @@
       "hash": "51f5032fe9f6a39a67ce42cbb9144d7e889924f2501288e53ca9c17cdb7f585a",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "benchmarks/jsx/src/benchmark.ts",
@@ -850,7 +925,8 @@
       "hash": "5481d32baa50542127a00f1b8107adfac9b1befb89a84730f30091e74f207b50",
       "module": "benchmarks/jsx",
       "fanIn": 0,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "source"
     },
     {
       "path": "benchmarks/jsx/src/hono.ts",
@@ -860,7 +936,8 @@
       "hash": "5e1530d823ccc42cdbdcdd60f38a737fcef29c9a6734e7d904ba10834ff3e968",
       "module": "benchmarks/jsx",
       "fanIn": 1,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "benchmarks/jsx/src/nano.ts",
@@ -870,7 +947,8 @@
       "hash": "214183dc9c358bdaa8ac3582261cfe19187636b52bbb111624d43583acea9d77",
       "module": "benchmarks/jsx",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "benchmarks/jsx/src/page-react.tsx",
@@ -880,7 +958,8 @@
       "hash": "e654c83d66bdb798c949d6e134008b86be404b8d06d8c48dcb4abef79f73ca8b",
       "module": "benchmarks/jsx",
       "fanIn": 1,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "benchmarks/jsx/src/page.tsx",
@@ -890,7 +969,8 @@
       "hash": "752b66e45befb5fee338552fb63c2aab0ed872c3e15b79e433d5842d0dac0373",
       "module": "benchmarks/jsx",
       "fanIn": 3,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "benchmarks/jsx/src/preact.ts",
@@ -900,7 +980,8 @@
       "hash": "26ca2295ab8609b3d6e5e667d4ea55478bcf2655183cc532123b74390f9e5b16",
       "module": "benchmarks/jsx",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "benchmarks/jsx/src/react-jsx/benchmark.ts",
@@ -910,7 +991,8 @@
       "hash": "5481d32baa50542127a00f1b8107adfac9b1befb89a84730f30091e74f207b50",
       "module": "benchmarks/jsx",
       "fanIn": 0,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "source"
     },
     {
       "path": "benchmarks/jsx/src/react-jsx/hono.ts",
@@ -920,7 +1002,8 @@
       "hash": "44b83d891f9d1654ec6c661d7ab62f94ae33729951d618cbc476374146c6d624",
       "module": "benchmarks/jsx",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "benchmarks/jsx/src/react-jsx/nano.ts",
@@ -930,7 +1013,8 @@
       "hash": "a8c3dec72052fb4130c763ffecc699ae9411709c8318215273bed688cf4880df",
       "module": "benchmarks/jsx",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "benchmarks/jsx/src/react-jsx/page-hono.tsx",
@@ -940,7 +1024,8 @@
       "hash": "c774c1b3176e50018e9a13e8050524402b75e1b0b42790ba53658aaa470ff648",
       "module": "benchmarks/jsx",
       "fanIn": 1,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "benchmarks/jsx/src/react-jsx/page-nano.tsx",
@@ -950,7 +1035,8 @@
       "hash": "05966db7298e1b418f26cc7ce95532205f935ac946ffdad5b28553c674160eb0",
       "module": "benchmarks/jsx",
       "fanIn": 1,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "benchmarks/jsx/src/react-jsx/page-preact.tsx",
@@ -960,7 +1046,8 @@
       "hash": "c606bdebe76a44bd6dbcb6446f19f3325716788c266baa251a9eb86de4f57460",
       "module": "benchmarks/jsx",
       "fanIn": 1,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "benchmarks/jsx/src/react-jsx/page-react.tsx",
@@ -970,7 +1057,8 @@
       "hash": "f2d122fffa4c4fbcf3c4c9d9f1bd53d9c90a308ac1bfbe9911474765bf4e551d",
       "module": "benchmarks/jsx",
       "fanIn": 1,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "benchmarks/jsx/src/react-jsx/preact.ts",
@@ -980,7 +1068,8 @@
       "hash": "36dc876ac327800fc3e7d3d6f374bf61a817b163f558b3de4826b8423fbe4713",
       "module": "benchmarks/jsx",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "benchmarks/jsx/src/react-jsx/react.ts",
@@ -990,7 +1079,8 @@
       "hash": "78f78f0721a6439d31e975cf4d44d2544d9a7ec82bf61632c01a2d763fd245ae",
       "module": "benchmarks/jsx",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "benchmarks/jsx/src/react.ts",
@@ -1000,7 +1090,8 @@
       "hash": "8435b8fb5f6cec7da89f9e8423708650aad43fc81a96ad72ad629ced1584f069",
       "module": "benchmarks/jsx",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "benchmarks/jsx-dom/benchmark.ts",
@@ -1010,7 +1101,8 @@
       "hash": "136d0f08b258e4eea86a02de026fd5eeedd07ddf80786132e2111488d8cb2429",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "benchmarks/query-param/src/bench.mts",
@@ -1020,7 +1112,8 @@
       "hash": "b4c1b922fbea3c7a6072c400d03dcba1df0a4ebe573a672025700cbf316ab4b4",
       "module": "benchmarks/query-param",
       "fanIn": 0,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "source"
     },
     {
       "path": "benchmarks/query-param/src/fast-querystring.mts",
@@ -1030,7 +1123,8 @@
       "hash": "0092a6fec8be2ce69a9455469d18b7521919fbc5ffef14e1e46cd477b92bf03a",
       "module": "benchmarks/query-param",
       "fanIn": 1,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "benchmarks/query-param/src/hono.mts",
@@ -1040,7 +1134,8 @@
       "hash": "9468e8d2f698c9eac731379951b9006ddd4407578f66674affb6eb4af3eb9829",
       "module": "benchmarks/query-param",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "benchmarks/query-param/src/qs.mts",
@@ -1050,7 +1145,8 @@
       "hash": "43d5bd762cf98690888c90a9986e3824e9908c2412f2da32157bb32ca18772ce",
       "module": "benchmarks/query-param",
       "fanIn": 1,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "benchmarks/routers/src/bench-includes-init.mts",
@@ -1060,7 +1156,8 @@
       "hash": "8f7f83ff96e928638701be69a68315052aedbc9180102674e63f3e92505e38f7",
       "module": "benchmarks/routers",
       "fanIn": 0,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "source"
     },
     {
       "path": "benchmarks/routers/src/bench.mts",
@@ -1070,7 +1167,8 @@
       "hash": "023b95da3b732f98cf7a7f5a3b63649c47e48f04d8342a3be1dea3befa86563c",
       "module": "benchmarks/routers",
       "fanIn": 0,
-      "fanOut": 11
+      "fanOut": 11,
+      "role": "source"
     },
     {
       "path": "benchmarks/routers/src/express.mts",
@@ -1080,7 +1178,8 @@
       "hash": "5d7033c9eea1309b2c7dcaed175b03704f297bf910cdd4648a3ee3e5b9894839",
       "module": "benchmarks/routers",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "benchmarks/routers/src/find-my-way.mts",
@@ -1090,7 +1189,8 @@
       "hash": "fef355b9c229224f288abafe5a059fdb92181b2d77bf2f4adf13515679e6569f",
       "module": "benchmarks/routers",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "benchmarks/routers/src/hono.mts",
@@ -1100,7 +1200,8 @@
       "hash": "aabc73974dad16ea7d9cffaf6f83c4118c06189be2db5d5c4fbcefe8ebd5224e",
       "module": "benchmarks/routers",
       "fanIn": 1,
-      "fanOut": 5
+      "fanOut": 5,
+      "role": "source"
     },
     {
       "path": "benchmarks/routers/src/koa-router.mts",
@@ -1110,7 +1211,8 @@
       "hash": "55abfe05d5117150be773cdc36205ed497dd1946292c0e09961985ad9478c2a1",
       "module": "benchmarks/routers",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "benchmarks/routers/src/koa-tree-router.mts",
@@ -1120,7 +1222,8 @@
       "hash": "9872ab13aebf012471a3488dd3fabd2b87d46a6b262efa0866c50d26906b4371",
       "module": "benchmarks/routers",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "benchmarks/routers/src/medley-router.mts",
@@ -1130,7 +1233,8 @@
       "hash": "dfd45afd0d5e653c1e828e040dc11e0b348ab6ad932f2197127b0ac319532f1a",
       "module": "benchmarks/routers",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "benchmarks/routers/src/memoirist.mts",
@@ -1140,7 +1244,8 @@
       "hash": "3018fa99d28b957116dcd774f833e32f72e709b26a29c714ea9902073a210cb2",
       "module": "benchmarks/routers",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "benchmarks/routers/src/radix3.mts",
@@ -1150,7 +1255,8 @@
       "hash": "f22726f5b41fed7fd14681a13d55e8f91858542498cd29e63de8bd5ed1d3f36b",
       "module": "benchmarks/routers",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "benchmarks/routers/src/rou3.mts",
@@ -1160,7 +1266,8 @@
       "hash": "6cc873c351c7b234925ac5fb4c37830d295e07b076b47385be8db7cf7afe257d",
       "module": "benchmarks/routers",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "benchmarks/routers/src/tool.mts",
@@ -1170,7 +1277,8 @@
       "hash": "6913e80ec6d2b01019e56477a35da1a3504614961bb1821e046ec68b298d732a",
       "module": "benchmarks/routers",
       "fanIn": 12,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "benchmarks/routers/src/trek-router.mts",
@@ -1180,7 +1288,8 @@
       "hash": "7a954e5bd5989e926403ad8f1cfd00278d18c63f23f874ae17e44a705e0ea88b",
       "module": "benchmarks/routers",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "benchmarks/routers-deno/src/bench.mts",
@@ -1190,7 +1299,8 @@
       "hash": "20a082fbe33fd448dfc32d5f6b4881d213dbd6c08efce875b9d2d09b2faaff32",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 7
+      "fanOut": 7,
+      "role": "source"
     },
     {
       "path": "benchmarks/routers-deno/src/find-my-way.mts",
@@ -1200,7 +1310,8 @@
       "hash": "9ea9eb00faa19c42843dae18cd19c916df55e67bdb42f23812b8a813e3d04ed9",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "benchmarks/routers-deno/src/hono.mts",
@@ -1210,7 +1321,8 @@
       "hash": "aabc73974dad16ea7d9cffaf6f83c4118c06189be2db5d5c4fbcefe8ebd5224e",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 5
+      "fanOut": 5,
+      "role": "source"
     },
     {
       "path": "benchmarks/routers-deno/src/koa-router.mts",
@@ -1220,7 +1332,8 @@
       "hash": "c378b3fd6266b8da223a4ae3502ef02fcbe75cdeddb200ec8ffca1d7ed62f35e",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "benchmarks/routers-deno/src/koa-tree-router.mts",
@@ -1230,7 +1343,8 @@
       "hash": "a85eef60ff08aa0d7db4edc8a81e1b19db3fdbe21c1a9f15e4192443377de269",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "benchmarks/routers-deno/src/medley-router.mts",
@@ -1240,7 +1354,8 @@
       "hash": "e1d748cc789c793d8c674f824477dcc4cf8bb14c31fe94e7230e751deccdc345",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "benchmarks/routers-deno/src/tool.mts",
@@ -1250,7 +1365,8 @@
       "hash": "6913e80ec6d2b01019e56477a35da1a3504614961bb1821e046ec68b298d732a",
       "module": ".",
       "fanIn": 7,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "benchmarks/routers-deno/src/trek-router.mts",
@@ -1260,7 +1376,8 @@
       "hash": "6cd322577c4a394576669aa915e1e885c765efd62db663d86449fbc26dcbf365",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "benchmarks/utils/src/get-path.ts",
@@ -1270,7 +1387,8 @@
       "hash": "d8816c5490ec5daf247ab7db52cc03068b640b1433c62220ccca9277687ad862",
       "module": "benchmarks/utils",
       "fanIn": 0,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "benchmarks/utils/src/loop.js",
@@ -1280,7 +1398,8 @@
       "hash": "ac9bc0e0368d9096871ce33665637684a69e4e70946cff32be36e7e176d8e801",
       "module": "benchmarks/utils",
       "fanIn": 0,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "build/declaration-emit.test.ts",
@@ -1290,7 +1409,8 @@
       "hash": "66de28b96b88d954b903a11f9a2b6b2e26b8c368cca0dd73d2f453adeb05fdda",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "test"
     },
     {
       "path": "build/dts-plugins.ts",
@@ -1300,7 +1420,8 @@
       "hash": "2fbccf965d97aa07d3e8afa1fee934cd4408b42314ffcc21ac5f93aec2e4cfdf",
       "module": ".",
       "fanIn": 9,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "build/fixtures/declaration-emit/index.ts",
@@ -1310,7 +1431,8 @@
       "hash": "df022d62d72bdef8562150e737c8a66df9befcfe1b39e072a8abf231e0441db6",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "build/fixtures/jsx-types/index.tsx",
@@ -1320,7 +1442,8 @@
       "hash": "4f460122afb4b0014d91eda919c35c569003521074bfd62cf1a946dc689358b5",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "build/jsx-types.test.ts",
@@ -1330,7 +1453,8 @@
       "hash": "30c56b3f9cc68f51ea84c4c1211460063732eaf2513d21a0f7a54f75f7d074c9",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "test"
     },
     {
       "path": "build/release-adapter.ts",
@@ -1340,7 +1464,8 @@
       "hash": "b5ff3a26dd6eb650927fbddf39f06484d13645eb7c1d1f8888a1bc7c513cf2dc",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "perf-measures/bundle-check/scripts/check-bundle-size.ts",
@@ -1350,7 +1475,8 @@
       "hash": "02d29c018f91fd826860489622191320530de911031ead07f3296ae513c6b31f",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "perf-measures/type-check/client.ts",
@@ -1360,7 +1486,8 @@
       "hash": "022991ab8d9a84953db68f2116917c5cdecb4ee502fbae0112798ca680f43dae",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "perf-measures/type-check/scripts/generate-app.ts",
@@ -1370,7 +1497,8 @@
       "hash": "8930a1697fa1a72a5b0f01981cdc8d29871b6d5671e20237bbf18fcc1f731862",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "perf-measures/type-check/scripts/process-results.ts",
@@ -1380,7 +1508,8 @@
       "hash": "6ce0c930a1c50ce3d3c6710e242ad5172c895e69b7ce5fa44b5975da834bf9bc",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "runtime-tests/bun/color.test.ts",
@@ -1390,7 +1519,8 @@
       "hash": "80f347d9150d3f30d1889f5c0cb6539e5fd1ebc563a7e6f89ec8263843c8cea5",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "test"
     },
     {
       "path": "runtime-tests/bun/index.test.tsx",
@@ -1400,7 +1530,8 @@
       "hash": "d33027be8c13ed5030aea8875df6d68b9f730ed407d7d084eae20d8f28c7fd30",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 7
+      "fanOut": 7,
+      "role": "test"
     },
     {
       "path": "runtime-tests/deno/hono.test.ts",
@@ -1410,7 +1541,8 @@
       "hash": "2412cb8aebf03454bdeb30cf983ec1af090e240d6e27e4b1a2611e82d5a990a2",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "runtime-tests/deno/middleware.test.tsx",
@@ -1420,7 +1552,8 @@
       "hash": "64ccb2acac2e49c31bcafdc952edbbdcfbc0ee950351895eb0712e341e058476",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "runtime-tests/deno/stream.test.ts",
@@ -1430,7 +1563,8 @@
       "hash": "10272d5588307119a82b2565658bed15a0daa5cf873699dead217d4f10f479a7",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "runtime-tests/deno-jsx/jsx.test.tsx",
@@ -1440,7 +1574,8 @@
       "hash": "6dd182df6fbb36e9a65770b4e5fac85e52d80b6f37cb2a760b42ed005bdabddc",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "runtime-tests/fastly/index.test.ts",
@@ -1450,7 +1585,8 @@
       "hash": "933c628f11e69d89cda0b8c891494581e7f0f7035e855e07dd9ab19989772f69",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "test"
     },
     {
       "path": "runtime-tests/fastly/vitest.config.ts",
@@ -1460,7 +1596,8 @@
       "hash": "7de063bfa43adab0a85fd37ee20b6b644dba33a82dc389c209cfcecbb4ccb590",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "config"
     },
     {
       "path": "runtime-tests/node/index.test.ts",
@@ -1470,7 +1607,8 @@
       "hash": "dce1841a1236069923ec30b3cc74b5fe3e2f156e293abd5197a6085003183ea1",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 7
+      "fanOut": 7,
+      "role": "test"
     },
     {
       "path": "runtime-tests/node/vitest.config.ts",
@@ -1480,7 +1618,8 @@
       "hash": "fb1d50638568a1b4d5e2a642815b03e7490bcbbfb9749c115bb846a7a5c83f38",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "config"
     },
     {
       "path": "runtime-tests/workerd/index.test.ts",
@@ -1490,7 +1629,8 @@
       "hash": "2156804354af15139fe82d288c703220c6e973bbed085052bd147741be536ab9",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "test"
     },
     {
       "path": "runtime-tests/workerd/index.ts",
@@ -1500,7 +1640,8 @@
       "hash": "685dd6c1036bda7f7013d082e43467caa04273fa2cd9792789296a4bc7130dcd",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "runtime-tests/workerd/vitest.config.ts",
@@ -1510,7 +1651,8 @@
       "hash": "670dfcc7bfe9b8de3562c621583b3616cd9143d652acd842a787c08b2dc2492f",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "config"
     },
     {
       "path": "src/adapter/aws-lambda/conninfo.test.ts",
@@ -1520,7 +1662,8 @@
       "hash": "ec4efbfc107392441676df0119d14d736a15d561e73fac6dc370888ee2d61f27",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/adapter/aws-lambda/conninfo.ts",
@@ -1530,7 +1673,8 @@
       "hash": "4a449d9ddae5d70409b24f51c8b928ff02c5515c06b86a1f02fe6f78260d9f54",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/adapter/aws-lambda/handler.test.ts",
@@ -1540,7 +1684,8 @@
       "hash": "dc5359e8883114644d1fd28cdfb641d7e1bdec7c8f6a5b24f72a6a1c6f52625c",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 5
+      "fanOut": 5,
+      "role": "test"
     },
     {
       "path": "src/adapter/aws-lambda/handler.ts",
@@ -1550,7 +1695,8 @@
       "hash": "500dd16dc73a7cd0bc42ea627ccc240574c2af214d5e9a9f52c6935d5da5fec7",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "source"
     },
     {
       "path": "src/adapter/aws-lambda/index.ts",
@@ -1560,7 +1706,8 @@
       "hash": "47f07783c54bf75f3eebfd9f476c149b9df3b28dfaec38b02a6f3cbb3d2c305f",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/adapter/aws-lambda/types.ts",
@@ -1570,7 +1717,8 @@
       "hash": "d2742f813a594c5f440ff12971239687c249ee9f25bf1fc22b84cd1e930ec13f",
       "module": ".",
       "fanIn": 4,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/adapter/bun/conninfo.test.ts",
@@ -1580,7 +1728,8 @@
       "hash": "76665ee06754e085d06354b2b1556fdbf83f807f15231a58dda01b226582881e",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "src/adapter/bun/conninfo.ts",
@@ -1590,7 +1739,8 @@
       "hash": "ce7ac4f066f8afd3ca14d1907033b024902b0768330e9a943e439e8c66cf3576",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/adapter/bun/index.ts",
@@ -1600,7 +1750,8 @@
       "hash": "565d362aa42c362626b7130f5ab7d1652901144fa9ea25eb025a7bd73256a817",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 5
+      "fanOut": 5,
+      "role": "source"
     },
     {
       "path": "src/adapter/bun/serve-static.ts",
@@ -1610,7 +1761,8 @@
       "hash": "be857f0ef3d0c43871aae71bcbd5ac496fbd3eac35ba72a419beff0254eb0ef4",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/adapter/bun/server.test.ts",
@@ -1620,7 +1772,8 @@
       "hash": "5e23ae704e396af6c047440026dc49bdd88f3740c3c55278716707d22f73ea53",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/adapter/bun/server.ts",
@@ -1630,7 +1783,8 @@
       "hash": "9afe5d2c9a43215e05779d5467d147dca0aa45abcc951c8705647e8877221d18",
       "module": ".",
       "fanIn": 4,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/adapter/bun/ssg.ts",
@@ -1640,7 +1794,8 @@
       "hash": "a32195488a29ce4e8a73bed5ae786d661b608d994880f34ba63bdb5de500fdc2",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/adapter/bun/websocket.test.ts",
@@ -1650,7 +1805,8 @@
       "hash": "5558956cae61380c4f2235994ac8ebf22c016aae38fba240f45499d4689b169e",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/adapter/bun/websocket.ts",
@@ -1660,7 +1816,8 @@
       "hash": "d9c5d196de25d0108722a3b28e1343f9edee7b3870b1ad77c8e51278236257d5",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/adapter/cloudflare-pages/conninfo.test.ts",
@@ -1670,7 +1827,8 @@
       "hash": "250500cf6e1b1a1639ddfe40e7c48c0538ed79f4c6d605f83c9fbf25243f1ff0",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/adapter/cloudflare-pages/conninfo.ts",
@@ -1680,7 +1838,8 @@
       "hash": "0eabb5973d3478e06fa9826cb71b3a632c45cc0d48d774dc682f645a3d42ce56",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/adapter/cloudflare-pages/handler.test.ts",
@@ -1690,7 +1849,8 @@
       "hash": "69f7a4b95acc6bf32ea27458963b8836264d7465611559e5700b66e12ca31d74",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "test"
     },
     {
       "path": "src/adapter/cloudflare-pages/handler.ts",
@@ -1700,7 +1860,8 @@
       "hash": "90efb1b159c11ebe3de2c79b20a8e9f5ff94187245d27fc71e0dff18f1a3c6e9",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "source"
     },
     {
       "path": "src/adapter/cloudflare-pages/index.ts",
@@ -1710,7 +1871,8 @@
       "hash": "515fbbfc921bf71c6fa33e96d9300cdcb45404a69e80747b30f9c94ee0d591aa",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/adapter/cloudflare-workers/conninfo.test.ts",
@@ -1720,7 +1882,8 @@
       "hash": "71035612d3f87b60ee624154b360f243da72d1360a712cdb6887c5a4ae63d9bb",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/adapter/cloudflare-workers/conninfo.ts",
@@ -1730,7 +1893,8 @@
       "hash": "699aac30dcaec9c0cb9bfb846e8387751a4f60c42da86aa3a5d5df00d2eeba38",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/adapter/cloudflare-workers/index.ts",
@@ -1740,7 +1904,8 @@
       "hash": "689f32a34808e0d43285e716df1a643988161331dc9676fa9465cc6c12a55f5a",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/adapter/cloudflare-workers/serve-static-module.ts",
@@ -1750,7 +1915,8 @@
       "hash": "cc6670ab91f92c5ac8b9924a7190d3f331feddcc68057e46f20aacfb17a24c73",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/adapter/cloudflare-workers/serve-static.test.ts",
@@ -1760,7 +1926,8 @@
       "hash": "8aed8ddb28b4be5a7ce198427506987d396c1d383a2c041b5c4b466a9628ac5d",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "test"
     },
     {
       "path": "src/adapter/cloudflare-workers/serve-static.ts",
@@ -1770,7 +1937,8 @@
       "hash": "56ec07e0f14565647c1d44a005fc72db2565732d11ca18bb484a355390170b22",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/adapter/cloudflare-workers/utils.test.ts",
@@ -1780,7 +1948,8 @@
       "hash": "6e1880bbea905ae01cb9164a8c64c3ab744f8245f75dc1f55ac750f31a31dbd9",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "src/adapter/cloudflare-workers/utils.ts",
@@ -1790,7 +1959,8 @@
       "hash": "769451bf78ea670634ce7fb0fe556256b0c25e0b9f6069d6703f54e0d428747a",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/adapter/cloudflare-workers/websocket.test.ts",
@@ -1800,7 +1970,8 @@
       "hash": "885c3cc6f02d7299ad3495deb3dbe5dd77d296bfdcb1325abe5f49214cb4a286",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "src/adapter/cloudflare-workers/websocket.ts",
@@ -1810,7 +1981,8 @@
       "hash": "002a5e63cd940055b12e8df5666b1471fdd5ee15f5330d1cd9fb31d460dee5f3",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/adapter/deno/conninfo.test.ts",
@@ -1820,7 +1992,8 @@
       "hash": "82aceaaa5a9b9a26648376db383ab092c76d7b204ba5e18b6f7d6e4e9438ab34",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/adapter/deno/conninfo.ts",
@@ -1830,7 +2003,8 @@
       "hash": "dc0c314a4a89d32c574ba862ec0af340c928d40c4700ed94583b3a05d5c726ea",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/adapter/deno/index.ts",
@@ -1840,7 +2014,8 @@
       "hash": "4ba9aa75157284206971a1bb0b4ac93680343d8e0292ba2280678ab7dcfdcb3e",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "source"
     },
     {
       "path": "src/adapter/deno/serve-static.ts",
@@ -1850,7 +2025,8 @@
       "hash": "a1a52c4874ef5c9732c5be2a3e84b32ddfc5f0ec1e30c0eeb259b96bd4ba8161",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/adapter/deno/ssg.ts",
@@ -1860,7 +2036,8 @@
       "hash": "f101f4573a3f764950c20bfc59ebcb2c285ca3c0d75bed35ac01868ba283ed09",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/adapter/deno/websocket.test.ts",
@@ -1870,7 +2047,8 @@
       "hash": "dac171a63eeab62fd33ce67d5af1c49dc2f9011144a3bf498986c012e50c12c1",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "src/adapter/deno/websocket.ts",
@@ -1880,7 +2058,8 @@
       "hash": "fc4b85ca83868bef13089bb3c3f07db83d34c6280737d3bfc7fbe13cdb1907af",
       "module": ".",
       "fanIn": 4,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/adapter/lambda-edge/conninfo.test.ts",
@@ -1890,7 +2069,8 @@
       "hash": "4af3251736a9d99cb472e0bba6e32cee246d8a74739a7cf08b77ebd53da794cd",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "src/adapter/lambda-edge/conninfo.ts",
@@ -1900,7 +2080,8 @@
       "hash": "ba678ccc710caec114e42397c7a4914aae714511dd33d954b084c7083f4343c1",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/adapter/lambda-edge/handler.test.ts",
@@ -1910,7 +2091,8 @@
       "hash": "40623c25a924157d28c4ecfdff7390a1f69c9d9b6e144f31020c33d54c76889f",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 5
+      "fanOut": 5,
+      "role": "test"
     },
     {
       "path": "src/adapter/lambda-edge/handler.ts",
@@ -1920,7 +2102,8 @@
       "hash": "39a12e00d8082041e14468efa646562e0b8e17c5b732129a74f6feca0bbaddcb",
       "module": ".",
       "fanIn": 4,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/adapter/lambda-edge/index.ts",
@@ -1930,7 +2113,8 @@
       "hash": "79472a2921aa88ea29d489c7934235c24345bf71340190420042b46ad2fee41f",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/adapter/netlify/conninfo.test.ts",
@@ -1940,7 +2124,8 @@
       "hash": "dde9b3ffcc3416d2ac1379ae1f1eea15b416d457698f9943cfabc7cf8d25d436",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/adapter/netlify/conninfo.ts",
@@ -1950,7 +2135,8 @@
       "hash": "4f7b8e3f4a91e50f2cd44e21b8a896b3a1bca1fdf676fd929693a181dcad7a28",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/adapter/netlify/handler.ts",
@@ -1960,7 +2146,8 @@
       "hash": "2697ee27a29cdf155baaf62524de6d01bc38ccb40c765aeba290e611ed553237",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/adapter/netlify/index.ts",
@@ -1970,7 +2157,8 @@
       "hash": "1f016b857a426babfc98c1960564b61c5dff1081ee3216cdd7393c45475f776f",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/adapter/netlify/mod.ts",
@@ -1980,7 +2168,8 @@
       "hash": "76c64927c61feb670b28c8fdf4d3f8d5a30c6a320169b945617bc742659b3365",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/adapter/service-worker/handler.test.ts",
@@ -1990,7 +2179,8 @@
       "hash": "350a2ffb4293270cd14d479f108f5036feb4fd16aa98e4255b3117395a5268f8",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "src/adapter/service-worker/handler.ts",
@@ -2000,7 +2190,8 @@
       "hash": "0dbbaad3b2a234bcf12c1ff3b915ea4df96c84773d05581d2b4f65ba937eb41f",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/adapter/service-worker/index.ts",
@@ -2010,7 +2201,8 @@
       "hash": "7dd676cda5eca63095e8a0d2e4031ba9968ede4f65c081aa71e694eb25a7a3af",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/adapter/service-worker/types.ts",
@@ -2020,7 +2212,8 @@
       "hash": "f1c5cbbbc7efc543eb3fc2d3e17f35b44e54a11401c1bd658919d735c859886f",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/adapter/vercel/conninfo.test.ts",
@@ -2030,7 +2223,8 @@
       "hash": "f5ac11d0f3590c0fe0514ecbf62e09fe242d96e4cf329a7e7203040d44c5e143",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/adapter/vercel/conninfo.ts",
@@ -2040,7 +2234,8 @@
       "hash": "3bae2ac97aee8247ba5cd310db3e81918eeac0a020db54388dd6ff2451bcdd44",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/adapter/vercel/handler.test.ts",
@@ -2050,7 +2245,8 @@
       "hash": "db1ee15d8e21b8df81c61c7e7e725b0a76928659db33f8098ff2b06afdd7e348",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/adapter/vercel/handler.ts",
@@ -2060,7 +2256,8 @@
       "hash": "934bdaa165ec6b45fc96fff55637a9893e87adb55711627ba23b958f0ff91445",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/adapter/vercel/index.ts",
@@ -2070,7 +2267,8 @@
       "hash": "b19759a6d51ab2e116adb2f843d23088e652b243ad9e4dd15b2331deb35a1cff",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/client/client.test.ts",
@@ -2080,7 +2278,8 @@
       "hash": "0260475e44f0e16a71d31caebd2fdb9b5eb063235f7fc3bb0f93ab36a6117d81",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 7
+      "fanOut": 7,
+      "role": "test"
     },
     {
       "path": "src/client/client.ts",
@@ -2090,7 +2289,8 @@
       "hash": "7b70eac86cbdbe78836d3919c3f374610b3cdda26914d11548b09d3d8e4042b8",
       "module": ".",
       "fanIn": 3,
-      "fanOut": 6
+      "fanOut": 6,
+      "role": "source"
     },
     {
       "path": "src/client/fetch-result-please.ts",
@@ -2100,7 +2300,8 @@
       "hash": "3c068997642838bf1b889b26ab31ab471b9016eff1803df91352776449e24d51",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/client/index.ts",
@@ -2110,7 +2311,8 @@
       "hash": "ff5c66f3e8a0ef25c3327c179b815cb26f1f7b13ca817e0658a9629150f2fd31",
       "module": ".",
       "fanIn": 7,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/client/types.test.ts",
@@ -2120,7 +2322,8 @@
       "hash": "ff8f7bd326550b78386aac80aeee4a904edbe2ff5e031fc9b92082eea7bd33e6",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "test"
     },
     {
       "path": "src/client/types.ts",
@@ -2130,7 +2333,8 @@
       "hash": "dd59184ce3d91d05c43e0ee6485a2fe1676180eb4fb197f6aa534c21891fe5e4",
       "module": ".",
       "fanIn": 7,
-      "fanOut": 6
+      "fanOut": 6,
+      "role": "source"
     },
     {
       "path": "src/client/utils.test.ts",
@@ -2140,7 +2344,8 @@
       "hash": "5e7ddd4cff8db5a6d4bb90abecd82c5644f7f19e138dae1a882264db1d8bc088",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "test"
     },
     {
       "path": "src/client/utils.ts",
@@ -2150,7 +2355,8 @@
       "hash": "31192e1ebf9ad42029a7b793ef5958cd222cdecfbfae48000d3ebf21d9daee63",
       "module": ".",
       "fanIn": 4,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/compose.test.ts",
@@ -2160,7 +2366,8 @@
       "hash": "d4a7f02eb6e81dfce312dab264e3aa8268d77a987fd9f6a314fc3a01012b1665",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "test"
     },
     {
       "path": "src/compose.ts",
@@ -2170,7 +2377,8 @@
       "hash": "e62bb2748fae15bdfc2abdc994ffd7b8675d194c928d4448157f016e829d6e56",
       "module": ".",
       "fanIn": 3,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/context.test.ts",
@@ -2180,7 +2388,8 @@
       "hash": "7754cbebb6645e4f0bbb17979bf157b0273691ac2ab05b3704648ad415aae9a9",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/context.ts",
@@ -2190,7 +2399,8 @@
       "hash": "0c81f7b2aae7aeaaf8d2d6306e8986c1ee58ed647628e2a4dca012ee81c09fa0",
       "module": ".",
       "fanIn": 73,
-      "fanOut": 8
+      "fanOut": 8,
+      "role": "source"
     },
     {
       "path": "src/helper/accepts/accepts.test.ts",
@@ -2200,7 +2410,8 @@
       "hash": "8b5dc23110ed8ac27ed20af78a2e3087cf06031f35de74fcb2452a6144d30880",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "test"
     },
     {
       "path": "src/helper/accepts/accepts.ts",
@@ -2210,7 +2421,8 @@
       "hash": "cf2ebc929ea422812ad429b3b8b6f07fbd20f42a225ae2f4b4483177a3ba3a7e",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/helper/accepts/index.ts",
@@ -2220,7 +2432,8 @@
       "hash": "696e0c317cbb9acc95f05961b0f036e9fc03cb763d624a32bc6f17c86a56b4c1",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/helper/adapter/index.test.ts",
@@ -2230,7 +2443,8 @@
       "hash": "c43cd5657f9af714c6eb53c9e92e1348576dd233c5b91b6c1e8bab9fc8b50453",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/helper/adapter/index.ts",
@@ -2240,7 +2454,8 @@
       "hash": "29af7c4980b01a89705b12ace95a3bbe2dd1a0052f74fc1e30cdf29f9d987fae",
       "module": ".",
       "fanIn": 7,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/helper/conninfo/index.ts",
@@ -2250,7 +2465,8 @@
       "hash": "62176baa843d3879dc4c2908ee7fb93be2ddbe16d84f5c580ce0977b9d69795b",
       "module": ".",
       "fanIn": 12,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/helper/conninfo/types.ts",
@@ -2260,7 +2476,8 @@
       "hash": "57ce162159e561380c1797f25d73c372a61c14140c95614f423c3d2e19666177",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/helper/cookie/index.test.ts",
@@ -2270,7 +2487,8 @@
       "hash": "3e9ebf57c375792ff1f84190875a89643c505f71368e1747b0687cb84a0be9d1",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/helper/cookie/index.ts",
@@ -2280,7 +2498,8 @@
       "hash": "90d86addfe5c32524c96d15d03db4dd100f0eac367dab22602abf2d8afb9ca84",
       "module": ".",
       "fanIn": 10,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/helper/css/common.case.test.tsx",
@@ -2290,7 +2509,8 @@
       "hash": "23ad7789ca0b7d3f276ccf088e645a4323bd26f15118d3751a895f5b4763688c",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "src/helper/css/common.ts",
@@ -2300,7 +2520,8 @@
       "hash": "d6653bc1dd6d084d2dd4496bcedbf4a0d26ccda5262856299ed00a4fe8cb480d",
       "module": ".",
       "fanIn": 3,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/helper/css/index.test.tsx",
@@ -2310,7 +2531,8 @@
       "hash": "bf3856702481d81b1e73e014a58a1162b98ea4c4725281c0e9e906bba98c15f1",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 7
+      "fanOut": 7,
+      "role": "test"
     },
     {
       "path": "src/helper/css/index.ts",
@@ -2320,7 +2542,8 @@
       "hash": "a32a8076840377c2a4c7b481521f725261deb43534abc762774ff3f4988027ca",
       "module": ".",
       "fanIn": 4,
-      "fanOut": 5
+      "fanOut": 5,
+      "role": "source"
     },
     {
       "path": "src/helper/dev/index.test.ts",
@@ -2330,7 +2553,8 @@
       "hash": "b585988fd0604ebbffc4bcc1c8b40e92ef111ad92e13cdbec8d241ef1aa1b2dc",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "test"
     },
     {
       "path": "src/helper/dev/index.ts",
@@ -2340,7 +2564,8 @@
       "hash": "52f8b5c74e6b6c3aa08c721de7774c0d9805844ebbc14922f8b76128b50fcc4c",
       "module": ".",
       "fanIn": 3,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "source"
     },
     {
       "path": "src/helper/factory/index.test.ts",
@@ -2350,7 +2575,8 @@
       "hash": "dda7e21734f4b0cf44ab9702e054909769fea25893340027ac4bf1b7e5e1f823",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 8
+      "fanOut": 8,
+      "role": "test"
     },
     {
       "path": "src/helper/factory/index.ts",
@@ -2360,7 +2586,8 @@
       "hash": "a9aabe8a21c561b6791205661be0089165ede48efae8587ae7afe2acacb97e1c",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/helper/html/index.test.ts",
@@ -2370,7 +2597,8 @@
       "hash": "cffcee62992b03f6e3eda79c5626702beaa80dd52b45cf3ed1a1b412b5398668",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/helper/html/index.ts",
@@ -2380,7 +2608,8 @@
       "hash": "872e006b63af8cc10952f1db760609cfc92845a3b45d0722e66760f90e86e8b5",
       "module": ".",
       "fanIn": 16,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/helper/proxy/index.test.ts",
@@ -2390,7 +2619,8 @@
       "hash": "1b8b57abe2208412d28954e924ef189d2036e2649b4a346ddbf32889cab62e7b",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/helper/proxy/index.ts",
@@ -2400,7 +2630,8 @@
       "hash": "77b89bdf07dc1b86128252a002e93aeb9c68ff45d1b4b1b064c674eedf8782ef",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/helper/route/index.test.ts",
@@ -2410,7 +2641,8 @@
       "hash": "06f09391c64eec8e3f99848e46a03d59611ffca816fa281f70cad7f5df418351",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "src/helper/route/index.ts",
@@ -2420,7 +2652,8 @@
       "hash": "5cf87e81d3c71efa1204072d2606c5e8c146a5c213190dc08197bc394b71896d",
       "module": ".",
       "fanIn": 3,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "source"
     },
     {
       "path": "src/helper/ssg/index.ts",
@@ -2430,7 +2663,8 @@
       "hash": "13c1dfcf26fc3ed0f29c9308f68c3d8f0ff918a9481eab41d585a16500db5455",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/helper/ssg/middleware.ts",
@@ -2440,7 +2674,8 @@
       "hash": "8a5fb4a45be9c8beb069e7c9c090d707de6c713228665308e83724c178067042",
       "module": ".",
       "fanIn": 3,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/helper/ssg/plugins.test.tsx",
@@ -2450,7 +2685,8 @@
       "hash": "8490fce6de40d2fbafa371b12d0c6a42801b1eee1ed5f9a48bec0349628eaa1e",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "test"
     },
     {
       "path": "src/helper/ssg/plugins.ts",
@@ -2460,7 +2696,8 @@
       "hash": "7d72337f0418c3653d4bef98025ca14cb3b4237f1404be7d2649ea4b01594148",
       "module": ".",
       "fanIn": 3,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/helper/ssg/ssg.test.tsx",
@@ -2470,7 +2707,8 @@
       "hash": "a1979bcfa0a510072f2bf4fd8d86ed008da735b36aba66db233ae1d5ff20ff82",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "test"
     },
     {
       "path": "src/helper/ssg/ssg.ts",
@@ -2480,7 +2718,8 @@
       "hash": "2cd0e94e2e2000adde6246b95a6287cbade1ca030ebeb8531b8548e5166447ce",
       "module": ".",
       "fanIn": 4,
-      "fanOut": 8
+      "fanOut": 8,
+      "role": "source"
     },
     {
       "path": "src/helper/ssg/utils.test.ts",
@@ -2490,7 +2729,8 @@
       "hash": "cf223c0615fce4a0110fdc490927ef9fe7dd7073403e0c086a70f61fc629b758",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "src/helper/ssg/utils.ts",
@@ -2500,7 +2740,8 @@
       "hash": "8263289a1c3da0f901797a7b75f5bd0b8566ae062c7c3ac2ac36ec52ac58bffd",
       "module": ".",
       "fanIn": 3,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "source"
     },
     {
       "path": "src/helper/streaming/index.ts",
@@ -2510,7 +2751,8 @@
       "hash": "1a37f2d832f63f8165cd7f74ae5086c9e70eb0e074519044b38b99a100ad6def",
       "module": ".",
       "fanIn": 8,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/helper/streaming/sse.test.tsx",
@@ -2520,7 +2762,8 @@
       "hash": "3e6b301914ccb15865bbca510de5aac9544d00d67457124e318a0156bc5f6c44",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "src/helper/streaming/sse.ts",
@@ -2530,7 +2773,8 @@
       "hash": "47d8a7d6ea4f506bc892675de7c9ed3d76d1bb2ca0856955e1766b2adefc89e5",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "source"
     },
     {
       "path": "src/helper/streaming/stream.test.ts",
@@ -2540,7 +2784,8 @@
       "hash": "605a7570008d09bd4cd2fe4a40086e6a866f170d3bc0ed025a4e0a892b3b099f",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/helper/streaming/stream.ts",
@@ -2550,7 +2795,8 @@
       "hash": "95a8d46c4eac72ff9ebcecd021c99f8ca4ebdd53dda8818957253bbba9ddeb42",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/helper/streaming/text.test.ts",
@@ -2560,7 +2806,8 @@
       "hash": "ddc4d2e3d76e40da9da188eaffa2fc2bc85bd73eaceffa77b6c7d83c286538c3",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/helper/streaming/text.ts",
@@ -2570,7 +2817,8 @@
       "hash": "f76bbb56232f1f36a6e30975b1c625dda04c0562f7c4a1a340bb3d9d2eeb17cd",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/helper/streaming/utils.ts",
@@ -2580,7 +2828,8 @@
       "hash": "0fee83108c8d0f491eb7107e5d2b71370c5d9f5da44b559b0019f3e649046839",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/helper/testing/index.test.ts",
@@ -2590,7 +2839,8 @@
       "hash": "32ee0d7d197d98554a9d4e456e6be222f0b1a602bd4d85636d5b5cc20b4a41bf",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/helper/testing/index.ts",
@@ -2600,7 +2850,8 @@
       "hash": "c0b81a624c2356ed87916981f3c63cedb6c7bf3934d3e2df5cb65c43431025d3",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 6
+      "fanOut": 6,
+      "role": "source"
     },
     {
       "path": "src/helper/websocket/index.test.ts",
@@ -2610,7 +2861,8 @@
       "hash": "1285c1572b6339f3e1d3672952ba3f5e4d283e9ff64f5bdb1374cb23ae7ea135",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/helper/websocket/index.ts",
@@ -2620,7 +2872,8 @@
       "hash": "82980d3387320ad6301b27fdf260b97d0ee7331b3dc3118bded79c483c5918d7",
       "module": ".",
       "fanIn": 4,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/hono-base.ts",
@@ -2630,7 +2883,8 @@
       "hash": "1d14c2ae08063b449090f3a773a8bdf4c188f687ce14a4151215f0827e548c73",
       "module": ".",
       "fanIn": 6,
-      "fanOut": 6
+      "fanOut": 6,
+      "role": "source"
     },
     {
       "path": "src/hono.test.ts",
@@ -2640,7 +2894,8 @@
       "hash": "d594a72de7675550c6dc26b12dc62b4152029a31f19978364175c6e73d17f22f",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 12
+      "fanOut": 12,
+      "role": "test"
     },
     {
       "path": "src/hono.ts",
@@ -2650,7 +2905,8 @@
       "hash": "d39498b9bb339bfc72cbc3741d1dbd499b2fb9aa762204418c7a7c241bcae8d4",
       "module": ".",
       "fanIn": 69,
-      "fanOut": 5
+      "fanOut": 5,
+      "role": "source"
     },
     {
       "path": "src/http-exception.test.ts",
@@ -2660,7 +2916,8 @@
       "hash": "9b11d05d295f33eafb5e7f410c1f4540174402f24d7d998bdcc6f56e11b7e2df",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "src/http-exception.ts",
@@ -2670,7 +2927,8 @@
       "hash": "6f37149536b482d7b654d69cf4c44ef1043679e5c04f635da24fe57f38770c36",
       "module": ".",
       "fanIn": 20,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/index.ts",
@@ -2680,7 +2938,8 @@
       "hash": "6bfa15e71ab8ef2a247ae731ec890b91a797fba539c49f9f5b3577b5c59d4e11",
       "module": ".",
       "fanIn": 13,
-      "fanOut": 5
+      "fanOut": 5,
+      "role": "source"
     },
     {
       "path": "src/jsx/base.test.tsx",
@@ -2690,7 +2949,8 @@
       "hash": "b3e2c4cc4c30a039a8db1811eebaafe5ead146c6003fccea5d740ed275104e7d",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/jsx/base.ts",
@@ -2700,7 +2960,8 @@
       "hash": "a43e428a0cf0efd44b44bf212bf9162bae55e844202f6ab798b196b17c074f3b",
       "module": ".",
       "fanIn": 18,
-      "fanOut": 8
+      "fanOut": 8,
+      "role": "source"
     },
     {
       "path": "src/jsx/children.test.ts",
@@ -2710,7 +2971,8 @@
       "hash": "c4c0435c4ec47d0676a5a4d20772f7a8e6900528819aed1d0ec3c1294c58f58b",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/jsx/children.ts",
@@ -2720,7 +2982,8 @@
       "hash": "4f0eb983f09b93f47a58484e77ec73ae84bb4dfe56ed48147a35482e9c6b3d82",
       "module": ".",
       "fanIn": 5,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/jsx/components.test.tsx",
@@ -2730,7 +2993,8 @@
       "hash": "5ac71c07118f20b2b0511533dc38bcdb06a3d773293c19b6f3709128add9f1b9",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "test"
     },
     {
       "path": "src/jsx/components.ts",
@@ -2740,7 +3004,8 @@
       "hash": "6373ebb7ff2963e78162606a72795d3663a7328f633f52f46129b2f8c5b4689e",
       "module": ".",
       "fanIn": 4,
-      "fanOut": 9
+      "fanOut": 9,
+      "role": "source"
     },
     {
       "path": "src/jsx/constants.ts",
@@ -2750,7 +3015,8 @@
       "hash": "ed2c705269e690e0f8e90158d3e7df589868b848b0f09017d629e5fe6b4bbe5f",
       "module": ".",
       "fanIn": 14,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/jsx/context-isolation.test.ts",
@@ -2760,7 +3026,8 @@
       "hash": "8e732941231a9b4f2923c7cf0a7d66f0c14d56d5cf1e3b2d352a1ec165d94fab",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "src/jsx/context.ts",
@@ -2770,7 +3037,8 @@
       "hash": "91de6b097a9f4e3a415421fef72d3fc4ef6a5b62e3d77f8fb671713adf0ee460",
       "module": ".",
       "fanIn": 13,
-      "fanOut": 6
+      "fanOut": 6,
+      "role": "source"
     },
     {
       "path": "src/jsx/dom/client.test.tsx",
@@ -2780,7 +3048,8 @@
       "hash": "76fc3add88d11b4e4a32a165ee85007a9e64bfadd3221bb262a08a52d282ec96",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/jsx/dom/client.ts",
@@ -2790,7 +3059,8 @@
       "hash": "6ff8ad6e69cbeb92ff0d46b0991f72c25fad8e88465794f45607255914aceced",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/jsx/dom/components.test.tsx",
@@ -2800,7 +3070,8 @@
       "hash": "00847f53e6eb138f9f8eb01165dad61606d53555d0d2d33c84284f6dfef7417d",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "src/jsx/dom/components.ts",
@@ -2810,7 +3081,8 @@
       "hash": "2efca2d20c10129ab6e66053ca757fe7177d43b4857321c3dace4e68f5c5846b",
       "module": ".",
       "fanIn": 3,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "source"
     },
     {
       "path": "src/jsx/dom/context.test.tsx",
@@ -2820,7 +3092,8 @@
       "hash": "df3407ba0c457f23311c42a2af83e9f5200e4efdbfbe1a1e04cfdaf3f9aebc33",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/jsx/dom/context.ts",
@@ -2830,7 +3103,8 @@
       "hash": "3f4126415d529c5894909c18d02f57f5f78979fb435a52f530c8ca3304b72d4e",
       "module": ".",
       "fanIn": 4,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "source"
     },
     {
       "path": "src/jsx/dom/css.test.tsx",
@@ -2840,7 +3114,8 @@
       "hash": "2b4cbb2d6c576be2e5989be3e97b45a92e9380476a7c5c077a0f64e11647730e",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 5
+      "fanOut": 5,
+      "role": "test"
     },
     {
       "path": "src/jsx/dom/css.ts",
@@ -2850,7 +3125,8 @@
       "hash": "a3dd5058a1fa52593de754365b6cc7ba5ada4fcd9dfab7e3b4e56a6d89efc854",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/jsx/dom/hooks/index.test.tsx",
@@ -2860,7 +3136,8 @@
       "hash": "d018b95032fcd0e342d87fa788ba7f9b393ae98c0c3e415c67817b17315c27f9",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/jsx/dom/hooks/index.ts",
@@ -2870,7 +3147,8 @@
       "hash": "b0a2dd762cfa38d0fc750c43e3a89f932f2985c28ef69d424c4bf093629350c7",
       "module": ".",
       "fanIn": 4,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "source"
     },
     {
       "path": "src/jsx/dom/index.test.tsx",
@@ -2880,7 +3158,8 @@
       "hash": "1fd1e4c848c28058f813b926063f91d55fa966007579f5218b9997123708b7dd",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "test"
     },
     {
       "path": "src/jsx/dom/index.ts",
@@ -2890,7 +3169,8 @@
       "hash": "5b7fb6a362d4ed98c187f45b437a8c18bb372219326691b6346e39c4b4499e34",
       "module": ".",
       "fanIn": 9,
-      "fanOut": 11
+      "fanOut": 11,
+      "role": "source"
     },
     {
       "path": "src/jsx/dom/intrinsic-element/components.test.tsx",
@@ -2900,7 +3180,8 @@
       "hash": "83eecac3a4832d85547f3174a5dbfe90da6f6d1907ee6fc2f011c495a0a8e509",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "src/jsx/dom/intrinsic-element/components.ts",
@@ -2910,7 +3191,8 @@
       "hash": "58380b9d04683485f9534ebd084fabbcd11a72aed10ea8fd5e26d8fd86b261cf",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 8
+      "fanOut": 8,
+      "role": "source"
     },
     {
       "path": "src/jsx/dom/jsx-dev-runtime.ts",
@@ -2920,7 +3202,8 @@
       "hash": "49f9d9cb2358fc2020f2e4f59b7903213eec6086b8d511d06102f768f5e699f6",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/jsx/dom/jsx-runtime.ts",
@@ -2930,7 +3213,8 @@
       "hash": "5e8a31094b03bd18c1138643cbd2cebf832140f76e23ab104da97470a2231de3",
       "module": ".",
       "fanIn": 3,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/jsx/dom/render.ts",
@@ -2940,7 +3224,8 @@
       "hash": "ce6a74409733dc3001695af5878fe0515ebc7d0016a249770f67123241af929b",
       "module": ".",
       "fanIn": 9,
-      "fanOut": 7
+      "fanOut": 7,
+      "role": "source"
     },
     {
       "path": "src/jsx/dom/server.test.tsx",
@@ -2950,7 +3235,8 @@
       "hash": "db91d832f9bd780a5897546670e7d42bfac5b53644a76513ee7ddf87842a1189",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/jsx/dom/server.ts",
@@ -2960,7 +3246,8 @@
       "hash": "1efc4689a6c19979141ba555da0b9198149384c24872e1bb19c421961c9db9ad",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "source"
     },
     {
       "path": "src/jsx/dom/utils.ts",
@@ -2970,7 +3257,8 @@
       "hash": "634c054e155147ab8ce052edb63cb9a6cf813fb08c0cb38ae774f0205a57ff9e",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/jsx/hooks/dom.test.tsx",
@@ -2980,7 +3268,8 @@
       "hash": "4c4e7bac2bcdc08b55a5601e3dcbab718c3c3910bc03b6941159ca751c4a548a",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/jsx/hooks/index.ts",
@@ -2990,7 +3279,8 @@
       "hash": "5af452f536a5a138f839e85fee83e4464a06b4183dc41fe30877ef03053d134d",
       "module": ".",
       "fanIn": 13,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/jsx/hooks/string.test.tsx",
@@ -3000,7 +3290,8 @@
       "hash": "634f731dde02b17b5ad67629086dce141452ac5a0afdb48be51be15fdd6de9d5",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "src/jsx/index.test.tsx",
@@ -3010,7 +3301,8 @@
       "hash": "daf38a15b472a204d458e7c063b1b3cfcf972417f09512edd42081ea125066e7",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 6
+      "fanOut": 6,
+      "role": "test"
     },
     {
       "path": "src/jsx/index.ts",
@@ -3020,7 +3312,8 @@
       "hash": "d42c4ae38724137d1a9ab6b4a6307375c01f960741d1534a67dc22238fa53a53",
       "module": ".",
       "fanIn": 20,
-      "fanOut": 9
+      "fanOut": 9,
+      "role": "source"
     },
     {
       "path": "src/jsx/intrinsic-element/common.ts",
@@ -3030,7 +3323,8 @@
       "hash": "745a286002ba09bbe6cc40d390273bd0bd8ab758e68a7f3d3c6bd85fe9ee2c21",
       "module": ".",
       "fanIn": 3,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/jsx/intrinsic-element/components.test.tsx",
@@ -3040,7 +3334,8 @@
       "hash": "d23c9d3eaea07cd60a16136b3b2b132d62c5269e29baadbc10b56f109ac876ae",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/jsx/intrinsic-element/components.ts",
@@ -3050,7 +3345,8 @@
       "hash": "ab99916cbba4640c82b86be382e2772d93b252ff9a63614e9abba82aec6df0a9",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 9
+      "fanOut": 9,
+      "role": "source"
     },
     {
       "path": "src/jsx/intrinsic-elements.ts",
@@ -3060,7 +3356,8 @@
       "hash": "0cd65e40c1507294137b51bcda4c410072a509c8809a698e3e8e12a95a4edf85",
       "module": ".",
       "fanIn": 5,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/jsx/jsx-dev-runtime.ts",
@@ -3070,7 +3367,8 @@
       "hash": "fbd8c8f6be6e04488472849fa5da82b6fa9c87deb20d835c8d06cf26414ccda4",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/jsx/jsx-runtime.test.tsx",
@@ -3080,7 +3378,8 @@
       "hash": "b2f94252dc88490b1882020454dab66d419f8bbc890df33bc59f1eee138c1375",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/jsx/jsx-runtime.ts",
@@ -3090,7 +3389,8 @@
       "hash": "ecd1cfccfc4ad54a2be37d9aa2ff5367d0ee13fba250a6adba6df457ae2cbbb9",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "source"
     },
     {
       "path": "src/jsx/streaming.test.tsx",
@@ -3100,7 +3400,8 @@
       "hash": "b7dd8c889867cea88d06bb0c3e6fb364eedc22bbaab4b2e64350c48ce9d6ba3e",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 6
+      "fanOut": 6,
+      "role": "test"
     },
     {
       "path": "src/jsx/streaming.ts",
@@ -3110,7 +3411,8 @@
       "hash": "012d1e40ec26ce7dc3b58e5ab127af91aba46538ae02e160975b0e5738fe3a66",
       "module": ".",
       "fanIn": 11,
-      "fanOut": 9
+      "fanOut": 9,
+      "role": "source"
     },
     {
       "path": "src/jsx/types.ts",
@@ -3120,7 +3422,8 @@
       "hash": "a20a8b5cfde4a2d4adeca833ef8225f08df48172d69c148bb2e38a5b93759819",
       "module": ".",
       "fanIn": 4,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "source"
     },
     {
       "path": "src/jsx/utils.test.ts",
@@ -3130,7 +3433,8 @@
       "hash": "75421f73b2064a54431cb8380fbc5e0a3b5f92fa1f5181003270fa031660e560",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "src/jsx/utils.ts",
@@ -3140,7 +3444,8 @@
       "hash": "8f4839b9d1b8b62b0a9104791f4882b5ad3a611ed9fffadcf498fa470e4fb243",
       "module": ".",
       "fanIn": 4,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/middleware/basic-auth/index.test.ts",
@@ -3150,7 +3455,8 @@
       "hash": "2eb86c567896f6ce5f685392e1c9bd902379d78417f3ceef56b3fff8b58caed7",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/middleware/basic-auth/index.ts",
@@ -3160,7 +3466,8 @@
       "hash": "8692ff7ac33e3291cf7c83d842fab91309cd655448e388f285cf0b888f7ce606",
       "module": ".",
       "fanIn": 5,
-      "fanOut": 5
+      "fanOut": 5,
+      "role": "source"
     },
     {
       "path": "src/middleware/bearer-auth/index.test.ts",
@@ -3170,7 +3477,8 @@
       "hash": "df47f69bdfd946a57c67c98f62f7f2dbcd425f5f38d9491bc6558238729c91aa",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "src/middleware/bearer-auth/index.ts",
@@ -3180,7 +3488,8 @@
       "hash": "2d8264ee981252b338820cb8f794246f176f58e08d2289ffaaa96347591b7f5d",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 5
+      "fanOut": 5,
+      "role": "source"
     },
     {
       "path": "src/middleware/body-limit/index.test.ts",
@@ -3190,7 +3499,8 @@
       "hash": "c433b4e0ca3871174ef36ce9972c10e407d99655a33f65a48df7259223841d24",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/middleware/body-limit/index.ts",
@@ -3200,7 +3510,8 @@
       "hash": "7ec54698bd2fed328294e877341ccf73e85b0a3e33911f85f3887ad8e15428fb",
       "module": ".",
       "fanIn": 3,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/middleware/cache/index.test.ts",
@@ -3210,7 +3521,8 @@
       "hash": "2c2f311cc4ff38a43c21a51622a2085e91fc1b35a8d4e5d65ff1126ed0ce7f6f",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "src/middleware/cache/index.ts",
@@ -3220,7 +3532,8 @@
       "hash": "eb9f8e51d14745f3068c5bb3e571cc8db72b8fd600aa16ac7a5ee646c957fa11",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 5
+      "fanOut": 5,
+      "role": "source"
     },
     {
       "path": "src/middleware/combine/index.test.ts",
@@ -3230,7 +3543,8 @@
       "hash": "07798776a00ab8554aedb168ace9cd4d9cdcb40b1e399f8a9883adefd6b86b6e",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "src/middleware/combine/index.ts",
@@ -3240,7 +3554,8 @@
       "hash": "8d45eef97d97b0a2225a0fa89fd074ed94a68a9482b4e4804bf51ce87b078315",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 5
+      "fanOut": 5,
+      "role": "source"
     },
     {
       "path": "src/middleware/compress/index.test.ts",
@@ -3250,7 +3565,8 @@
       "hash": "d41677f112ef365780af5d6367556363e7b077787cbd4b47d380a7580b308b9c",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "src/middleware/compress/index.ts",
@@ -3260,7 +3576,8 @@
       "hash": "80ac349f7983cf9b66d6332ca536b131ca921ad4c6d1935515e22b25bc2e4373",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/middleware/context-storage/index.test.ts",
@@ -3270,7 +3587,8 @@
       "hash": "a198b799ae79cb5607c42d946a4178df0e9d9a58f9c464deb3a369930719895b",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/middleware/context-storage/index.ts",
@@ -3280,7 +3598,8 @@
       "hash": "ef5888c7f9bbcae1d8529bb0e02397de6b5c1d2667973be8bb5c9e164bef4d38",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/middleware/cors/index.test.ts",
@@ -3290,7 +3609,8 @@
       "hash": "642622580719b65c352c8afe4e614093799410b205e01828ce9b4347e50cde39",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/middleware/cors/index.ts",
@@ -3300,7 +3620,8 @@
       "hash": "af25a2b0e9f5ac739b656f627cd3906a3fcdeb36db25a789523c369f2dc5efc8",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/middleware/csrf/index.test.ts",
@@ -3310,7 +3631,8 @@
       "hash": "001c3e30a252e4a7681c8cfb78806ece1af7df9b19a29a9a18a4225d976df625",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "src/middleware/csrf/index.ts",
@@ -3320,7 +3642,8 @@
       "hash": "4b77c709c34447dc92448f407d7db2cb863dd0723fd9951093126b0fc05d6e28",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/middleware/etag/digest.test.ts",
@@ -3330,7 +3653,8 @@
       "hash": "8f6fef179504cf42ce3a4e3a1f6bd32088511df52c8a414ddfe48f0987c32c87",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "src/middleware/etag/digest.ts",
@@ -3340,7 +3664,8 @@
       "hash": "5e61f28c702f4e67915aa712db662f64ee8ac57b239121f8b205a035731aed94",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/middleware/etag/index.test.ts",
@@ -3350,7 +3675,8 @@
       "hash": "ca1d1124b950ce9d8568fb084b89e7330083be51bf1622291dde9ed536dcf6c5",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/middleware/etag/index.ts",
@@ -3360,7 +3686,8 @@
       "hash": "2b354670ebba9903c587be9b0e035a1a94a9cec8bc5434ade2165a3b251a0c4d",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/middleware/ip-restriction/index.test.ts",
@@ -3370,7 +3697,8 @@
       "hash": "eec880f9e6730ebb2511a75f6847f309c18c287cf9e1daac927696c2632efeee",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "test"
     },
     {
       "path": "src/middleware/ip-restriction/index.ts",
@@ -3380,7 +3708,8 @@
       "hash": "039d798b6e6b71ff090f5748f516156b38febbab3a350ea8856d76c3459212a1",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "source"
     },
     {
       "path": "src/middleware/jsx-renderer/index.test.tsx",
@@ -3390,7 +3719,8 @@
       "hash": "65f65265096e167cec84e3c8cc23cfaf1d60a9eebd8bcdb888557dc38301da57",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 5
+      "fanOut": 5,
+      "role": "test"
     },
     {
       "path": "src/middleware/jsx-renderer/index.ts",
@@ -3400,7 +3730,8 @@
       "hash": "72a7f15c61f256bab91d974c58ac3b9c04bcfa25da83c625c65e500be4eadb0b",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 5
+      "fanOut": 5,
+      "role": "source"
     },
     {
       "path": "src/middleware/jwk/index.test.ts",
@@ -3410,7 +3741,8 @@
       "hash": "15c15efcc7c44649e6944f98c2f3a2fa79dba56952c71e776d2086eae7f51c76",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 10
+      "fanOut": 10,
+      "role": "test"
     },
     {
       "path": "src/middleware/jwk/index.ts",
@@ -3420,7 +3752,8 @@
       "hash": "84571211137723fd5a455887bcec846d89611e6b5aa86d0c5c773b11e50638e5",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/middleware/jwk/jwk.ts",
@@ -3430,7 +3763,8 @@
       "hash": "e98c57fb9858ff26244ccd6f252a5c9d38ca0f824aaef90de105d030a074b8b1",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 9
+      "fanOut": 9,
+      "role": "source"
     },
     {
       "path": "src/middleware/jwt/index.test.ts",
@@ -3440,7 +3774,8 @@
       "hash": "afc5100aaef4022c8b0f6d4552f7f4b8a38b0638767f4f7e5b0bd73daee9ec40",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "src/middleware/jwt/index.ts",
@@ -3450,7 +3785,8 @@
       "hash": "b0ff9829400821271fe4d370d49346b2f810b3e17765c3fe9557506ac8e8bef9",
       "module": ".",
       "fanIn": 5,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/middleware/jwt/jwt.ts",
@@ -3460,7 +3796,8 @@
       "hash": "e63f4e96b7bbb3d12b95634ad33e0507320d3a0586aef843ad2390cdb3e65deb",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 9
+      "fanOut": 9,
+      "role": "source"
     },
     {
       "path": "src/middleware/language/index.test.ts",
@@ -3470,7 +3807,8 @@
       "hash": "1387326de9f39142949dd07296794be394e5e3c3564f4a964d6d177e440933ef",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "src/middleware/language/index.ts",
@@ -3480,7 +3818,8 @@
       "hash": "ab00affc298158a12012cd0a0f9cddad9fe4a498537778aae83f073e8a6a152d",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/middleware/language/language.ts",
@@ -3490,7 +3829,8 @@
       "hash": "b0eb7789db8308f716b071bebab9db7478d1228d392333201e05e182888eaf73",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "source"
     },
     {
       "path": "src/middleware/logger/index.test.ts",
@@ -3500,7 +3840,8 @@
       "hash": "c400b6a91b8e3208f419c3fb30ee998d134237611259aaf1545f04f3b2edeef0",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/middleware/logger/index.ts",
@@ -3510,7 +3851,8 @@
       "hash": "27ab0633f493a675660e8a05f4ef8cb3c0aa751f5a1bd1c8dd2be1a6082ff022",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/middleware/method-not-allowed/index.test.ts",
@@ -3520,7 +3862,8 @@
       "hash": "d86358a6e519ada4041ce388e0569d8cf0300b932be2acd3777a86ddae611a09",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/middleware/method-not-allowed/index.ts",
@@ -3530,7 +3873,8 @@
       "hash": "83dbff6a9ce31f36fca139b7acc2af897336eecc41f8d4ed242db94599f2f2f6",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 6
+      "fanOut": 6,
+      "role": "source"
     },
     {
       "path": "src/middleware/method-override/index.test.ts",
@@ -3540,7 +3884,8 @@
       "hash": "a8b6227a12072c848e2c28a43a4c7076f7d22fd327a8acbd890abffd7ca6a01f",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/middleware/method-override/index.ts",
@@ -3550,7 +3895,8 @@
       "hash": "9c29a6b02f591395ec303f5d4a32fb78011239674de376d5aadf2d4ddcc46b51",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "source"
     },
     {
       "path": "src/middleware/mount/index.test.ts",
@@ -3560,7 +3906,8 @@
       "hash": "ad36cc8007f8b280269dd120f79906b0b3566738ca4cbb79c55744660b6608e6",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "test"
     },
     {
       "path": "src/middleware/mount/index.ts",
@@ -3570,7 +3917,8 @@
       "hash": "4c760428c9472d84bba000b6a4ee2354568301b7c60e6fd86cb06092ecffdd6b",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/middleware/powered-by/index.test.ts",
@@ -3580,7 +3928,8 @@
       "hash": "8fd8af2470e69063bfabef1beb0a03a5ee28ff5d52ea9d6068c22dd1db6fb34a",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/middleware/powered-by/index.ts",
@@ -3590,7 +3939,8 @@
       "hash": "7ab5420562123a2bc9039cbdeb248e4e910edfc34c140fc492eddd0ef401b803",
       "module": ".",
       "fanIn": 5,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/middleware/pretty-json/index.test.ts",
@@ -3600,7 +3950,8 @@
       "hash": "bd1f006ec4d0780c74074330303dc765a72a956dd2fc4e298b1b057d515c5516",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/middleware/pretty-json/index.ts",
@@ -3610,7 +3961,8 @@
       "hash": "dc49ddbca64ba275ac981461ce4a1aa167187b5c9b0a9cc54fba5f9d1de8673f",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/middleware/request-id/index.test.ts",
@@ -3620,7 +3972,8 @@
       "hash": "bda3791cf1870c0d75854160246b143aaee35fd08e03a65ba57ebb488186b8d7",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "src/middleware/request-id/index.ts",
@@ -3630,7 +3983,8 @@
       "hash": "f1b20ee9ab71e26a7df4e01c0191cca1a5e121be962a54361c7612d684086462",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/middleware/request-id/request-id.ts",
@@ -3640,7 +3994,8 @@
       "hash": "e7aac5d8c6479b4f6fd3e605375cbbb8f705858a3f07c360adfbf06866c0a476",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/middleware/secure-headers/index.test.ts",
@@ -3650,7 +4005,8 @@
       "hash": "fe75acd4f200570f16704da1d527eb5f30f5ea5264919f944942852ba727787e",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "src/middleware/secure-headers/index.ts",
@@ -3660,7 +4016,8 @@
       "hash": "4dc2c95a0f6b529264ad0dd39e3b1b76ffb9c26ceba38cefcb73f9cce4b4d31d",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/middleware/secure-headers/permissions-policy.ts",
@@ -3670,7 +4027,8 @@
       "hash": "c5b81f452d4c693540274ba8db90fe2a2a6fb73c05cca08466bf8cfab2c26b72",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/middleware/secure-headers/secure-headers.ts",
@@ -3680,7 +4038,8 @@
       "hash": "e8ae1aae30378bb1b1d4f6efebd56142ee5cf9c5ecabb1789e985b3c01ebcb8c",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "source"
     },
     {
       "path": "src/middleware/serve-static/index.test.ts",
@@ -3690,7 +4049,8 @@
       "hash": "b8b7d3c190912c8fa020367ec94f99de6a34abd28eb395283ce6763b0eb3a8bf",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/middleware/serve-static/index.ts",
@@ -3700,7 +4060,8 @@
       "hash": "e1289f43a38e12fe6882e00b874c1f4e66e926522084ba1076a6f6c4c8f65937",
       "module": ".",
       "fanIn": 4,
-      "fanOut": 7
+      "fanOut": 7,
+      "role": "source"
     },
     {
       "path": "src/middleware/serve-static/path.test.ts",
@@ -3710,7 +4071,8 @@
       "hash": "947ac059aee424d27d4e88ca4aea744953411029f4066eef9a2dc3f37cd9ea27",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "src/middleware/serve-static/path.ts",
@@ -3720,7 +4082,8 @@
       "hash": "64cdf7abc8921c77830a26ddd42c58403cb0ddb2a13a928a49996cd16b28e15d",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/middleware/timeout/index.test.ts",
@@ -3730,7 +4093,8 @@
       "hash": "3e3b073ed4ef3b53e6c83810c7506e5f4fe3c3d1250d18cca91bb767d166057c",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "test"
     },
     {
       "path": "src/middleware/timeout/index.ts",
@@ -3740,7 +4104,8 @@
       "hash": "d73a6d697e1935927e09fb8f28da8eacb305491d95ba54f8078a0d22d04698c9",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/middleware/timing/index.test.ts",
@@ -3750,7 +4115,8 @@
       "hash": "4147e28401d9ef6a800b3e45e9855c1a375305c449757d51342811986f36de9e",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/middleware/timing/index.ts",
@@ -3760,7 +4126,8 @@
       "hash": "3352d5d412ad4367e910a9669e3bd69aa1d77db6a8335d4aeabbf35e4cc05e54",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/middleware/timing/timing.ts",
@@ -3770,7 +4137,8 @@
       "hash": "3ba12c7b02009c0a56358550a4a414329c299ffe96f2148852c6df6d5b5bed5d",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/middleware/trailing-slash/index.test.ts",
@@ -3780,7 +4148,8 @@
       "hash": "f76af4b058b62fab2d2a8b70babee235fe8661514cda30171950d407e314f9bd",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/middleware/trailing-slash/index.ts",
@@ -3790,7 +4159,8 @@
       "hash": "1b10cfef0ad9736fac0ddd231ab425acecefd5e5deeab409e7ed37bd01c5f345",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/preset/quick.test.ts",
@@ -3800,7 +4170,8 @@
       "hash": "10b23dbe8d4c039522585180738773ccba7c7cbbcf9ac7e26a00154cbb36e2ad",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/preset/quick.ts",
@@ -3810,7 +4181,8 @@
       "hash": "6f317c3716e424f689eb5577be29bb18146181ae5016bcc499a1f4a1e9f4db9e",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 5
+      "fanOut": 5,
+      "role": "source"
     },
     {
       "path": "src/preset/tiny.test.ts",
@@ -3820,7 +4192,8 @@
       "hash": "878f9c0cd445bee03e6c13de5ef9a03aa1b9c973b4aab322154bff9015ba4bdf",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/preset/tiny.ts",
@@ -3830,7 +4203,8 @@
       "hash": "6143d909bb95394e1da8adeb21e19bd52fb9cba3f328a842033a24019a7fde5e",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/request/constants.ts",
@@ -3840,7 +4214,8 @@
       "hash": "69b2127c163359faf05ef8f08e8ba9a351c682f4d1eeceee03b1be038b0eb104",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/request.test.ts",
@@ -3850,7 +4225,8 @@
       "hash": "edb083e468979a49800d88da7cbd9db51dfcc42ef08b0449c8d9f04236d932a7",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "src/request.ts",
@@ -3860,7 +4236,8 @@
       "hash": "d312c56376929130d7d4d5048825882b2b0f6452c41774223e298c5b3ec6177a",
       "module": ".",
       "fanIn": 6,
-      "fanOut": 8
+      "fanOut": 8,
+      "role": "source"
     },
     {
       "path": "src/router/common.case.test.ts",
@@ -3870,7 +4247,8 @@
       "hash": "3054e8583c5585739fbf261d6794a3ccfc737b1feb9de633163a6eafe660bcd7",
       "module": ".",
       "fanIn": 6,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "src/router/linear-router/index.ts",
@@ -3880,7 +4258,8 @@
       "hash": "b2cd46dc70df35f6be4b3eddce65f66efcc3785711b8026e12b37405a14c38e6",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/router/linear-router/router.test.ts",
@@ -3890,7 +4269,8 @@
       "hash": "0bf85744f3795a300e34315aa9602828e74586d374d50962ef6a3191ae4e81b0",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "src/router/linear-router/router.ts",
@@ -3900,7 +4280,8 @@
       "hash": "4ed4b2e7bd29b3b61c2df9734251f06d318facd501c1d75a826c75eb1c4a9937",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/router/pattern-router/index.ts",
@@ -3910,7 +4291,8 @@
       "hash": "490317c9035534d7beb56dddabf45f4bcdca5971ebdb32bc43cd1ec56b0f65c6",
       "module": ".",
       "fanIn": 3,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/router/pattern-router/router.test.ts",
@@ -3920,7 +4302,8 @@
       "hash": "f2648b7663648ea56909ca8bcee3fb160ad9c840588e72e9655f94783a47c21c",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "src/router/pattern-router/router.ts",
@@ -3930,7 +4313,8 @@
       "hash": "d6a8786dcbcb07a615e9f019ce5ba80a08df724a5d6dd0574f00257745c53331",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/router/reg-exp-router/index.ts",
@@ -3940,7 +4324,8 @@
       "hash": "526f7170e0773924c62ff51e86900dc7fe82fc2d8f35001844801a1639e438a3",
       "module": ".",
       "fanIn": 7,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/router/reg-exp-router/matcher.ts",
@@ -3950,7 +4335,8 @@
       "hash": "4a9645511a90543b3d59fe33c9fad02d8412a5cf3fdebd130e60e0139be32c57",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/router/reg-exp-router/node.ts",
@@ -3960,7 +4346,8 @@
       "hash": "4e2ae698afe6bd6adfa6b9664dd08813a4ff03b8f3c92cf72937bb2889c9a1af",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/router/reg-exp-router/prepared-router.test.ts",
@@ -3970,7 +4357,8 @@
       "hash": "d1826a3af177a0dfb6d5f0274e89ed502c930226073628c6eb547567ded60c1b",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "src/router/reg-exp-router/prepared-router.ts",
@@ -3980,7 +4368,8 @@
       "hash": "e5eb361fa570e1f6854db8733d5316dc562184c8056fa994b0409531757a36ef",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/router/reg-exp-router/router.test.ts",
@@ -3990,7 +4379,8 @@
       "hash": "a58fffe440adc0eba6d95cfc0ba1c2b731499085c49deabfdcb5f21bf23e0c0e",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "test"
     },
     {
       "path": "src/router/reg-exp-router/router.ts",
@@ -4000,7 +4390,8 @@
       "hash": "508411515605adcefc4127d26e3a01aca8aac7d4d5fb92b3eea87f4521fc37ff",
       "module": ".",
       "fanIn": 3,
-      "fanOut": 6
+      "fanOut": 6,
+      "role": "source"
     },
     {
       "path": "src/router/reg-exp-router/trie.ts",
@@ -4010,7 +4401,8 @@
       "hash": "e54d5bec98497260428e400c54948a946972e2fdd57f2ae06c0bc61619715aed",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/router/smart-router/index.ts",
@@ -4020,7 +4412,8 @@
       "hash": "721df1e0dce8d6a45d320d9b4130bde4160b6a24bdd7c5af811dd3717405ce93",
       "module": ".",
       "fanIn": 3,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/router/smart-router/router.test.ts",
@@ -4030,7 +4423,8 @@
       "hash": "1f63ff1561f602e755657fdd36965d16a7f4169daefd364e3c716a0e29a85e04",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 4
+      "fanOut": 4,
+      "role": "test"
     },
     {
       "path": "src/router/smart-router/router.ts",
@@ -4040,7 +4434,8 @@
       "hash": "6f133f78a081dd561ea8390cded532af36905a8e59fd440c0285c2303ce120fe",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/router/trie-router/index.ts",
@@ -4050,7 +4445,8 @@
       "hash": "067d9253748f3f9e5d7382336400d4a5fcb61e9c9b76a6e62c246636898b0f0b",
       "module": ".",
       "fanIn": 9,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/router/trie-router/node.test.ts",
@@ -4060,7 +4456,8 @@
       "hash": "6f5f916383576a7d5aaca6f2725ff59f69211a7c540425dc45f438c0abf5d0dd",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "src/router/trie-router/node.ts",
@@ -4070,7 +4467,8 @@
       "hash": "6a5bf0e5177ce8c3654f8bd0999007f8c3f5827ad6ff48510313e859c7a10778",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/router/trie-router/router.test.ts",
@@ -4080,7 +4478,8 @@
       "hash": "cf1866688005e73a8a5cc21fdb3bd41167895fd6c50c8a6a7a67ef8f0e5bf36b",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "test"
     },
     {
       "path": "src/router/trie-router/router.ts",
@@ -4090,7 +4489,8 @@
       "hash": "7141e5097cfb2a9c24728fe488cdedd4c8df434df6352197030c74f5829591b8",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 3
+      "fanOut": 3,
+      "role": "source"
     },
     {
       "path": "src/router/utils.ts",
@@ -4100,7 +4500,8 @@
       "hash": "82bdd9591feddd3dc71c27978a6aa32f001f49d21caa136cf675e35d0351a251",
       "module": ".",
       "fanIn": 4,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/router.ts",
@@ -4110,7 +4511,8 @@
       "hash": "a487dc6485b7b51abf92e8e350fe356281d0002c570199d3bb05c50f321b6efa",
       "module": ".",
       "fanIn": 23,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/types.test.ts",
@@ -4120,7 +4522,8 @@
       "hash": "29e51437fd662250357a9971bd548e4578b3357eeefe27854716e2507f1d55f3",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 10
+      "fanOut": 10,
+      "role": "test"
     },
     {
       "path": "src/types.ts",
@@ -4130,7 +4533,8 @@
       "hash": "7918dfe28a9f7d7c151002f31b97d30f298e888c98db82dd2fa473781a409d65",
       "module": ".",
       "fanIn": 63,
-      "fanOut": 5
+      "fanOut": 5,
+      "role": "source"
     },
     {
       "path": "src/utils/accept.test.ts",
@@ -4140,7 +4544,8 @@
       "hash": "f0e28e3230c7bd2f948f4e73155363b5f090243c5214b75638d632b53c29f6c9",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "src/utils/accept.ts",
@@ -4150,7 +4555,8 @@
       "hash": "371b3310442ce6d9bca373fa54ab1df5d9ca894e9f9d67845847db9fce733a8a",
       "module": ".",
       "fanIn": 6,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/utils/basic-auth.test.ts",
@@ -4160,7 +4566,8 @@
       "hash": "b70e0ad2fb463c65461c54edf89861023161d40c6941819a7202e382305c2059",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "src/utils/basic-auth.ts",
@@ -4170,7 +4577,8 @@
       "hash": "740c46bf1177b1660fcf26fd91e47864324ebce8ff4bd9a61423f5a88d4c2547",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/utils/body.test.ts",
@@ -4180,7 +4588,8 @@
       "hash": "c582ea535f8a2a0b6a3773b42c1c20f32f83b00e897d5bbf148578f47799c7b0",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "src/utils/body.ts",
@@ -4190,7 +4599,8 @@
       "hash": "c732bfeab26f953407c968c9bf9935c7a784bd836bfe54c712c6215df5f87941",
       "module": ".",
       "fanIn": 4,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/utils/buffer.test.ts",
@@ -4200,7 +4610,8 @@
       "hash": "561afc55abe3195c427cdd696727fe0717f845dcd6e990a69833f37c91f74f24",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "src/utils/buffer.ts",
@@ -4210,7 +4621,8 @@
       "hash": "8f5b893fdf24e15f1bdd8fd3c40cf66f85c5b5cb2727af42b9bfd113458667af",
       "module": ".",
       "fanIn": 5,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/utils/color.test.ts",
@@ -4220,7 +4632,8 @@
       "hash": "53b03bb3381de64a32874e300db9c5d9bdb9ee35b0aad3a2442cad2840fe05ec",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "src/utils/color.ts",
@@ -4230,7 +4643,8 @@
       "hash": "b74ef1e26f87942183778bc67ef6971b5e639e17600444ba2e637cd6910222a7",
       "module": ".",
       "fanIn": 4,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/utils/compress.ts",
@@ -4240,7 +4654,8 @@
       "hash": "89d0807f7a76b1abe097254e6d4c768f1c907642b5076fc06a24e29ffa95d5b7",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/utils/concurrent.test.ts",
@@ -4250,7 +4665,8 @@
       "hash": "2bd7beded92926a70ac230978d3727ed5fe00cfd5dd11170ee363a31d74bc9e1",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "src/utils/concurrent.ts",
@@ -4260,7 +4676,8 @@
       "hash": "3de6e71c6b74c18e6af0eaaec26636d7b9caeb0e10df28129465a10a161a5053",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/utils/constants.ts",
@@ -4270,7 +4687,8 @@
       "hash": "0ae54e099acec4e3404d5b58754af0ec583a2dadcb9819d59c0600e3247ac313",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/utils/cookie.test.ts",
@@ -4280,7 +4698,8 @@
       "hash": "d49b8824c2513ac4e15182b45a54d7249eabf9d46bf6b32d2aa63bde6f4aecc8",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "src/utils/cookie.ts",
@@ -4290,7 +4709,8 @@
       "hash": "18734c4c8d55f09ebc96b646559b38f94a01c1f46ee816de38bbdfa70b31065d",
       "module": ".",
       "fanIn": 6,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/utils/crypto.test.ts",
@@ -4300,7 +4720,8 @@
       "hash": "b2f5e2de6c7bd8343faae326a56e4ac4f6d197257d34097aa52cf0f1e12c4c3c",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "src/utils/crypto.ts",
@@ -4310,7 +4731,8 @@
       "hash": "08e9a18560dbd147a4ed40d9ae3ab94a571502a4d88d3e2dc6ced2c7014e9871",
       "module": ".",
       "fanIn": 3,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/utils/encode.test.ts",
@@ -4320,7 +4742,8 @@
       "hash": "f66485b7afc868746400049a7bd2fd3c9e84021382137e2236ef9ae8459bff72",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "src/utils/encode.ts",
@@ -4330,7 +4753,8 @@
       "hash": "b37805ffcbbdddf7a7b0a7c5a0d65c719ad74983c740899c030f3bdfe6ece5fa",
       "module": ".",
       "fanIn": 10,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/utils/filepath.test.ts",
@@ -4340,7 +4764,8 @@
       "hash": "f9cabaccfb8b006d50f42a19efcba3b393dae0fffc6b89c01c5426b6ce00ca8d",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "src/utils/filepath.ts",
@@ -4350,7 +4775,8 @@
       "hash": "31e477ddb1c5a2ed41cbb65265cb52959dd06f529d0d3576cfd8dc2965fedd32",
       "module": ".",
       "fanIn": 1,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/utils/handler.ts",
@@ -4360,7 +4786,8 @@
       "hash": "7b41da0f432673dde4a5c3dfc674c233500a533368fea376e125b4561d35f1b9",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/utils/headers.ts",
@@ -4370,7 +4797,8 @@
       "hash": "d74c130b195c0555380eab63da21fd02767fdc3c85e1b16a4542b10a60bd4b9d",
       "module": ".",
       "fanIn": 6,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/utils/html.test.ts",
@@ -4380,7 +4808,8 @@
       "hash": "aacb2ea89e7aff2eb7b5ff8d83749602a6e6989838736cf5f962a33fcee5419e",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "src/utils/html.ts",
@@ -4390,7 +4819,8 @@
       "hash": "ea55e58ccb46a28edfd86c307abca670f6ec2290cabde3a268270d0e7f3eeb69",
       "module": ".",
       "fanIn": 20,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/utils/http-status.ts",
@@ -4400,7 +4830,8 @@
       "hash": "7736f82dec467fb8d5075166f502d819bd472657e87336f00cb420ea44ee2531",
       "module": ".",
       "fanIn": 12,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/utils/ipaddr.test.ts",
@@ -4410,7 +4841,8 @@
       "hash": "65540751fa18c07314b2d4b1e48cb678b65349d6a35714adfce488cfc785eb10",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "src/utils/ipaddr.ts",
@@ -4420,7 +4852,8 @@
       "hash": "76718004e5c8c5862005c6086ff2f40857e269ef4f7d27c20f89f9ef33b95e45",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/utils/jwt/index.ts",
@@ -4430,7 +4863,8 @@
       "hash": "6f4ce32503639f1a2dd5b670fdabbcc5cd5eb56afa655d4bdc0769e2d2c6341a",
       "module": ".",
       "fanIn": 3,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/utils/jwt/jwa.test.ts",
@@ -4440,7 +4874,8 @@
       "hash": "3d3cb2d19c7e003a8d966ae342a247c70679b373bbcffd4e5556d1deef1a6fa7",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "src/utils/jwt/jwa.ts",
@@ -4450,7 +4885,8 @@
       "hash": "91c6350b5255fbb252b1542247c2c8b0bc8ad0c0b030a11d7b79871ab1f60122",
       "module": ".",
       "fanIn": 7,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/utils/jwt/jws.ts",
@@ -4460,7 +4896,8 @@
       "hash": "ddce37116e7ef86e7d0bfedc9a0a65970aa571c5dcd266512f5e3a3724394ef8",
       "module": ".",
       "fanIn": 6,
-      "fanOut": 5
+      "fanOut": 5,
+      "role": "source"
     },
     {
       "path": "src/utils/jwt/jwt.test.ts",
@@ -4470,7 +4907,8 @@
       "hash": "34216ff5d875e8b866b4018af49ace1d52dca4e7f0b4e2d21495734281162cf7",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 6
+      "fanOut": 6,
+      "role": "test"
     },
     {
       "path": "src/utils/jwt/jwt.ts",
@@ -4480,7 +4918,8 @@
       "hash": "2abecd02aefed81dee01107baa5aecb0c19c7b2b3ae4ea3684ec97c7b293f38f",
       "module": ".",
       "fanIn": 5,
-      "fanOut": 5
+      "fanOut": 5,
+      "role": "source"
     },
     {
       "path": "src/utils/jwt/types.ts",
@@ -4490,7 +4929,8 @@
       "hash": "7e8c370998783d6fb2fd666686763c8371264e051712ee162f06876c9bb83d44",
       "module": ".",
       "fanIn": 4,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "source"
     },
     {
       "path": "src/utils/jwt/utf8.ts",
@@ -4500,7 +4940,8 @@
       "hash": "21202242395f8577b508fb53e622f6695494821933a8f05d80de0f6d6c136c44",
       "module": ".",
       "fanIn": 4,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/utils/mime.test.ts",
@@ -4510,7 +4951,8 @@
       "hash": "fad6e5dd05ccc46048af523e7bddcdd806089af95cc6125eca759580c4b047cd",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "src/utils/mime.ts",
@@ -4520,7 +4962,8 @@
       "hash": "b53d33a79fa9d9e0cd937c828f0dd3bab4223b7cca882eb3558d9138fcae2b8f",
       "module": ".",
       "fanIn": 5,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/utils/stream.test.ts",
@@ -4530,7 +4973,8 @@
       "hash": "3aa94985e1a9ba34c4917dcfe62d108025ad65fdaaa2b7964b54e4be163dde79",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "src/utils/stream.ts",
@@ -4540,7 +4984,8 @@
       "hash": "280be5d310923a0d73f52020e1749bebab3f9445539782a020496181348926d1",
       "module": ".",
       "fanIn": 4,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/utils/types.test.ts",
@@ -4550,7 +4995,8 @@
       "hash": "388c8a06e39fe470bfbb92e349ae897ad4ff137c23513463cc607fc1c1af9fd1",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "src/utils/types.ts",
@@ -4560,7 +5006,8 @@
       "hash": "9d258023e6e780f277a3267dfb4e59e581d8095eea48f8c129ae67cc39459c43",
       "module": ".",
       "fanIn": 16,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/utils/url.test.ts",
@@ -4570,7 +5017,8 @@
       "hash": "9e6880d874b621bdbe7c11d5010752445d96048a3872820544b2609cdb778536",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "src/utils/url.ts",
@@ -4580,7 +5028,8 @@
       "hash": "223552e628546e1be5bac5f2dffef854cba4128ed874f3a1bda9094ebfe83181",
       "module": ".",
       "fanIn": 14,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "source"
     },
     {
       "path": "src/validator/index.ts",
@@ -4590,7 +5039,8 @@
       "hash": "211d9bb5223bde1e1fd240d3fe736291912371eb3d81521e58c2270496524357",
       "module": ".",
       "fanIn": 3,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/validator/utils.test.ts",
@@ -4600,7 +5050,8 @@
       "hash": "e72d7b1e6bf30e6c5a19e8cf156f2ed8e4f0398058a5546445df526a06eb0d02",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "test"
     },
     {
       "path": "src/validator/utils.ts",
@@ -4610,7 +5061,8 @@
       "hash": "aa652d5f854b8c6be2e2b2883ca5dbd95303bf29f529cf3f0e91d086597c7f1b",
       "module": ".",
       "fanIn": 3,
-      "fanOut": 2
+      "fanOut": 2,
+      "role": "source"
     },
     {
       "path": "src/validator/validator.test.ts",
@@ -4620,7 +5072,8 @@
       "hash": "2eaac2b993b486886efa46a3ecfd026ad3e03908c7ff879490b821eb8c308cde",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 8
+      "fanOut": 8,
+      "role": "test"
     },
     {
       "path": "src/validator/validator.ts",
@@ -4630,7 +5083,8 @@
       "hash": "9c8f9afc01f6bf385680b3a4a8f64c6475660ca4670ce2849b621bd2506b6e28",
       "module": ".",
       "fanIn": 2,
-      "fanOut": 7
+      "fanOut": 7,
+      "role": "source"
     },
     {
       "path": "vite.config.ts",
@@ -4640,7 +5094,8 @@
       "hash": "19ce6602d3a1efc7ce744d0bc1328467a6042b36961fa8f5a9122b1957063334",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 1
+      "fanOut": 1,
+      "role": "config"
     },
     {
       "path": "vitest.config.ts",
@@ -4650,7 +5105,8 @@
       "hash": "f63c46aee01fcd5c9e9b7573f999ae262b28b9516652009ed9ed525674144940",
       "module": ".",
       "fanIn": 0,
-      "fanOut": 0
+      "fanOut": 0,
+      "role": "config"
     }
   ],
   "excludedFiles": [
@@ -31504,7 +31960,7 @@
   "routes": [],
   "configNotes": [],
   "stats": {
-    "durationMs": 8445,
+    "durationMs": 5079,
     "duplicateImportsCollapsed": 148
   }
 }

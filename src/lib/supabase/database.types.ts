@@ -299,6 +299,7 @@ export type Database = {
           module: string
           org_id: string
           path: string
+          role: string | null
         }
         Insert: {
           analysis_id: string
@@ -312,6 +313,7 @@ export type Database = {
           module: string
           org_id: string
           path: string
+          role?: string | null
         }
         Update: {
           analysis_id?: string
@@ -325,6 +327,7 @@ export type Database = {
           module?: string
           org_id?: string
           path?: string
+          role?: string | null
         }
         Relationships: [
           {
@@ -456,6 +459,7 @@ export type Database = {
           file_id: string
           id: string
           kind: string
+          line: number | null
           methods: string[]
           org_id: string
           path: string
@@ -465,6 +469,7 @@ export type Database = {
           file_id: string
           id?: string
           kind: string
+          line?: number | null
           methods?: string[]
           org_id: string
           path: string
@@ -474,6 +479,7 @@ export type Database = {
           file_id?: string
           id?: string
           kind?: string
+          line?: number | null
           methods?: string[]
           org_id?: string
           path?: string

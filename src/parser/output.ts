@@ -1,4 +1,5 @@
 import { readFileSync, writeFileSync } from "node:fs";
+import { FRAMEWORKS, isFrameworkId } from "./taxonomy.ts";
 import { PARSE_RESULT_VERSION, type ParseResult } from "./types.ts";
 
 /**
@@ -47,6 +48,18 @@ export function checkInvariants(result: ParseResult): string[] {
   for (const f of result.files) {
     if (f.fanIn !== (fanIn.get(f.path) ?? 0)) problems.push(`fan-in mismatch: ${f.path}`);
     if (f.fanOut !== (fanOut.get(f.path) ?? 0)) problems.push(`fan-out mismatch: ${f.path}`);
+  }
+
+  // Every role is one the rail can show for this framework.
+  const roles = isFrameworkId(result.adapter.id) ? new Set<string>(FRAMEWORKS[result.adapter.id].roles) : null;
+  if (roles === null) problems.push(`unknown adapter: ${result.adapter.id}`);
+  else for (const f of result.files) if (!roles.has(f.role)) problems.push(`role ${f.role} is not in the ${result.adapter.id} taxonomy: ${f.path}`);
+
+  for (const route of result.routes) {
+    if (!nodes.has(route.file)) problems.push(`route file is not a node: ${route.file}`);
+    if (!route.path.startsWith("/")) problems.push(`route path is not absolute: ${route.path}`);
+    if (route.methods.length === 0) problems.push(`route has no method: ${route.path}`);
+    if (route.line !== null && !(Number.isInteger(route.line) && route.line >= 1)) problems.push(`route line is not a line: ${route.file}`);
   }
   return problems;
 }

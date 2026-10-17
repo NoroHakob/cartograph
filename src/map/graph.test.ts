@@ -8,7 +8,7 @@ import type { MapEdge } from "./view";
 
 const file = (p: string, fanIn = 0, fanOut = 0, lineCount = 10): DetailFile => {
   const slash = p.lastIndexOf("/");
-  return { path: p, folder: slash < 0 ? "." : p.slice(0, slash), language: "ts", lineCount, fanIn, fanOut };
+  return { path: p, folder: slash < 0 ? "." : p.slice(0, slash), language: "ts", role: "source", lineCount, fanIn, fanOut };
 };
 const edge = (source: string, target: string): MapEdge => ({ source, target, typeOnly: false });
 const none = conventions({ routes: [], entryPoints: [] });

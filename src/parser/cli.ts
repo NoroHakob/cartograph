@@ -8,6 +8,7 @@ import { existsSync, statSync } from "node:fs";
 import path from "node:path";
 import { parseRepository } from "./index.ts";
 import { checkInvariants, writeParseResult } from "./output.ts";
+import { FRAMEWORKS, ROLES } from "./taxonomy.ts";
 import type { CoverageBucket, ParseResult } from "./types.ts";
 
 function main(argv: string[]): number {
@@ -94,6 +95,18 @@ function print(r: ParseResult, examples: number) {
   for (const f of top("fanIn")) console.log(`  ${String(f.fanIn).padStart(4)}  ${f.path}`);
   row("top fan-out", "");
   for (const f of top("fanOut")) console.log(`  ${String(f.fanOut).padStart(4)}  ${f.path}`);
+
+  console.log("");
+  row("roles", "");
+  for (const role of FRAMEWORKS[r.adapter.id].roles) {
+    const count = r.files.filter((f) => f.role === role).length;
+    if (count > 0) console.log(`  ${ROLES[role].name.padEnd(26)}${String(count).padStart(6)}`);
+  }
+  row("routes", r.routes.length);
+  for (const route of r.routes.slice(0, examples * 10)) {
+    console.log(`  ${route.methods.join(",").padEnd(8)}${route.path.padEnd(40)} ${route.file}${route.line === null ? "" : `:${route.line}`}`);
+  }
+  if (r.routes.length > examples * 10) console.log(`  ... ${r.routes.length - examples * 10} more`);
 
   if (r.entryPoints.length > 0) {
     console.log("");

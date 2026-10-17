@@ -56,8 +56,9 @@ export async function storeParse(
     module: f.module,
     fan_in: f.fanIn,
     fan_out: f.fanOut,
+    role: f.role,
   }));
-  const routes = result.routes.map((r) => ({ file: r.file, path: r.path, kind: r.kind, methods: r.methods }));
+  const routes = result.routes.map((r) => ({ file: r.file, path: r.path, kind: r.kind, methods: r.methods, line: r.line }));
 
   const { error } = await db.rpc("store_parse", {
     p_analysis_id: analysisId,

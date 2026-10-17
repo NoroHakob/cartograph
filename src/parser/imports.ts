@@ -11,7 +11,7 @@ export interface RawImport {
   line: number;
 }
 
-const SCRIPT_KIND: Record<Language, ScriptKind> = {
+export const SCRIPT_KIND: Record<Language, ScriptKind> = {
   ts: ScriptKind.TS,
   mts: ScriptKind.TS,
   cts: ScriptKind.TS,

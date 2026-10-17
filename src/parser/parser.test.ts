@@ -320,6 +320,255 @@ describe("adapter", () => {
   });
 });
 
+/** Routes as "METHOD /path file:line", the way the route table reads. */
+function routeLines(result: ParseResult): string[] {
+  return result.routes.map((r) => `${r.methods.join(",")} ${r.path} ${r.file}${r.line === null ? "" : `:${r.line}`}`).sort();
+}
+
+function rolesOf(result: ParseResult): Record<string, string> {
+  return Object.fromEntries(result.files.map((f) => [f.path, f.role]));
+}
+
+describe("framework detection", () => {
+  test("runs in a fixed order and the first match wins", () => {
+    const pkg = (deps: Record<string, string>) => JSON.stringify({ name: "x", dependencies: deps });
+    assert.equal(parse({ "package.json": pkg({ next: "16", react: "19" }), "a.ts": "" }).adapter.id, "nextjs");
+    assert.equal(parse({ "package.json": pkg({ "@nestjs/core": "11", react: "19" }), "a.ts": "" }).adapter.id, "nestjs");
+    assert.equal(parse({ "package.json": pkg({ react: "19" }), "a.ts": "" }).adapter.id, "react");
+    // React only for tests is not a React codebase.
+    assert.equal(parse({ "package.json": JSON.stringify({ devDependencies: { react: "19" } }), "a.ts": "" }).adapter.id, "none");
+  });
+
+  test("a small package in a corner doesn't decide what the repository is", () => {
+    const library = Object.fromEntries(Array.from({ length: 8 }, (_, i) => [`src/f${i}.ts`, ""]));
+    const bench = { "benchmarks/jsx/package.json": JSON.stringify({ dependencies: { react: "19" } }), "benchmarks/jsx/a.tsx": "" };
+    assert.equal(parse({ "package.json": JSON.stringify({ name: "lib" }), ...library, ...bench }).adapter.id, "none");
+    // The same app as a quarter of the repository does.
+    const app = Object.fromEntries(Array.from({ length: 3 }, (_, i) => [`apps/web/f${i}.tsx`, ""]));
+    const web = { "apps/web/package.json": JSON.stringify({ dependencies: { react: "19" } }), ...app };
+    assert.equal(parse({ "package.json": JSON.stringify({ name: "lib" }), ...library, ...web }).adapter.id, "react");
+  });
+
+  test("a repository matching nothing gets generic roles and no routes", () => {
+    const r = parse({
+      "package.json": JSON.stringify({ main: "src/index.ts" }),
+      "src/index.ts": "",
+      "src/util.ts": "",
+      "src/util.test.ts": "",
+      "vite.config.ts": "",
+    });
+    assert.deepEqual(rolesOf(r), { "src/index.ts": "entry", "src/util.test.ts": "test", "src/util.ts": "source", "vite.config.ts": "config" });
+    assert.deepEqual(r.routes, []);
+  });
+});
+
+describe("Next.js adapter", () => {
+  const app = (files: Record<string, string>, config = "export default {};") => ({
+    "package.json": JSON.stringify({ dependencies: { next: "16.0.0", react: "19.0.0" } }),
+    "next.config.ts": config,
+    ...files,
+  });
+
+  test("roles come from path conventions and directives", () => {
+    const r = parse(
+      app({
+        "app/page.tsx": "",
+        "app/layout.tsx": "",
+        "app/loading.tsx": "",
+        "app/sitemap.ts": "",
+        "app/(shop)/cart/page.tsx": "'use client';\nexport default function P() {}",
+        "app/api/items/route.ts": "export function GET() {}",
+        "app/actions.ts": "// actions\n'use server';\nexport async function save() {}",
+        "app/_lib/page.tsx": "", // private: not a page
+        "components/button.tsx": "",
+        "components/menu.tsx": '"use client"',
+        "lib/useCart.ts": "",
+        "lib/db.ts": "function f() { 'use server'; }", // marks a function, not the file
+        "proxy.ts": "",
+        "instrumentation.ts": "",
+        "app/page.test.tsx": "",
+      }),
+    );
+    assert.equal(r.adapter.id, "nextjs");
+    assert.deepEqual(rolesOf(r), {
+      "app/page.tsx": "page",
+      "app/layout.tsx": "layout",
+      "app/loading.tsx": "route-ui",
+      "app/sitemap.ts": "metadata",
+      "app/(shop)/cart/page.tsx": "page",
+      "app/api/items/route.ts": "api",
+      "app/actions.ts": "server-action",
+      "app/_lib/page.tsx": "component",
+      "components/button.tsx": "component",
+      "components/menu.tsx": "client-component",
+      "lib/useCart.ts": "hook",
+      "lib/db.ts": "other",
+      "proxy.ts": "proxy",
+      "instrumentation.ts": "instrumentation",
+      "app/page.test.tsx": "test",
+      "next.config.ts": "config",
+    });
+  });
+
+  test("routes come from the same paths, and handlers list only what they export", () => {
+    const r = parse(
+      app({
+        "app/page.tsx": "",
+        "app/(shop)/cart/page.tsx": "",
+        "app/blog/[slug]/page.tsx": "",
+        "app/docs/[[...path]]/page.tsx": "",
+        "app/%5Fnext/page.tsx": "",
+        "app/_private/page.tsx": "",
+        "app/@modal/page.tsx": "", // a slot: renders inside /, has no URL of its own
+        "app/feed/(.)photo/[id]/page.tsx": "", // intercepting: depends on navigation
+        "app/api/items/route.ts": "export async function GET() {}\nexport const POST = () => {};\nexport function helper() {}",
+        "app/api/auth/route.ts": "import { handlers } from './auth';\nexport const { GET, POST } = handlers;",
+        "app/api/auth/auth.ts": "export const handlers = {};",
+        "app/api/reexport/route.ts": "export { GET } from '../items/route';",
+        "app/api/star/route.ts": "export * from '../items/route';",
+      }),
+    );
+    assert.deepEqual(routeLines(r), [
+      "GET / app/page.tsx",
+      "GET /_next app/%5Fnext/page.tsx",
+      "GET /api/auth app/api/auth/route.ts:2",
+      "GET /api/items app/api/items/route.ts:1",
+      "GET /api/reexport app/api/reexport/route.ts:1",
+      "GET /blog/[slug] app/blog/[slug]/page.tsx",
+      "GET /cart app/(shop)/cart/page.tsx",
+      "GET /docs/[[...path]] app/docs/[[...path]]/page.tsx",
+      "POST /api/auth app/api/auth/route.ts:2",
+      "POST /api/items app/api/items/route.ts:2",
+    ]);
+  });
+
+  test("pages router: pages are routes, API routes have no method to state", () => {
+    const r = parse(
+      app({
+        "src/pages/index.tsx": "",
+        "src/pages/blog/[slug].tsx": "",
+        "src/pages/_app.tsx": "",
+        "src/pages/404.tsx": "",
+        "src/pages/api/hello.ts": "export default function handler() {}",
+      }),
+    );
+    assert.deepEqual(routeLines(r), ["GET / src/pages/index.tsx", "GET /blog/[slug] src/pages/blog/[slug].tsx"]);
+    assert.equal(rolesOf(r)["src/pages/api/hello.ts"], "api");
+    assert.equal(rolesOf(r)["src/pages/_app.tsx"], "layout");
+  });
+
+  test("a literal basePath is applied; anything next.config can't settle removes routes", () => {
+    const files = { "app/page.tsx": "", "app/about/page.tsx": "" };
+    assert.deepEqual(routeLines(parse(app(files, "export default { basePath: '/docs' };"))), [
+      "GET /docs app/page.tsx",
+      "GET /docs/about app/about/page.tsx",
+    ]);
+    assert.deepEqual(parse(app(files, "export default { basePath: process.env.BASE };")).routes, []);
+    assert.deepEqual(parse(app(files, "export default { pageExtensions: ['page.tsx'] };")).routes, []);
+    // Roles don't depend on it.
+    assert.equal(rolesOf(parse(app(files, "export default { basePath: process.env.BASE };")))["app/about/page.tsx"], "page");
+  });
+});
+
+describe("NestJS adapter", () => {
+  const nest = (files: Record<string, string>) => ({
+    "package.json": JSON.stringify({ dependencies: { "@nestjs/core": "11.0.0", "@nestjs/common": "11.0.0" } }),
+    ...files,
+  });
+  const controller = [
+    "import { Controller, Get, Post, Delete as Remove } from '@nestjs/common';",
+    "@Controller('users')",
+    "export class UsersController {",
+    "  @Get()",
+    "  list() {}",
+    "  @Get(':id')",
+    "  one() {}",
+    "  @Post(['', 'bulk'])",
+    "  create() {}",
+    "  @Remove('/:id/')",
+    "  remove() {}",
+    "  @Get(PATH)",
+    "  computed() {}",
+    "  helper() {}",
+    "}",
+  ].join("\n");
+
+  test("roles come from file name suffixes", () => {
+    const r = parse(
+      nest({
+        "src/users/users.controller.ts": "",
+        "src/users/users.service.ts": "",
+        "src/users/users.module.ts": "",
+        "src/users/user.entity.ts": "",
+        "src/users/dto/create-user.dto.ts": "",
+        "src/users/users.controller.spec.ts": "",
+        "src/main.ts": "",
+        "test/app.e2e-spec.ts": "",
+      }),
+    );
+    assert.equal(r.adapter.id, "nestjs");
+    assert.deepEqual(rolesOf(r), {
+      "src/main.ts": "other",
+      "src/users/dto/create-user.dto.ts": "dto",
+      "src/users/user.entity.ts": "entity",
+      "src/users/users.controller.spec.ts": "test",
+      "src/users/users.controller.ts": "controller",
+      "src/users/users.module.ts": "module",
+      "src/users/users.service.ts": "service",
+      "test/app.e2e-spec.ts": "test",
+    });
+  });
+
+  test("routes join the controller's path and the method's, under a literal global prefix", () => {
+    const r = parse(
+      nest({
+        "src/users/users.controller.ts": controller,
+        "src/main.ts": "const app = await NestFactory.create(AppModule);\napp.setGlobalPrefix('api');",
+        "src/health.controller.ts": "import * as common from '@nestjs/common';\n@common.Controller()\nexport class H {\n  @common.Get('health') check() {}\n}",
+        "src/other.controller.ts": "import { Controller, Get } from './not-nest';\n@Controller('x')\nexport class O { @Get() a() {} }",
+        "src/computed.controller.ts": "import { Controller, Get } from '@nestjs/common';\n@Controller(BASE)\nexport class C { @Get() a() {} }",
+        "src/host.controller.ts":
+          "import { Controller, Get } from '@nestjs/common';\n@Controller({ path: 'h', host: 'admin.example.com' })\nexport class C { @Get() a() {} }",
+        "src/versioned.controller.ts":
+          "import { Controller, Get, Version } from '@nestjs/common';\n@Controller('v')\nexport class V { @Version('2') @Get() a() {} @Get('b') b() {} }",
+      }),
+    );
+    assert.deepEqual(routeLines(r), [
+      "DELETE /api/users/:id src/users/users.controller.ts:10",
+      "GET /api/health src/health.controller.ts:4",
+      "GET /api/users src/users/users.controller.ts:4",
+      "GET /api/users/:id src/users/users.controller.ts:6",
+      "GET /api/v/b src/versioned.controller.ts:3",
+      "POST /api/users src/users/users.controller.ts:8",
+      "POST /api/users/bulk src/users/users.controller.ts:8",
+    ]);
+  });
+
+  test("no routes when something outside the decorators moves every path", () => {
+    const files = { "src/users/users.controller.ts": controller };
+    assert.equal(parse(nest(files)).routes.length, 5);
+    const routesWith = (main: string) => parse(nest({ ...files, "src/main.ts": main })).routes;
+    assert.deepEqual(routesWith("app.setGlobalPrefix(PREFIX);"), []);
+    assert.deepEqual(routesWith("app.setGlobalPrefix('api', { exclude: ['health'] });"), []);
+    assert.deepEqual(routesWith("app.enableVersioning({ type: VersioningType.URI });"), []);
+    assert.deepEqual(routesWith("import { RouterModule } from '@nestjs/core';"), []);
+  });
+});
+
+describe("React adapter", () => {
+  test("components and hooks by name; React routes nothing", () => {
+    const r = parse({
+      "package.json": JSON.stringify({ dependencies: { react: "19.0.0" } }),
+      "src/App.tsx": "",
+      "src/useThing.ts": "",
+      "src/api.ts": "",
+    });
+    assert.equal(r.adapter.id, "react");
+    assert.deepEqual(rolesOf(r), { "src/App.tsx": "component", "src/api.ts": "other", "src/useThing.ts": "hook" });
+    assert.deepEqual(r.routes, []);
+  });
+});
+
 describe("output", () => {
   test("round-trips through the data file and rejects broken data", () => {
     const r = parse({ "a.ts": "import './b';", "b.ts": "" });
@@ -331,7 +580,7 @@ describe("output", () => {
 
     writeParseResult({ ...r, files: r.files.filter((f) => f.path !== "b.ts") }, file);
     assert.throws(() => readParseResult(file), /invariant/);
-    writeParseResult({ ...r, version: 2 as unknown as 1 }, file);
-    assert.throws(() => readParseResult(file), /version 1/);
+    writeParseResult({ ...r, version: 1 as unknown as 2 }, file);
+    assert.throws(() => readParseResult(file), /version 2/);
   });
 });
