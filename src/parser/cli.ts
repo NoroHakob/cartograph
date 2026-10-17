@@ -6,9 +6,9 @@
 
 import { existsSync, statSync } from "node:fs";
 import path from "node:path";
-import { parseRepository } from "./index";
-import { checkInvariants, writeParseResult } from "./output";
-import type { CoverageBucket, ParseResult } from "./types";
+import { parseRepository } from "./index.ts";
+import { checkInvariants, writeParseResult } from "./output.ts";
+import type { CoverageBucket, ParseResult } from "./types.ts";
 
 function main(argv: string[]): number {
   let dir: string | undefined;

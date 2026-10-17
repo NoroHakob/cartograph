@@ -3,10 +3,10 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { after, describe, test } from "node:test";
-import { parseRepository } from "./index";
-import { checkInvariants, readParseResult, writeParseResult } from "./output";
-import type { ImportRecord, ParseResult, Resolution } from "./types";
-import { countLines } from "./walk";
+import { parseRepository } from "./index.ts";
+import { checkInvariants, readParseResult, writeParseResult } from "./output.ts";
+import type { ImportRecord, ParseResult, Resolution } from "./types.ts";
+import { countLines } from "./walk.ts";
 
 const made: string[] = [];
 after(() => {

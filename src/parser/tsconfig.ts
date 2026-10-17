@@ -1,7 +1,7 @@
 import path from "node:path";
 import { ts } from "ts-morph";
-import type { ConfigNote } from "./types";
-import { parentDir } from "./walk";
+import type { ConfigNote } from "./types.ts";
+import { parentDir } from "./walk.ts";
 
 export interface LoadedConfig {
   /** Repo-relative path of the config, or null for the built-in default. */

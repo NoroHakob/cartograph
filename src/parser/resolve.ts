@@ -2,10 +2,10 @@ import { existsSync, statSync } from "node:fs";
 import { builtinModules } from "node:module";
 import path from "node:path";
 import { ts } from "ts-morph";
-import type { ConfigLookup } from "./tsconfig";
-import { toRel, tsPath } from "./tsconfig";
-import type { ExcludedFileReason, ImportKind, Resolution } from "./types";
-import { isDeclarationFile, parentDir, type PackageJson } from "./walk";
+import type { ConfigLookup } from "./tsconfig.ts";
+import { toRel, tsPath } from "./tsconfig.ts";
+import type { ExcludedFileReason, ImportKind, Resolution } from "./types.ts";
+import { isDeclarationFile, parentDir, type PackageJson } from "./walk.ts";
 
 export interface ResolverInput {
   root: string;

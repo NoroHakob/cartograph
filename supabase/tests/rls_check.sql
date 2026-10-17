@@ -53,3 +53,38 @@ union all select 'second-team', * from as_second
 union all select 'no org', 'analyses', visible, visible from as_no_org;
 
 rollback;
+
+-- 3. Progress channels (after the progress migration). A member can join their
+--    own organization's analysis channel and not another's. Realtime decides
+--    a join by selecting from realtime.messages with realtime.topic set to the
+--    channel, as the subscriber; this does the same.
+--    Expect: own_channel = true, other_channel = false, not_ours = false.
+--    If own_channel is false too, the day's realtime.messages partition may not
+--    exist yet: it's created once a client connects. Open any page and re-run.
+begin;
+
+create temp table channels on commit drop as
+select
+  (select public.analysis_topic(id) from public.analyses where org_id = 'org_3KlcDKciHUKQRTAaaO8suJIjkYg' limit 1) as own,
+  (select public.analysis_topic(id) from public.analyses where org_id = 'org_3Kmj3beZ8qWs6bNnIiGYXAPlQwJ' limit 1) as other;
+grant select on channels to authenticated;
+
+select realtime.send('{}'::jsonb, 'check', own, true) from channels;
+select realtime.send('{}'::jsonb, 'check', other, true) from channels;
+select realtime.send('{}'::jsonb, 'check', 'room-1', true);
+
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"user_check","role":"authenticated","o":{"id":"org_3KlcDKciHUKQRTAaaO8suJIjkYg"}}';
+
+select set_config('realtime.topic', own, true) from channels;
+create temp table own_channel on commit drop as select exists (select 1 from realtime.messages) as visible;
+select set_config('realtime.topic', other, true) from channels;
+create temp table other_channel on commit drop as select exists (select 1 from realtime.messages) as visible;
+select set_config('realtime.topic', 'room-1', true);
+create temp table not_ours on commit drop as select exists (select 1 from realtime.messages) as visible;
+
+select (select visible from own_channel) as own_channel,
+       (select visible from other_channel) as other_channel,
+       (select visible from not_ours) as not_ours;
+
+rollback;

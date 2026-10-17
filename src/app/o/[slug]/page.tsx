@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { getIdentity } from "@/lib/identity";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { Analyses, AnalysesSkeleton } from "./analyses";
+import { AnalyzeForm } from "./analyze-form";
 
 export default function WorkspacePage() {
   return (
@@ -10,6 +11,8 @@ export default function WorkspacePage() {
       <Suspense fallback={<WorkspaceHeaderSkeleton />}>
         <WorkspaceHeader />
       </Suspense>
+
+      <AnalyzeForm />
 
       <section aria-labelledby="analyses-heading">
         <h2 id="analyses-heading" className="sr-only">

@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync } from "node:fs";
-import { PARSE_RESULT_VERSION, type ParseResult } from "./types";
+import { PARSE_RESULT_VERSION, type ParseResult } from "./types.ts";
 
 /**
  * Checks the promises the result makes to everything downstream. Returns

@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import ignore, { type Ignore } from "ignore";
-import type { ExcludedFile, ExcludedFileReason, Language, Module } from "./types";
+import type { ExcludedFile, ExcludedFileReason, Language, Module } from "./types.ts";
 
 /** Files bigger than this are generated far more often than they are written. */
 export const MAX_FILE_BYTES = 1024 * 1024;

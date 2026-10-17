@@ -1,7 +1,7 @@
-import type { Adapter, RepoContext } from "./adapter";
-import { noFrameworkAdapter } from "./none";
+import type { Adapter, RepoContext } from "./adapter.ts";
+import { noFrameworkAdapter } from "./none.ts";
 
-export type { Adapter, RepoContext } from "./adapter";
+export type { Adapter, RepoContext } from "./adapter.ts";
 
 /** Framework adapters, most specific first. The fallback is always last. */
 const ADAPTERS: readonly Adapter[] = [noFrameworkAdapter];

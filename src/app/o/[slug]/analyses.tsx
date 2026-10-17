@@ -1,11 +1,18 @@
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getIdentity } from "@/lib/identity";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { Enums } from "@/lib/supabase/database.types";
+import { isStale } from "@/pipeline/stale";
 
 type Status = Enums<"analysis_status">;
+type Stage = Enums<"analysis_stage">;
 
 type Analysis = {
   id: string;
   status: Status;
+  stage: Stage | null;
+  stage_at: string | null;
   commit_sha: string | null;
   file_count: number | null;
   edge_count: number | null;
@@ -31,6 +38,8 @@ type Repository = {
  * another organization's row, the bug is in the policy, not here.
  */
 export async function Analyses() {
+  const identity = await getIdentity();
+  if (!identity) redirect("/");
   const { analyses, error, loadedAt } = await loadAnalyses();
 
   if (error) {
@@ -55,21 +64,29 @@ export async function Analyses() {
   }
 
   const repositories = groupByRepository(analyses);
-  const inProgress = analyses.filter((a) => a.status !== "complete" && a.status !== "failed").length;
+  const unfinished = analyses.filter((a) => a.status !== "complete" && a.status !== "failed");
+  const stalled = unfinished.filter((a) => isStale(a, loadedAt)).length;
+  const inProgress = unfinished.length - stalled;
 
   return (
     <>
       <p className="mt-1.5 text-sm text-fg-muted">
         {count(repositories.length, "repository", "repositories")}
         {inProgress > 0 && `, ${count(inProgress, "analysis", "analyses")} in progress`}
+        {stalled > 0 && `, ${count(stalled, "analysis", "analyses")} stalled`}
       </p>
 
       <ol className="mt-8 border-t border-border">
         {repositories.map((repo) => (
           <li key={repo.id} className="border-b border-border py-5">
             <h3 className="text-[15px] font-semibold tracking-tight">
-              <span className="font-normal text-fg-muted">{repo.owner}/</span>
-              {repo.name}
+              <Link
+                href={`/o/${identity.orgSlug}/analyses/${repo.analyses[0].id}`}
+                className="rounded-sm underline-offset-4 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <span className="font-normal text-fg-muted">{repo.owner}/</span>
+                {repo.name}
+              </Link>
             </h3>
             <ol className="mt-3 flex flex-col gap-3 sm:gap-2" aria-label={`Analyses of ${repo.owner}/${repo.name}`}>
               {repo.analyses.map((analysis) => (
@@ -85,6 +102,10 @@ export async function Analyses() {
 
 function AnalysisRow({ analysis, now }: { analysis: Analysis; now: number }) {
   const failed = analysis.status === "failed";
+  // Nothing runs analyses under a timeout, so a run that died stays
+  // "parsing" forever. Past a few minutes without its stage moving, it's
+  // shown as stalled rather than as work in progress.
+  const stalled = isStale(analysis, now);
   const facts = [
     analysis.file_count !== null && count(analysis.file_count, "file", "files"),
     analysis.edge_count !== null && count(analysis.edge_count, "import", "imports"),
@@ -92,12 +113,22 @@ function AnalysisRow({ analysis, now }: { analysis: Analysis; now: number }) {
 
   return (
     <li className="grid grid-cols-[auto_1fr_auto] items-baseline gap-x-4 gap-y-1 text-sm sm:grid-cols-[auto_6.5rem_1fr_auto]">
-      <Route status={analysis.status} />
-      <span className={`font-medium ${STATUS_TONE[analysis.status]}`}>{STATUS_LABEL[analysis.status]}</span>
+      <Route status={analysis.status} stalled={stalled} />
+      <span className={`font-medium ${stalled ? "text-fg-muted" : STATUS_TONE[analysis.status]}`}>
+        {stalled ? "Stalled" : STATUS_LABEL[analysis.status]}
+      </span>
 
       <span className="col-span-3 min-w-0 row-start-2 text-fg-muted sm:col-span-1 sm:row-start-auto">
         {failed && analysis.error ? (
-          <span className="text-danger">{analysis.error}</span>
+          <span className="text-danger">
+            {analysis.stage && `Failed while ${STAGE_VERB[analysis.stage]}: `}
+            {analysis.error}
+          </span>
+        ) : stalled ? (
+          <span>
+            Last moved {relativeTime(analysis.stage_at ?? analysis.created_at, now)}
+            {analysis.stage && `, while ${STAGE_VERB[analysis.stage]}`}. It has probably stopped.
+          </span>
         ) : (
           <>
             {analysis.commit_sha && (
@@ -120,7 +151,7 @@ function AnalysisRow({ analysis, now }: { analysis: Analysis; now: number }) {
 }
 
 // The pipeline every analysis travels. `failed` has no stop of its own: the
-// line turns red, because the row doesn't record which stage it failed in.
+// line turns red, and the text beside it names the stage it failed in.
 const STOPS = ["Queued", "Parsing", "Explaining", "Complete"] as const;
 const STAGE: Record<Status, number | null> = {
   queued: 0,
@@ -138,6 +169,13 @@ const STATUS_LABEL: Record<Status, string> = {
   failed: "Failed",
 };
 
+const STAGE_VERB: Record<Stage, string> = {
+  fetch: "fetching",
+  select: "unpacking",
+  parse: "parsing",
+  store: "storing",
+};
+
 const STATUS_TONE: Record<Status, string> = {
   queued: "text-fg-muted",
   parsing: "text-accent",
@@ -150,13 +188,14 @@ const STATUS_TONE: Record<Status, string> = {
  * Four stops joined by a line. Stops already passed are filled; the current
  * stop is filled and, while work is happening on it, pulses.
  */
-function Route({ status, muted = false }: { status: Status; muted?: boolean }) {
+function Route({ status, muted = false, stalled = false }: { status: Status; muted?: boolean; stalled?: boolean }) {
   const stage = STAGE[status];
   const failed = stage === null;
-  const live = status === "parsing" || status === "explaining";
+  // A stalled run is not working, so it doesn't pulse as if it were.
+  const live = !stalled && (status === "parsing" || status === "explaining");
   const label = failed
     ? "Analysis failed"
-    : `Stage ${stage + 1} of ${STOPS.length}: ${STOPS[stage]}`;
+    : `Stage ${stage + 1} of ${STOPS.length}: ${STOPS[stage]}${stalled ? ", stalled" : ""}`;
 
   return (
     <span
@@ -164,7 +203,7 @@ function Route({ status, muted = false }: { status: Status; muted?: boolean }) {
       aria-label={muted ? undefined : label}
       aria-hidden={muted || undefined}
       className={`relative inline-flex w-[5.5rem] translate-y-[-1px] items-center self-center ${
-        failed ? "text-danger" : status === "complete" ? "text-fg" : "text-accent"
+        failed ? "text-danger" : status === "complete" ? "text-fg" : stalled ? "text-fg-muted" : "text-accent"
       } ${muted ? "opacity-40" : ""}`}
     >
       {STOPS.map((stop, i) => {
@@ -204,7 +243,7 @@ async function loadAnalyses() {
   const { data, error } = await supabase
     .from("analyses")
     .select(
-      "id, status, commit_sha, file_count, edge_count, error, created_at, project:projects (id, repo_owner, repo_name)",
+      "id, status, stage, stage_at, commit_sha, file_count, edge_count, error, created_at, project:projects (id, repo_owner, repo_name)",
     )
     .order("created_at", { ascending: false });
   // Relative times are measured from when the rows were read.

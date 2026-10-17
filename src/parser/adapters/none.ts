@@ -1,5 +1,5 @@
-import type { EntryPoint } from "../types";
-import type { Adapter, RepoContext } from "./adapter";
+import type { EntryPoint } from "../types.ts";
+import type { Adapter, RepoContext } from "./adapter.ts";
 
 /**
  * The fallback: assumes no framework at all. Entry points come only from what

@@ -28,8 +28,12 @@ export type Database = {
           id: string
           org_id: string
           project_id: string
+          stage: Database["public"]["Enums"]["analysis_stage"] | null
+          stage_at: string | null
+          stage_message: string | null
           started_at: string | null
           status: Database["public"]["Enums"]["analysis_status"]
+          summary: Json | null
         }
         Insert: {
           commit_sha?: string | null
@@ -41,8 +45,12 @@ export type Database = {
           id?: string
           org_id: string
           project_id: string
+          stage?: Database["public"]["Enums"]["analysis_stage"] | null
+          stage_at?: string | null
+          stage_message?: string | null
           started_at?: string | null
           status?: Database["public"]["Enums"]["analysis_status"]
+          summary?: Json | null
         }
         Update: {
           commit_sha?: string | null
@@ -54,8 +62,12 @@ export type Database = {
           id?: string
           org_id?: string
           project_id?: string
+          stage?: Database["public"]["Enums"]["analysis_stage"] | null
+          stage_at?: string | null
+          stage_message?: string | null
           started_at?: string | null
           status?: Database["public"]["Enums"]["analysis_status"]
+          summary?: Json | null
         }
         Relationships: [
           {
@@ -77,33 +89,51 @@ export type Database = {
       edges: {
         Row: {
           analysis_id: string
+          detail: string | null
           id: string
+          installed: boolean | null
           kind: string
+          line: number
           org_id: string
+          reason: string | null
           resolved: boolean
           source_file_id: string
           specifier: string
+          status: string
           target_file_id: string | null
+          type_only: boolean
         }
         Insert: {
           analysis_id: string
+          detail?: string | null
           id?: string
+          installed?: boolean | null
           kind: string
+          line: number
           org_id: string
+          reason?: string | null
           resolved?: boolean
           source_file_id: string
           specifier: string
+          status: string
           target_file_id?: string | null
+          type_only?: boolean
         }
         Update: {
           analysis_id?: string
+          detail?: string | null
           id?: string
+          installed?: boolean | null
           kind?: string
+          line?: number
           org_id?: string
+          reason?: string | null
           resolved?: boolean
           source_file_id?: string
           specifier?: string
+          status?: string
           target_file_id?: string | null
+          type_only?: boolean
         }
         Relationships: [
           {
@@ -259,28 +289,40 @@ export type Database = {
       files: {
         Row: {
           analysis_id: string
+          fan_in: number
+          fan_out: number
           folder: string
+          hash: string
           id: string
           language: string
           line_count: number
+          module: string
           org_id: string
           path: string
         }
         Insert: {
           analysis_id: string
+          fan_in?: number
+          fan_out?: number
           folder: string
+          hash: string
           id?: string
           language: string
           line_count: number
+          module: string
           org_id: string
           path: string
         }
         Update: {
           analysis_id?: string
+          fan_in?: number
+          fan_out?: number
           folder?: string
+          hash?: string
           id?: string
           language?: string
           line_count?: number
+          module?: string
           org_id?: string
           path?: string
         }
@@ -465,9 +507,30 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      analysis_id_from_topic: { Args: { p_topic: string }; Returns: string }
+      analysis_topic: { Args: { p_analysis_id: string }; Returns: string }
+      start_analysis: {
+        Args: { p_default_branch: string; p_name: string; p_owner: string }
+        Returns: {
+          analysis_id: string
+          created: boolean
+        }[]
+      }
+      store_parse: {
+        Args: {
+          p_analysis_id: string
+          p_commit_sha: string
+          p_default_branch: string
+          p_files: Json
+          p_imports: Json
+          p_routes: Json
+          p_summary: Json
+        }
+        Returns: undefined
+      }
     }
     Enums: {
+      analysis_stage: "fetch" | "select" | "parse" | "store"
       analysis_status:
         | "queued"
         | "parsing"
@@ -601,6 +664,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      analysis_stage: ["fetch", "select", "parse", "store"],
       analysis_status: [
         "queued",
         "parsing",

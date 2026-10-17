@@ -1,9 +1,9 @@
 import { statSync } from "node:fs";
 import path from "node:path";
-import { selectAdapter, type Adapter, type RepoContext } from "./adapters";
-import { createImportReader } from "./imports";
-import { createResolver } from "./resolve";
-import { loadConfigs } from "./tsconfig";
+import { selectAdapter, type Adapter, type RepoContext } from "./adapters/index.ts";
+import { createImportReader } from "./imports.ts";
+import { createResolver } from "./resolve.ts";
+import { loadConfigs } from "./tsconfig.ts";
 import {
   PARSE_RESULT_VERSION,
   type Coverage,
@@ -14,12 +14,12 @@ import {
   type ImportKind,
   type ImportRecord,
   type ParseResult,
-} from "./types";
-import { assignModules, walkRepository } from "./walk";
+} from "./types.ts";
+import { assignModules, walkRepository } from "./walk.ts";
 
-export type * from "./types";
-export { PARSE_RESULT_VERSION } from "./types";
-export type { Adapter, RepoContext } from "./adapters";
+export type * from "./types.ts";
+export { PARSE_RESULT_VERSION } from "./types.ts";
+export type { Adapter, RepoContext } from "./adapters/index.ts";
 
 export interface ParseOptions {
   /** Examples kept per coverage bucket. Every import is still in `imports`. */

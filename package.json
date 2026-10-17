@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "parse": "tsx src/parser/cli.ts",
+    "analyze": "tsx --conditions=react-server --env-file=.env.local src/pipeline/cli.ts",
+    "test:pipeline": "tsx --conditions=react-server --test src/pipeline/**/*.test.ts",
     "test:parser": "tsx --test src/parser/**/*.test.ts",
     "test:map": "tsx --test src/map/**/*.test.ts"
   },
@@ -21,6 +23,7 @@
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "server-only": "^0.0.1",
+    "tar": "7.4.3",
     "ts-morph": "28.0.0"
   },
   "devDependencies": {

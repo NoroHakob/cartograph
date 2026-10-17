@@ -1,5 +1,5 @@
-import type { Edge, EntryPoint, FileNode, Module, Route } from "../types";
-import type { PackageJson } from "../walk";
+import type { Edge, EntryPoint, FileNode, Module, Route } from "../types.ts";
+import type { PackageJson } from "../walk.ts";
 
 /** What an adapter is allowed to see: the finished graph and the files on disk. */
 export interface RepoContext {

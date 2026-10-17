@@ -1,5 +1,5 @@
 import { Node, Project, ScriptKind, SyntaxKind, ts, type SourceFile } from "ts-morph";
-import type { ImportKind, Language } from "./types";
+import type { ImportKind, Language } from "./types.ts";
 
 /** An import as written, before resolution. */
 export interface RawImport {
