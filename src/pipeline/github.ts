@@ -22,6 +22,15 @@ export interface RepoSnapshot extends RepoRef {
 /** The archive is refused past this, before it is ever unpacked. */
 export const MAX_ARCHIVE_BYTES = 200 * 1024 * 1024;
 
+// Every call here takes an AbortSignal, and none is optional: a request
+// without a deadline can stall forever with nothing recorded. Callers bound
+// them with one of these.
+
+/** A lookup someone is waiting on: one small JSON response. */
+export const LOOKUP_TIMEOUT_MS = 30 * 1000;
+/** A whole fetch, lookup and download together, up to MAX_ARCHIVE_BYTES. */
+export const FETCH_TIMEOUT_MS = 5 * 60 * 1000;
+
 const API = "https://api.github.com";
 const OWNER = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$/;
 const NAME = /^[A-Za-z0-9._-]{1,100}$/;
@@ -52,7 +61,7 @@ export function parseRepoUrl(input: string): RepoRef | null {
  */
 export async function lookupRepository(
   ref: RepoRef,
-  signal?: AbortSignal,
+  signal: AbortSignal,
 ): Promise<RepoRef & { defaultBranch: string }> {
   const repoPath = `${encodeURIComponent(ref.owner)}/${encodeURIComponent(ref.name)}`;
   const repo = await request(`${API}/repos/${repoPath}`, "application/vnd.github+json", ref, signal);
@@ -68,7 +77,7 @@ export async function lookupRepository(
 /**
  * lookupRepository, plus the commit the default branch points at right now.
  */
-export async function resolveSnapshot(ref: RepoRef, signal?: AbortSignal): Promise<RepoSnapshot> {
+export async function resolveSnapshot(ref: RepoRef, signal: AbortSignal): Promise<RepoSnapshot> {
   const { owner, name, defaultBranch: branch } = await lookupRepository(ref, signal);
   const commit = await request(
     `${API}/repos/${owner}/${name}/commits/${encodeURIComponent(branch)}`,
@@ -88,7 +97,7 @@ export async function resolveSnapshot(ref: RepoRef, signal?: AbortSignal): Promi
  * Pinned to the commit, not the branch, so what's parsed is what's recorded
  * even if someone pushes in between.
  */
-export async function downloadArchive(snapshot: RepoSnapshot, file: string, signal?: AbortSignal): Promise<number> {
+export async function downloadArchive(snapshot: RepoSnapshot, file: string, signal: AbortSignal): Promise<number> {
   const url = `${API}/repos/${snapshot.owner}/${snapshot.name}/tarball/${snapshot.commitSha}`;
   const response = await request(url, "application/vnd.github+json", snapshot, signal);
   const declared = Number(response.headers.get("content-length"));
@@ -109,7 +118,7 @@ export async function downloadArchive(snapshot: RepoSnapshot, file: string, sign
   return bytes;
 }
 
-async function request(url: string, accept: string, ref: RepoRef, signal?: AbortSignal): Promise<Response> {
+async function request(url: string, accept: string, ref: RepoRef, signal: AbortSignal): Promise<Response> {
   let response: Response;
   try {
     response = await fetch(url, {
@@ -118,7 +127,7 @@ async function request(url: string, accept: string, ref: RepoRef, signal?: Abort
       signal,
     });
   } catch (error) {
-    if (signal?.aborted) throw error;
+    if (signal.aborted) throw error;
     throw new PipelineError(`Couldn't reach GitHub: ${error instanceof Error ? error.message : String(error)}`);
   }
   if (response.ok) return response;

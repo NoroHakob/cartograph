@@ -5,8 +5,8 @@ import { redirect } from "next/navigation";
 import { after } from "next/server";
 import { getIdentity } from "@/lib/identity";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { PipelineError } from "@/pipeline/errors";
-import { lookupRepository, parseRepoUrl } from "@/pipeline/github";
+import { isTimeout, PipelineError } from "@/pipeline/errors";
+import { LOOKUP_TIMEOUT_MS, lookupRepository, parseRepoUrl } from "@/pipeline/github";
 import { claimAnalysis, runClaimed } from "@/pipeline/run";
 
 export type StartState = { status: "idle" } | { status: "error"; message: string; url: string };
@@ -33,9 +33,10 @@ export async function startAnalysis(_prev: StartState, formData: FormData): Prom
   // that fails a moment later.
   let repo;
   try {
-    repo = await lookupRepository(ref);
+    repo = await lookupRepository(ref, AbortSignal.timeout(LOOKUP_TIMEOUT_MS));
   } catch (e) {
     if (e instanceof PipelineError) return error(e.message);
+    if (isTimeout(e)) return error(`GitHub didn't answer within ${LOOKUP_TIMEOUT_MS / 1000} seconds. Try again in a moment.`);
     throw e;
   }
 

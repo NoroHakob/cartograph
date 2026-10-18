@@ -12,7 +12,7 @@ import { mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
-import { downloadArchive, parseRepoUrl, resolveSnapshot } from "./github";
+import { downloadArchive, FETCH_TIMEOUT_MS, LOOKUP_TIMEOUT_MS, parseRepoUrl, resolveSnapshot } from "./github";
 import { parseInWorker } from "./parse";
 import { runAnalysis } from "./run";
 import { selectFromArchive } from "./select";
@@ -39,7 +39,7 @@ async function main(argv: string[]): Promise<number> {
 async function run(ref: { owner: string; name: string }, orgId: string): Promise<number> {
   const db = createAdminSupabaseClient();
   // Canonical names first, so "Honojs/Hono" and "honojs/hono" are one project.
-  const snapshot = await resolveSnapshot(ref);
+  const snapshot = await resolveSnapshot(ref, AbortSignal.timeout(LOOKUP_TIMEOUT_MS));
 
   const { data: project, error: projectError } = await db
     .from("projects")
@@ -72,6 +72,7 @@ async function run(ref: { owner: string; name: string }, orgId: string): Promise
   const took = `${((performance.now() - started) / 1000).toFixed(1)} s`;
 
   if (outcome.status === "busy") return fatal("another run holds this analysis; try again once it finishes or goes stale");
+  if (outcome.status === "superseded") return fatal("this run went stale and another run took the analysis over; nothing from this run was stored");
   if (outcome.status === "failed") {
     console.log(`\nfailed in ${outcome.stage}: ${outcome.error}`);
     return 1;
@@ -88,10 +89,11 @@ async function run(ref: { owner: string; name: string }, orgId: string): Promise
 async function dry(ref: { owner: string; name: string }): Promise<number> {
   const workdir = mkdtempSync(path.join(tmpdir(), "cartograph-"));
   try {
-    const snapshot = await resolveSnapshot(ref);
+    const signal = AbortSignal.timeout(FETCH_TIMEOUT_MS);
+    const snapshot = await resolveSnapshot(ref, signal);
     console.log(`fetch       ${snapshot.owner}/${snapshot.name}@${snapshot.commitSha} (${snapshot.defaultBranch})`);
     const archive = path.join(workdir, "archive.tar.gz");
-    const bytes = await downloadArchive(snapshot, archive);
+    const bytes = await downloadArchive(snapshot, archive, signal);
     console.log(`            ${(bytes / 1024 / 1024).toFixed(1)} MB archive`);
 
     const root = path.join(workdir, "repo", snapshot.name);

@@ -79,10 +79,14 @@ export function createResolver(input: ResolverInput): Resolve {
     const sourceAbs = path.join(root, source);
     const sourceTs = tsPath(sourceAbs);
     const config = configs.forFile(source);
+    // require() is CommonJS resolution whatever format the file is in: Node
+    // picks the "require" export condition for it even inside an ES module.
     const mode =
       kind === "dynamic"
         ? ts.ModuleKind.ESNext
-        : ts.getImpliedNodeFormatForFile(sourceTs, config.cache.getPackageJsonInfoCache(), ts.sys, config.options);
+        : kind === "require"
+          ? ts.ModuleKind.CommonJS
+          : ts.getImpliedNodeFormatForFile(sourceTs, config.cache.getPackageJsonInfoCache(), ts.sys, config.options);
     const resolved = ts.resolveModuleName(specifier, sourceTs, config.options, ts.sys, config.cache, undefined, mode)
       .resolvedModule;
     if (resolved) return classifyFile(resolved.resolvedFileName);

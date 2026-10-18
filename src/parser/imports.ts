@@ -1,4 +1,4 @@
-import { Node, Project, ScriptKind, SyntaxKind, ts, type SourceFile } from "ts-morph";
+import { Node, Project, ScriptKind, SyntaxKind, ts, type CallExpression, type SourceFile } from "ts-morph";
 import type { ImportKind, Language } from "./types.ts";
 
 /** An import as written, before resolution. */
@@ -50,6 +50,7 @@ export function createImportReader(): (path: string, language: Language, text: s
 function readImports(sourceFile: SourceFile): RawImport[] {
   const found: RawImport[] = [];
   const lineOf = (node: Node) => node.getStartLineNumber();
+  const readRequires = sourceFile.getFullText().includes("require") && !shadowsRequire(sourceFile);
 
   for (const decl of sourceFile.getImportDeclarations()) {
     const named = decl.getNamedImports();
@@ -96,7 +97,19 @@ function readImports(sourceFile: SourceFile): RawImport[] {
       return;
     }
 
-    if (!Node.isCallExpression(node) || node.getExpression().getKind() !== SyntaxKind.ImportKeyword) return;
+    if (!Node.isCallExpression(node)) return;
+
+    // require("x"): only with one literal argument. require(expr) loads
+    // something, but nothing in the syntax says what, so it isn't collected.
+    if (readRequires && isRequireCall(node)) {
+      const [arg] = node.getArguments();
+      if (Node.isStringLiteral(arg) || Node.isNoSubstitutionTemplateLiteral(arg)) {
+        found.push({ specifier: arg.getLiteralValue(), literal: true, kind: "require", typeOnly: false, line: lineOf(node) });
+      }
+      return;
+    }
+
+    if (node.getExpression().getKind() !== SyntaxKind.ImportKeyword) return;
     const [arg] = node.getArguments();
     if (!arg) return;
     if (Node.isStringLiteral(arg) || Node.isNoSubstitutionTemplateLiteral(arg)) {
@@ -107,4 +120,40 @@ function readImports(sourceFile: SourceFile): RawImport[] {
   });
 
   return found;
+}
+
+/** `require(<one argument>)` called by its bare name; `require.resolve(...)` loads nothing. */
+function isRequireCall(call: CallExpression): boolean {
+  const callee = call.getExpression();
+  return Node.isIdentifier(callee) && callee.getText() === "require" && call.getArguments().length === 1;
+}
+
+/**
+ * Whether the file declares its own `require`, so a call to it may not be
+ * Node's. Scope is ignored: one such declaration anywhere and no call in the
+ * file is collected, because without a binder there's no telling which
+ * `require` a call reaches. Two declarations still mean Node's: one made by
+ * `createRequire(...)`, and an ambient `declare` that only types the global.
+ */
+function shadowsRequire(sourceFile: SourceFile): boolean {
+  return sourceFile.getDescendantsOfKind(SyntaxKind.Identifier).some((id) => {
+    if (id.getText() !== "require") return false;
+    const parent = id.getParent();
+    if (!parent) return false;
+    if (Node.isVariableDeclaration(parent) && parent.getNameNode() === id) {
+      if (parent.getVariableStatement()?.hasDeclareKeyword()) return false;
+      const init = parent.getInitializer();
+      if (init && Node.isCallExpression(init)) {
+        const callee = init.getExpression();
+        const name = Node.isPropertyAccessExpression(callee) ? callee.getName() : callee.getText();
+        if (name === "createRequire") return false;
+      }
+      return true;
+    }
+    if (Node.isFunctionDeclaration(parent) && parent.getNameNode() === id) return !parent.hasDeclareKeyword();
+    if (Node.isParameterDeclaration(parent) || Node.isBindingElement(parent)) return parent.getNameNode() === id;
+    if (Node.isImportSpecifier(parent) || Node.isImportClause(parent) || Node.isNamespaceImport(parent)) return true;
+    if (Node.isImportEqualsDeclaration(parent)) return parent.getNameNode() === id;
+    return false;
+  });
 }

@@ -1,5 +1,6 @@
 import path from "node:path";
-import { Node, SyntaxKind, type SourceFile } from "ts-morph";
+import { Node } from "ts-morph";
+import { esmExports } from "../exports.ts";
 import { FRAMEWORKS, type RoleId } from "../taxonomy.ts";
 import type { Route } from "../types.ts";
 import type { Adapter, RepoContext } from "./adapter.ts";
@@ -192,7 +193,7 @@ function appRoutes(repo: RepoContext, app: NextApp): Route[] {
     // A page answers GET by definition; that is what rendering it is.
     if (served.kind === "page") routes.push({ file: f.path, path: urlPath, kind: "page", methods: ["GET"], line: null });
     else {
-      const methods = exportedNames(repo.syntax(f.path));
+      const methods = esmExports(repo.syntax(f.path));
       if (methods === null) continue; // `export *`: what it exports isn't in this file
       for (const { name, line } of methods) {
         if (HANDLER_METHODS.has(name)) routes.push({ file: f.path, path: urlPath, kind: "route_handler", methods: [name], line });
@@ -200,39 +201,4 @@ function appRoutes(repo: RepoContext, app: NextApp): Route[] {
     }
   }
   return routes;
-}
-
-/**
- * Every value name a file exports, with the line it is exported on. Null when
- * the file re-exports everything from somewhere else, because then the list
- * can't be read from this file alone.
- */
-function exportedNames(source: SourceFile): { name: string; line: number }[] | null {
-  const names: { name: string; line: number }[] = [];
-  for (const statement of source.getStatements()) {
-    const line = statement.getStartLineNumber();
-    if (Node.isExportDeclaration(statement)) {
-      if (statement.isTypeOnly()) continue;
-      if (!statement.hasNamedExports()) {
-        const namespace = statement.getNamespaceExport();
-        if (!namespace) return null; // export * from "x"
-        names.push({ name: namespace.getName(), line });
-        continue;
-      }
-      for (const spec of statement.getNamedExports()) {
-        if (!spec.isTypeOnly()) names.push({ name: spec.getAliasNode()?.getText() ?? spec.getName(), line });
-      }
-    } else if (Node.isFunctionDeclaration(statement) || Node.isClassDeclaration(statement)) {
-      const name = statement.getName();
-      if (name && statement.hasExportKeyword() && !statement.hasDefaultKeyword()) names.push({ name, line });
-    } else if (Node.isVariableStatement(statement) && statement.hasExportKeyword()) {
-      for (const decl of statement.getDeclarations()) {
-        const nameNode = decl.getNameNode();
-        // `export const { GET, POST } = handlers` names its exports too.
-        const identifiers = Node.isIdentifier(nameNode) ? [nameNode] : nameNode.getDescendantsOfKind(SyntaxKind.BindingElement).map((b) => b.getNameNode());
-        for (const id of identifiers) if (Node.isIdentifier(id)) names.push({ name: id.getText(), line: decl.getStartLineNumber() });
-      }
-    }
-  }
-  return names;
 }

@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database, Json } from "@/lib/supabase/database.types";
 import type { ImportRecord, ParseResult } from "@/parser/types";
+import { SupersededError } from "./errors";
 import type { RepoSnapshot } from "./github";
 import type { Selection } from "./select";
 
@@ -24,13 +25,16 @@ export interface AnalysisSummary {
 
 /**
  * Replaces everything stored for the analysis with `result` and marks it
- * complete, in one transaction (public.store_parse). The parse result goes in
+ * complete, in one transaction (public.store_parse), provided run `runId`
+ * still holds the analysis. Throws SupersededError, having written nothing,
+ * when another run has claimed it since. The parse result goes in
  * as the parser produced it: no file, import or route is added, dropped or
  * renamed on the way.
  */
 export async function storeParse(
   db: SupabaseClient<Database>,
   analysisId: string,
+  runId: string,
   snapshot: RepoSnapshot,
   result: ParseResult,
   selection: Selection,
@@ -62,6 +66,7 @@ export async function storeParse(
 
   const { error } = await db.rpc("store_parse", {
     p_analysis_id: analysisId,
+    p_run_id: runId,
     p_commit_sha: snapshot.commitSha,
     p_default_branch: snapshot.defaultBranch,
     // The summary is plain data the parser built, so it is valid JSON; the
@@ -71,6 +76,8 @@ export async function storeParse(
     p_imports: result.imports.map(importRow),
     p_routes: routes,
   });
+  // CG001 is store_parse's own code for "another run holds this analysis".
+  if (error?.code === "CG001") throw new SupersededError(error.message);
   if (error) throw new Error(`store_parse failed: ${error.message}`);
 }
 

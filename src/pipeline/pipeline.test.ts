@@ -6,7 +6,9 @@ import { after, describe, test } from "node:test";
 import { gzipSync } from "node:zlib";
 import { Header } from "tar";
 import { parseRepository } from "@/parser";
-import { parseRepoUrl } from "./github";
+import { isTimeout } from "./errors";
+import { downloadArchive, parseRepoUrl } from "./github";
+import type { Claim, RunOptions, RunOutcome } from "./run";
 import { selectFromArchive } from "./select";
 import { isStale, STALE_AFTER_MS } from "./stale";
 
@@ -125,5 +127,138 @@ describe("isStale", () => {
     for (const status of ["complete", "failed"]) {
       assert.equal(isStale({ status, stage_at: ago(STALE_AFTER_MS * 10), created_at: ago(STALE_AFTER_MS * 10) }, now), false);
     }
+  });
+});
+
+describe("GitHub timeouts", () => {
+  test("a download whose body stalls fails as a timeout", async () => {
+    const real = globalThis.fetch;
+    // Headers arrive, then nothing: the body never ends and never errors.
+    globalThis.fetch = async () => new Response(new ReadableStream({ pull: () => new Promise(() => {}) }));
+    const dir = mkdtempSync(path.join(tmpdir(), "cartograph-timeout-"));
+    try {
+      const snapshot = { owner: "o", name: "n", defaultBranch: "main", commitSha: "a".repeat(40) };
+      const error = await downloadArchive(snapshot, path.join(dir, "a.tar.gz"), AbortSignal.timeout(50)).then(
+        () => null,
+        (e: unknown) => e,
+      );
+      // The stream pipeline wraps the timeout in an AbortError; it still counts.
+      assert.ok(isTimeout(error), `expected a timeout, got ${String(error)}`);
+    } finally {
+      globalThis.fetch = real;
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  test("isTimeout tells a deadline from any other abort", () => {
+    assert.equal(isTimeout(new DOMException("late", "TimeoutError")), true);
+    assert.equal(isTimeout(Object.assign(new Error("aborted"), { name: "AbortError", cause: new DOMException("late", "TimeoutError") })), true);
+    assert.equal(isTimeout(new DOMException("stopped", "AbortError")), false);
+    assert.equal(isTimeout(new Error("TimeoutError")), false);
+  });
+});
+
+describe("run ownership", () => {
+  type Row = Record<string, unknown>;
+
+  /**
+   * The analyses table as far as a run writes it: update().eq()...select()
+   * changes the row only when every filter matches, and returns the rows it
+   * changed, as PostgREST does.
+   */
+  function fakeDb(row: Row) {
+    const db = {
+      from: () => ({
+        update: (values: Row) => {
+          const filters: [string, unknown][] = [];
+          const query = {
+            eq: (column: string, value: unknown) => (filters.push([column, value]), query),
+            select: async () => {
+              const hit = filters.every(([column, value]) => row[column] === value);
+              if (hit) Object.assign(row, values);
+              return { data: hit ? [{ id: row.id }] : [], error: null };
+            },
+          };
+          return query;
+        },
+      }),
+    };
+    // Only the calls runClaimed makes before storing are implemented.
+    return db as unknown as NonNullable<RunOptions["db"]>;
+  }
+
+  /**
+   * run.ts loads the admin client's environment checks on import. These tests
+   * pass their own db, so no client is ever made; placeholders satisfy the
+   * checks without reading .env.local.
+   */
+  async function runClaimed(claim: Claim, options: RunOptions): Promise<RunOutcome> {
+    process.env.NEXT_PUBLIC_SUPABASE_URL ??= "http://supabase.invalid";
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??= "placeholder";
+    process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL ??= "/sign-in";
+    const run = await import("./run");
+    return run.runClaimed(claim, options);
+  }
+
+  /** GitHub, answering lookups normally and the tarball with `tarball`. */
+  async function withGitHub<T>(tarball: () => Response, body: () => Promise<T>): Promise<T> {
+    const real = globalThis.fetch;
+    globalThis.fetch = async (input) => {
+      const url = String(input);
+      if (url.endsWith("/repos/o/n")) return Response.json({ full_name: "o/n", default_branch: "main" });
+      if (url.includes("/commits/")) return new Response("b".repeat(40));
+      if (url.includes("/tarball/")) return tarball();
+      return new Response(null, { status: 500, statusText: "unexpected" });
+    };
+    try {
+      return await body();
+    } finally {
+      globalThis.fetch = real;
+    }
+  }
+
+  const claimA = { analysisId: "an-1", runId: "run-A", repo: { owner: "o", name: "n" } };
+  /** The row as run B's claim left it. */
+  const claimedByB = { run_id: "run-B", status: "parsing", stage: "fetch", stage_message: "Starting", error: null };
+
+  test("a run that failed after another claimed the analysis leaves the row alone", async () => {
+    const row: Row = { id: "an-1", run_id: "run-A", status: "parsing", stage: "fetch", stage_message: "Starting", error: null };
+    const outcome = await withGitHub(
+      () => {
+        // A went stale mid-download; B claims the analysis; then A's download fails.
+        Object.assign(row, claimedByB);
+        return new Response(null, { status: 502, statusText: "Bad Gateway" });
+      },
+      () => runClaimed(claimA, { db: fakeDb(row) }),
+    );
+    assert.deepEqual(outcome, { status: "superseded" });
+    assert.deepEqual(row, { id: "an-1", ...claimedByB });
+  });
+
+  test("a superseded run stops at its next stage write", async () => {
+    const row: Row = { id: "an-1", run_id: "run-A", status: "parsing", stage: "fetch", stage_message: "Starting", error: null };
+    const stages: string[] = [];
+    const outcome = await withGitHub(
+      () => {
+        Object.assign(row, claimedByB);
+        return new Response("not reached: the select stage never starts");
+      },
+      () => runClaimed(claimA, { db: fakeDb(row), onStage: (stage) => stages.push(stage) }),
+    );
+    assert.deepEqual(outcome, { status: "superseded" });
+    assert.deepEqual(row, { id: "an-1", ...claimedByB });
+    assert.deepEqual(stages, ["fetch", "fetch"]);
+  });
+
+  test("a run that still holds the analysis records its failure", async () => {
+    const row: Row = { id: "an-1", run_id: "run-A", status: "parsing", stage: "fetch", stage_message: "Starting", error: null };
+    const outcome = await withGitHub(
+      () => new Response(null, { status: 502, statusText: "Bad Gateway" }),
+      () => runClaimed(claimA, { db: fakeDb(row) }),
+    );
+    assert.equal(outcome.status, "failed");
+    assert.equal(row.status, "failed");
+    assert.equal(row.run_id, "run-A");
+    assert.match(String(row.error), /GitHub answered 502/);
   });
 });

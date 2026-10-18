@@ -3,6 +3,8 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { after, describe, test } from "node:test";
+import { Project } from "ts-morph";
+import { commonJsExports, esmExports } from "./exports.ts";
 import { parseRepository } from "./index.ts";
 import { checkInvariants, readParseResult, writeParseResult } from "./output.ts";
 import type { ImportRecord, ParseResult, Resolution } from "./types.ts";
@@ -155,9 +157,9 @@ describe("imports become edges", () => {
     );
   });
 
-  test("ignores require(), import types and export without from", () => {
+  test("ignores import types and export without from", () => {
     const r = parse({
-      "a.js": "const b = require('./b'); export { c }; let t; /** @type {import('./b').X} */ let x;",
+      "a.js": "export { c }; let t; /** @type {import('./b').X} */ let x;",
       "b.js": "",
     });
     assert.equal(importsFrom(r, "a.js").length, 0);
@@ -335,6 +337,10 @@ describe("framework detection", () => {
     assert.equal(parse({ "package.json": pkg({ next: "16", react: "19" }), "a.ts": "" }).adapter.id, "nextjs");
     assert.equal(parse({ "package.json": pkg({ "@nestjs/core": "11", react: "19" }), "a.ts": "" }).adapter.id, "nestjs");
     assert.equal(parse({ "package.json": pkg({ react: "19" }), "a.ts": "" }).adapter.id, "react");
+    // A front end with its own small server is still a front end.
+    assert.equal(parse({ "package.json": pkg({ express: "5", react: "19" }), "a.ts": "" }).adapter.id, "react");
+    assert.equal(parse({ "package.json": pkg({ "@nestjs/core": "11", express: "5" }), "a.ts": "" }).adapter.id, "nestjs");
+    assert.equal(parse({ "package.json": pkg({ express: "5" }), "a.ts": "" }).adapter.id, "express");
     // React only for tests is not a React codebase.
     assert.equal(parse({ "package.json": JSON.stringify({ devDependencies: { react: "19" } }), "a.ts": "" }).adapter.id, "none");
   });
@@ -566,6 +572,205 @@ describe("React adapter", () => {
     assert.equal(r.adapter.id, "react");
     assert.deepEqual(rolesOf(r), { "src/App.tsx": "component", "src/api.ts": "other", "src/useThing.ts": "hook" });
     assert.deepEqual(r.routes, []);
+  });
+});
+
+describe("CommonJS", () => {
+  test("require() with a literal argument is collected and resolved like an import", () => {
+    const r = parse({
+      "package.json": JSON.stringify({ name: "x", dependencies: { debug: "4" } }),
+      "lib/a.js": [
+        "const b = require('./b');",
+        "const dir = require(`./dir`);",
+        "const fs = require('fs');",
+        "const debug = require('debug')('x');",
+        "const missing = require('./nope');",
+        "const up = require('..');",
+      ].join("\n"),
+      "lib/b.js": "",
+      "lib/dir/index.js": "",
+      "index.js": "",
+    });
+    assert.deepEqual(
+      importsFrom(r, "lib/a.js").map((i) => [i.specifier, i.kind, i.line, i.resolution]),
+      [
+        ["./b", "require", 1, { status: "internal", target: "lib/b.js" }],
+        ["./dir", "require", 2, { status: "internal", target: "lib/dir/index.js" }],
+        ["fs", "require", 3, { status: "external", kind: "builtin" }],
+        ["debug", "require", 4, { status: "external", kind: "package", packageName: "debug", installed: false }],
+        ["./nope", "require", 5, { status: "unresolved", reason: "file-not-found" }],
+        ["..", "require", 6, { status: "internal", target: "index.js" }],
+      ],
+    );
+    assert.equal(r.coverage.total, 6);
+    assert.equal(r.edges.length, 3);
+  });
+
+  test("only a literal require() is collected: not require(expr), require.resolve, or a local require", () => {
+    const r = parse({
+      "a.js": "const n = './b'; require(n); require.resolve('./b'); require('./b', 1); require();",
+      "shadowed.js": "function load(require) { return require('./b'); }",
+      "own.js": "const require = (p) => p; require('./b');",
+      "esm.mjs": "import { createRequire } from 'node:module'; const require = createRequire(import.meta.url); require('./b');",
+      "typed.ts": "declare const require: (id: string) => unknown; require('./b');",
+      "b.js": "",
+    });
+    assert.equal(importsFrom(r, "a.js").length, 0);
+    assert.equal(importsFrom(r, "shadowed.js").length, 0);
+    assert.equal(importsFrom(r, "own.js").length, 0);
+    assert.deepEqual(
+      importsFrom(r, "esm.mjs").map((i) => [i.specifier, i.kind]),
+      [
+        ["node:module", "static"],
+        ["./b", "require"],
+      ],
+    );
+    assert.deepEqual(
+      importsFrom(r, "typed.ts").map((i) => [i.specifier, i.kind]),
+      [["./b", "require"]],
+    );
+  });
+
+  test("a file mixing require() and import reports both, without duplicates", () => {
+    const r = parse({
+      "a.ts": ["import b from './b';", "import c = require('./c');", "const b2 = require('./b');", "const d = require('./d');"].join("\n"),
+      "b.ts": "",
+      "c.ts": "",
+      "d.ts": "",
+    });
+    assert.deepEqual(
+      importsFrom(r, "a.ts").map((i) => [i.specifier, i.kind, i.line]),
+      [
+        ["./b", "static", 1],
+        ["./c", "static", 2],
+        ["./b", "require", 3],
+        ["./d", "require", 4],
+      ],
+    );
+    assert.deepEqual(
+      r.edges.map((e) => [e.target, e.kinds, e.occurrences]),
+      [
+        ["b.ts", ["require", "static"], 2],
+        ["c.ts", ["static"], 1],
+        ["d.ts", ["require"], 1],
+      ],
+    );
+  });
+
+  test("require() picks the require condition, import picks import", () => {
+    const r = parse({
+      "package.json": JSON.stringify({ name: "x", imports: { "#impl": { require: "./impl.cjs", import: "./impl.mjs" } } }),
+      "a.mjs": "import x from '#impl'; const y = require('#impl');",
+      "impl.cjs": "",
+      "impl.mjs": "",
+    });
+    assert.deepEqual(
+      importsFrom(r, "a.mjs").map((i) => [i.kind, i.resolution]),
+      [
+        ["static", { status: "internal", target: "impl.mjs" }],
+        ["require", { status: "internal", target: "impl.cjs" }],
+      ],
+    );
+  });
+
+  test("the names a module exports, both ways", () => {
+    const project = new Project({ useInMemoryFileSystem: true, skipLoadingLibFiles: true, compilerOptions: { allowJs: true } });
+    const read = (text: string) => commonJsExports(project.createSourceFile("/m.js", text, { overwrite: true }))?.map((n) => `${n.name}:${n.line}`) ?? null;
+    assert.deepEqual(read("exports.a = 1;\nmodule.exports.b = 2;\nexports['c'] = 3;\nObject.defineProperty(exports, 'd', { value: 4 });"), ["a:1", "b:2", "c:3", "d:4"]);
+    assert.deepEqual(read("module.exports = { a, b: 1, 'c': 2, d() {} };"), ["a:1", "b:1", "c:1", "d:1"]);
+    // Express's own lib/express.js.
+    assert.deepEqual(read("exports = module.exports = createApplication;\nexports.application = proto;"), ["default:1", "application:2"]);
+    assert.deepEqual(read("exports.a = exports.b = fn;"), ["a:1", "b:1"]);
+    // Only top-level statements, and only the real exports object.
+    assert.deepEqual(read("if (x) { exports.hidden = 1; } const exportsLike = {}; exportsLike.a = 1; foo.exports = 2;"), []);
+    // Unreadable from this file alone.
+    assert.equal(read("module.exports = require('./other');"), null);
+    assert.equal(read("module.exports = { ...base, a };"), null);
+    assert.equal(read("module.exports = { [key]: 1 };"), null);
+
+    const esm = (text: string) => esmExports(project.createSourceFile("/m.ts", text, { overwrite: true }))?.map((n) => n.name) ?? null;
+    assert.deepEqual(esm("export const GET = 1; export function POST() {} export { x as PUT }; export type T = 1;"), ["GET", "POST", "PUT"]);
+    assert.equal(esm("export * from './x';"), null);
+  });
+});
+
+describe("Express adapter", () => {
+  const app = (files: Record<string, string>) => ({
+    "package.json": JSON.stringify({ name: "api", main: "src/index.js", dependencies: { express: "5.0.0" } }),
+    ...files,
+  });
+
+  test("roles come from directory names, singular or plural", () => {
+    const r = parse(
+      app({
+        "src/index.js": "const app = require('./app'); app.listen(3000);",
+        "src/app.js": "const express = require('express'); const routes = require('./routes/v1'); module.exports = express();",
+        "src/routes/v1/index.js": "const router = require('express').Router(); router.use('/users', require('./user.route')); module.exports = router;",
+        "src/routes/v1/user.route.js": "const c = require('../../controllers/user.controller'); const auth = require('../../middlewares/auth');",
+        "src/router/admin.js": "",
+        "src/controllers/user.controller.js": "const s = require('../services'); module.exports = { list: s.list };",
+        "src/controller/legacy.js": "",
+        "src/services/index.js": "",
+        "src/service/mail.js": "",
+        "src/models/user.model.js": "",
+        "src/model/token.js": "",
+        "src/middlewares/auth.js": "",
+        "src/middleware/error.js": "",
+        "src/routes/middleware/rate.js": "",
+        "src/config/config.js": "",
+        "src/utils/pick.js": "",
+        "tests/user.test.js": "",
+      }),
+    );
+    assert.equal(r.adapter.id, "express");
+    assert.deepEqual(rolesOf(r), {
+      "src/app.js": "other",
+      "src/config/config.js": "config",
+      "src/controller/legacy.js": "controller",
+      "src/controllers/user.controller.js": "controller",
+      "src/index.js": "entry",
+      "src/middleware/error.js": "middleware",
+      "src/middlewares/auth.js": "middleware",
+      "src/model/token.js": "model",
+      "src/models/user.model.js": "model",
+      "src/router/admin.js": "route",
+      "src/routes/middleware/rate.js": "middleware",
+      "src/routes/v1/index.js": "route",
+      "src/routes/v1/user.route.js": "route",
+      "src/service/mail.js": "service",
+      "src/services/index.js": "service",
+      "src/utils/pick.js": "other",
+      "tests/user.test.js": "test",
+    });
+    // The graph is real even though no route is extracted.
+    const has = (source: string, target: string) => r.edges.some((e) => e.source === source && e.target === target);
+    assert.ok(has("src/routes/v1/user.route.js", "src/controllers/user.controller.js"));
+    assert.ok(has("src/routes/v1/user.route.js", "src/middlewares/auth.js"));
+    assert.ok(has("src/controllers/user.controller.js", "src/services/index.js"));
+  });
+
+  test("routes are never extracted, however literal they look", () => {
+    const r = parse(
+      app({
+        "src/index.js": "const express = require('express'); const app = express(); app.get('/health', (req, res) => res.send('ok')); app.listen(3000);",
+        "src/routes/users.js": "const router = require('express').Router(); router.post('/', create); module.exports = router;",
+      }),
+    );
+    assert.equal(r.adapter.id, "express");
+    assert.deepEqual(r.routes, []);
+  });
+
+  test("conventional directory names count only inside an Express package", () => {
+    const r = parse({
+      "package.json": JSON.stringify({ name: "mono" }),
+      "server/package.json": JSON.stringify({ name: "server", dependencies: { express: "5" } }),
+      "server/routes/a.js": "",
+      "server/models/b.js": "",
+      "tools/package.json": JSON.stringify({ name: "tools" }),
+      "tools/models/c.js": "",
+    });
+    assert.equal(r.adapter.id, "express");
+    assert.deepEqual(rolesOf(r), { "server/models/b.js": "model", "server/routes/a.js": "route", "tools/models/c.js": "other" });
   });
 });
 

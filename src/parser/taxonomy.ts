@@ -4,7 +4,7 @@
 // adapters, ts-morph or the filesystem into the bundle. The adapters assign
 // these roles; this file only names and orders them.
 
-export type FrameworkId = "nextjs" | "nestjs" | "react" | "none";
+export type FrameworkId = "nextjs" | "nestjs" | "express" | "react" | "none";
 
 export type RoleId =
   // Next.js
@@ -37,6 +37,9 @@ export type RoleId =
   | "middleware"
   | "strategy"
   | "decorator"
+  // Express, alongside NestJS's controller, service and middleware
+  | "route"
+  | "model"
   // Any framework
   | "entry"
   | "source"
@@ -81,6 +84,9 @@ export const ROLES: Record<RoleId, RoleInfo> = {
   middleware: { name: "Middleware", color: "#4f8bb5" },
   strategy: { name: "Strategies", color: "#6f9a2a" },
   decorator: { name: "Decorators", color: "#c48a3b" },
+
+  route: { name: "Routes", color: "#16a3a8" },
+  model: { name: "Models", color: "#9b6ad6" },
 
   entry: { name: "Entry points", color: "#e07a3a" },
   source: { name: "Source files", color: "#3b82c4" },
@@ -144,6 +150,10 @@ export const FRAMEWORKS: Record<FrameworkId, Framework> = {
       "test",
       "other",
     ],
+  },
+  express: {
+    name: "Express",
+    roles: ["route", "controller", "service", "model", "middleware", "entry", "config", "test", "other"],
   },
   react: {
     name: "React",

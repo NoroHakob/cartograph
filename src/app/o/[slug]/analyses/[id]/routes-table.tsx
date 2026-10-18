@@ -6,6 +6,8 @@ import type { StoredRoute } from "./explorer-data";
 const EMPTY: Record<FrameworkId, string> = {
   nextjs: "No route could be read exactly from the code. A route is listed only when both its method and its full path are.",
   nestjs: "No route could be read exactly from the code. A route is listed only when both its method and its full path are.",
+  express:
+    "Express builds its routes at runtime from routers, variables and middleware chains, so no route can be read exactly from the code. None are listed rather than guessed.",
   react: "React doesn't turn files into routes by itself, so there are none to list.",
   none: "Without a framework, nothing turns files into routes, so there are none to list.",
 };

@@ -52,11 +52,12 @@ export interface ExcludedFile {
   reason: ExcludedFileReason;
 }
 
-/** The three syntactic forms that produce edges. */
+/** The syntactic forms that produce edges. */
 export type ImportKind =
   | "static" // import ... from "x", import "x", import x = require("x")
   | "reexport" // export ... from "x"
-  | "dynamic"; // import("x")
+  | "dynamic" // import("x")
+  | "require"; // require("x"), with one literal argument
 
 export type ExternalKind =
   | "builtin" // node:fs, path, ...

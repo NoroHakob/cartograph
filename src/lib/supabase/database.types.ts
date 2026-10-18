@@ -28,6 +28,7 @@ export type Database = {
           id: string
           org_id: string
           project_id: string
+          run_id: string | null
           stage: Database["public"]["Enums"]["analysis_stage"] | null
           stage_at: string | null
           stage_message: string | null
@@ -45,6 +46,7 @@ export type Database = {
           id?: string
           org_id: string
           project_id: string
+          run_id?: string | null
           stage?: Database["public"]["Enums"]["analysis_stage"] | null
           stage_at?: string | null
           stage_message?: string | null
@@ -62,6 +64,7 @@ export type Database = {
           id?: string
           org_id?: string
           project_id?: string
+          run_id?: string | null
           stage?: Database["public"]["Enums"]["analysis_stage"] | null
           stage_at?: string | null
           stage_message?: string | null
@@ -530,6 +533,7 @@ export type Database = {
           p_files: Json
           p_imports: Json
           p_routes: Json
+          p_run_id: string
           p_summary: Json
         }
         Returns: undefined
