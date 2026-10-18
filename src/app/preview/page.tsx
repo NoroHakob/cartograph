@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MapWorkspace } from "@/components/map/map-workspace";
-import { categoriesOf } from "@/map/categories";
 import type { RepoFacts } from "@/map/detail";
 import { FIXTURE_REPOSITORY, loadFixture } from "./fixture";
 
@@ -31,7 +30,7 @@ export default function PreviewPage() {
 
   return (
     <div className="h-dvh">
-      <MapWorkspace categories={categoriesOf(result.adapter.id, result.files)} files={files} edges={edges} facts={facts} />
+      <MapWorkspace framework={result.adapter.id} files={files} edges={edges} facts={facts} />
     </div>
   );
 }

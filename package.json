@@ -11,14 +11,18 @@
     "analyze": "tsx --conditions=react-server --env-file=.env.local src/pipeline/cli.ts",
     "test:pipeline": "tsx --conditions=react-server --test src/pipeline/**/*.test.ts",
     "test:parser": "tsx --test src/parser/**/*.test.ts",
-    "test:map": "tsx --test src/map/**/*.test.ts"
+    "test:map": "tsx --test src/map/**/*.test.ts",
+    "test:explain": "tsx --test src/explain/**/*.test.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.9.16",
     "@dagrejs/dagre": "3.1.1",
+    "@langchain/core": "1.2.18",
+    "@langchain/google": "0.2.11",
     "@supabase/supabase-js": "^2.118.0",
     "@xyflow/react": "12.12.0",
     "ignore": "7.0.12",
+    "langsmith": "0.11.0",
     "next": "16.4.1",
     "react": "19.3.0",
     "react-dom": "19.3.0",

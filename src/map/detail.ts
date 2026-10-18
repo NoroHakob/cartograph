@@ -6,7 +6,11 @@ import type { FileNode, Language, Route } from "@/parser/types";
 import type { Fold } from "./fold";
 import { rowOrder, type MapEdge, type MapFile } from "./view";
 
-export type DetailFile = MapFile & Pick<FileNode, "lineCount">;
+export type DetailFile = MapFile &
+  Pick<FileNode, "lineCount"> & {
+    /** Set when no adapter identified the file and a model gave its role: the model's name. */
+    roleBy?: string;
+  };
 
 /** The repository-level facts the parser recorded, beyond files and edges. */
 export interface RepoFacts {

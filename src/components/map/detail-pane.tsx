@@ -26,7 +26,9 @@ import {
   type Insights,
 } from "@/map/graph";
 import { nodeId, type MapEdge } from "@/map/view";
+import { targetKey, type ExplainTarget } from "@/explain/types";
 import type { MapController } from "./dependency-map";
+import { ExplanationPanel, type ExplainState, type PathLinks } from "./explanation";
 
 export type DetailTab = "structure" | "explanation";
 
@@ -62,14 +64,20 @@ interface DetailPaneProps {
   /** Also lives above the pane: an open walk stays open as the selection moves. */
   reachMode: ReachMode | null;
   onReachMode: (mode: ReachMode | null) => void;
+  /** Also lives above the pane, by target: a fetched explanation stays put. */
+  explanations: ReadonlyMap<string, ExplainState>;
+  /** Absent where nothing can be explained. */
+  onExplain?: (target: ExplainTarget) => void;
+  onReanalyse?: () => Promise<{ error: string }>;
 }
 
 /**
  * The right-hand pane. With nothing selected it summarises the repository;
  * that is its resting state. A selected file or folder gets Structure and
- * Explanation tabs. Everything comes from data already in the browser.
+ * Explanation tabs. Structure comes from data already in the browser;
+ * Explanation asks the server, once, and keeps the answer above the pane.
  */
-export function DetailPane({ map, files, edges, facts, tab, onTab, reachMode, onReachMode }: DetailPaneProps) {
+export function DetailPane({ map, files, edges, facts, tab, onTab, reachMode, onReachMode, explanations, onExplain, onReanalyse }: DetailPaneProps) {
   const fileByPath = useMemo(() => new Map(files.map((f) => [f.path, f])), [files]);
   const known = useMemo(() => conventions(facts), [facts]);
   const neighboursOf = useMemo(() => neighbourIndex(edges), [edges]);
@@ -82,6 +90,20 @@ export function DetailPane({ map, files, edges, facts, tab, onTab, reachMode, on
   const lit = (path: string) =>
     hover !== null && (hover.file === null ? hover.node === nodeId(fold.groupOf.get(path) ?? "") : hover.file === path);
   const rowProps = { fileByPath, lit, onSelect: map.focusFile, onHover: map.setHover };
+  const folders = useMemo(() => new Set(fold.groups.map((g) => g.dir)), [fold]);
+  const links = useMemo<PathLinks>(
+    () => ({ files: new Set(fileByPath.keys()), folders, onFile: map.focusFile, onFolder: map.focusFolder, onHover: map.setHover }),
+    [fileByPath, folders, map.focusFile, map.focusFolder, map.setHover],
+  );
+  const explanationFor = (noun: "file" | "folder", target: ExplainTarget) => (
+    <ExplanationPanel
+      noun={noun}
+      state={explanations.get(targetKey(target))}
+      onExplain={onExplain && (() => onExplain(target))}
+      onReanalyse={onReanalyse}
+      links={links}
+    />
+  );
 
   if (selection === null) {
     return <RepoView facts={facts} summary={summary} insights={found} rowProps={rowProps} />;
@@ -104,13 +126,18 @@ export function DetailPane({ map, files, edges, facts, tab, onTab, reachMode, on
     const { imports, importedBy } = neighboursOf(file.path);
     const roles = known.of(file.path);
     return (
-      <Frame back={back} kicker="File" title={file.path} tab={tab} onTab={onTab}>
+      <Frame back={back} kicker="File" title={file.path} tab={tab} onTab={onTab} explanation={explanationFor("file", { kind: "file", path: file.path })}>
         <Section>
           <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-sm">
             <dt className="text-fg-muted">Category</dt>
             <dd className="flex min-w-0 items-center gap-1.5">
               <Swatch color={roleColor(file.role)} />
               {ROLES[file.role].name}
+              {file.roleBy && (
+                <span className="text-xs text-fg-muted" title="No convention identified this file; a model labelled it when it was explained">
+                  · suggested by <span className="font-mono">{file.roleBy}</span>
+                </span>
+              )}
             </dd>
             <dt className="text-fg-muted">Kind</dt>
             <dd className="min-w-0">
@@ -152,7 +179,14 @@ export function DetailPane({ map, files, edges, facts, tab, onTab, reachMode, on
   const folder = node ? folderSummary(fold, node.dir, fileByPath, known) : null;
   if (!node || !folder) return null;
   return (
-    <Frame back={back} kicker="Folder" title={node.dir === "." ? `${facts.name} (root)` : node.dir} tab={tab} onTab={onTab}>
+    <Frame
+      back={back}
+      kicker="Folder"
+      title={node.dir === "." ? `${facts.name} (root)` : node.dir}
+      tab={tab}
+      onTab={onTab}
+      explanation={explanationFor("folder", { kind: "folder", dir: node.dir })}
+    >
       <Section>
         <div className="grid grid-cols-3 gap-2">
           <Stat value={folder.files.length} label="files" />
@@ -451,6 +485,7 @@ function Frame({
   title,
   tab,
   onTab,
+  explanation,
   children,
 }: {
   back: ReactNode;
@@ -458,6 +493,7 @@ function Frame({
   title: string;
   tab: DetailTab;
   onTab: (tab: DetailTab) => void;
+  explanation: ReactNode;
   children: ReactNode;
 }) {
   return (
@@ -484,16 +520,7 @@ function Frame({
         </div>
       </header>
       <div role="tabpanel" id="detail-tabpanel" aria-labelledby={`detail-tab-${tab}`} className="flex flex-col">
-        {tab === "structure" ? (
-          children
-        ) : (
-          <div className="px-4 py-8 text-center">
-            <p className="text-sm font-medium">No explanation yet</p>
-            <p className="mt-1 text-xs text-fg-muted">
-              Explanations will describe what the parser found here. Nothing writes them yet.
-            </p>
-          </div>
-        )}
+        {tab === "structure" ? children : explanation}
       </div>
     </div>
   );

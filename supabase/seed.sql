@@ -101,7 +101,7 @@ join seed_done d on d.analysis_id = f.analysis_id
 where f.path = 'src/index.ts';
 
 insert into public.file_roles (org_id, analysis_id, file_id, role, rationale, model)
-select f.org_id, f.analysis_id, f.id, 'entry', 'Imported by nothing; imports the core client.', 'seed'
+select f.org_id, f.analysis_id, f.id, 'service', 'Re-exports the core client for the rest of the package.', 'seed'
 from public.files f
 join seed_done d on d.analysis_id = f.analysis_id
 where f.path = 'src/index.ts';

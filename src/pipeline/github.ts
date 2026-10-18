@@ -149,3 +149,47 @@ function notFound(ref: RepoRef): PipelineError {
 function tooLarge(ref: RepoRef): PipelineError {
   return new PipelineError(`${ref.owner}/${ref.name} is over ${MAX_ARCHIVE_BYTES / 1024 / 1024} MB as an archive, which is more than this can parse.`);
 }
+
+/**
+ * The commit `branch` points at right now. One API request, for checking
+ * whether an analysis is still current without starting a run.
+ */
+export async function headCommit(ref: RepoRef, branch: string, signal: AbortSignal): Promise<string> {
+  const response = await request(
+    `${API}/repos/${encodeURIComponent(ref.owner)}/${encodeURIComponent(ref.name)}/commits/${encodeURIComponent(branch)}`,
+    "application/vnd.github.sha",
+    ref,
+    signal,
+  );
+  const sha = (await response.text()).trim();
+  if (!/^[0-9a-f]{40}$/.test(sha)) throw new PipelineError(`GitHub didn't return a commit for ${ref.owner}/${ref.name}@${branch}.`);
+  return sha;
+}
+
+/** The parser's own limit (MAX_FILE_BYTES): no file past it is ever a node. */
+const MAX_RAW_BYTES = 1024 * 1024;
+
+/**
+ * One file's bytes at exactly `commitSha`, or null when the file isn't there
+ * at that commit. Served by raw.githubusercontent.com, which doesn't count
+ * against the API's anonymous limit, and immutable for a full commit sha.
+ */
+export async function fetchRawFile(ref: RepoRef, commitSha: string, filePath: string, signal: AbortSignal): Promise<Buffer | null> {
+  const url = `https://raw.githubusercontent.com/${encodeURIComponent(ref.owner)}/${encodeURIComponent(ref.name)}/${commitSha}/${filePath
+    .split("/")
+    .map(encodeURIComponent)
+    .join("/")}`;
+  let response: Response;
+  try {
+    response = await fetch(url, { headers: { "user-agent": "cartograph" }, signal });
+  } catch (error) {
+    if (signal.aborted) throw error;
+    throw new PipelineError(`Couldn't reach GitHub: ${error instanceof Error ? error.message : String(error)}`);
+  }
+  if (response.status === 404) return null;
+  if (!response.ok) throw new PipelineError(`GitHub answered ${response.status} for ${filePath}.`);
+  if (Number(response.headers.get("content-length")) > MAX_RAW_BYTES) throw new PipelineError(`${filePath} is too large to read.`);
+  const bytes = Buffer.from(await response.arrayBuffer());
+  if (bytes.length > MAX_RAW_BYTES) throw new PipelineError(`${filePath} is too large to read.`);
+  return bytes;
+}

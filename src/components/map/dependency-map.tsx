@@ -54,6 +54,8 @@ export interface MapController {
   actions: MapActions;
   /** Opens the folder holding `path`, scrolls its row into view and selects it. */
   focusFile: (path: string) => void;
+  /** Opens the folded folder `dir` and selects it, as clicking it on the map does. */
+  focusFolder: (dir: string) => void;
   deselect: () => void;
   setHover: (hover: Hover | null) => void;
   onNodeClick: NodeMouseHandler;
@@ -149,6 +151,17 @@ export function useMapController(files: readonly MapFile[], edges: readonly MapE
     [folded, fileByPath, open, view, requestFit],
   );
 
+  const focusFolder = useCallback(
+    (dir: string) => {
+      if (!folded.groups.some((g) => g.dir === dir)) return;
+      const id = nodeId(dir);
+      requestFit(id);
+      setOpen((current) => (current.has(dir) ? current : new Set(current).add(dir)));
+      setSelection({ kind: "node", id });
+    },
+    [folded, requestFit],
+  );
+
   const actions = useMemo<MapActions>(
     () => ({
       close: (dir) => {
@@ -174,7 +187,7 @@ export function useMapController(files: readonly MapFile[], edges: readonly MapE
 
   const deselect = useCallback(() => setSelection(null), []);
 
-  return { fold: folded, view, layout, highlight, selection, hover, category, setCategory, actions, focusFile, deselect, setHover, onNodeClick };
+  return { fold: folded, view, layout, highlight, selection, hover, category, setCategory, actions, focusFile, focusFolder, deselect, setHover, onNodeClick };
 }
 
 /** The canvas. All state comes from the controller. */

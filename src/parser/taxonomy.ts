@@ -40,6 +40,8 @@ export type RoleId =
   // Express, alongside NestJS's controller, service and middleware
   | "route"
   | "model"
+  // Only ever assigned by classification, never by an adapter
+  | "util"
   // Any framework
   | "entry"
   | "source"
@@ -87,6 +89,8 @@ export const ROLES: Record<RoleId, RoleInfo> = {
 
   route: { name: "Routes", color: "#16a3a8" },
   model: { name: "Models", color: "#9b6ad6" },
+
+  util: { name: "Utilities", color: "#7a8f5a" },
 
   entry: { name: "Entry points", color: "#e07a3a" },
   source: { name: "Source files", color: "#3b82c4" },
@@ -164,6 +168,27 @@ export const FRAMEWORKS: Record<FrameworkId, Framework> = {
     roles: ["entry", "source", "config", "test"],
   },
 };
+
+/**
+ * Roles an adapter gives a file it couldn't identify: the framework's
+ * catch-all, or the fallback's plain source file. Only these files are ever
+ * classified.
+ */
+export const UNIDENTIFIED_ROLES: readonly RoleId[] = ["other", "source"];
+
+/**
+ * The only answers classification may give, in the order the rail lists
+ * them after a framework's own roles. None is structural: page, route,
+ * controller and the rest decide the route table and the entry-point
+ * colouring, and convention owns them. The database checks the same list.
+ */
+export const CLASSIFIABLE_ROLES = ["service", "repository", "model", "util", "config", "component", "hook"] as const satisfies readonly RoleId[];
+
+export type ClassifiableRole = (typeof CLASSIFIABLE_ROLES)[number];
+
+export function isClassifiableRole(value: unknown): value is ClassifiableRole {
+  return typeof value === "string" && (CLASSIFIABLE_ROLES as readonly string[]).includes(value);
+}
 
 export function isFrameworkId(value: unknown): value is FrameworkId {
   return typeof value === "string" && Object.hasOwn(FRAMEWORKS, value);

@@ -3,8 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { MapWorkspace } from "@/components/map/map-workspace";
-import { categoriesOf } from "@/map/categories";
 import { loadExplorer } from "../explorer-data";
+import { explainTarget, reanalyse } from "./actions";
 
 export const metadata: Metadata = {
   title: "Map · Cartograph",
@@ -42,7 +42,14 @@ async function StoredMap({ params }: { params: PageProps<"/o/[slug]/analyses/[id
         )}
       </div>
       <div className="min-h-0 flex-1">
-        <MapWorkspace categories={categoriesOf(explorer.framework, explorer.files)} files={explorer.files} edges={explorer.edges} facts={explorer.facts} />
+        <MapWorkspace
+          framework={explorer.framework}
+          files={explorer.files}
+          edges={explorer.edges}
+          facts={explorer.facts}
+          explain={explainTarget.bind(null, id)}
+          reanalyse={reanalyse.bind(null, id)}
+        />
       </div>
     </div>
   );

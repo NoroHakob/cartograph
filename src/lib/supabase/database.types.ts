@@ -169,6 +169,47 @@ export type Database = {
           },
         ]
       }
+      explanation_cache: {
+        Row: {
+          body: string
+          created_at: string
+          key: string
+          kind: string
+          model: string
+          org_id: string
+          rationale: string | null
+          role: string | null
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          key: string
+          kind: string
+          model: string
+          org_id: string
+          rationale?: string | null
+          role?: string | null
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          key?: string
+          kind?: string
+          model?: string
+          org_id?: string
+          rationale?: string | null
+          role?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "explanation_cache_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       explanations: {
         Row: {
           analysis_id: string

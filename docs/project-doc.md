@@ -26,7 +26,7 @@ A map that's wrong is worse than no map. If the AI invents a dependency, the use
 
 ## AI
 
-- One wrapped OpenAI client, so models, retries and limits are changed in one place.
+- One wrapped model client (Google Gemini, via LangChain), so models, retries and limits are changed in one place.
 - Every call is traced in LangSmith, so bad answers can be traced back to their inputs.
 - Answers pass the AI the relevant part of the graph, not the whole repo.
 
