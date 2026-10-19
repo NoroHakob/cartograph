@@ -69,10 +69,10 @@ export function ExplanationPanel({ noun, state, onExplain, onReanalyse, links }:
           {shown.role.rationale ? `: ${shown.role.rationale}` : "."}
         </p>
       )}
-      {shown.unknownPaths.length > 0 && (
+      {shown.inventedPaths.length > 0 && (
         <p className="border-t border-border px-4 py-3 text-xs text-fg-muted">
-          It also named {shown.unknownPaths.length === 1 ? "a path" : "paths"} the parser didn&apos;t hand it, which{" "}
-          {shown.unknownPaths.length === 1 ? "isn't" : "aren't"} linked: <span className="font-mono"><SlashBreaks text={shown.unknownPaths.join(", ")} /></span>
+          It also named {shown.inventedPaths.length === 1 ? "a path" : "paths"} the parser didn&apos;t hand it, which{" "}
+          {shown.inventedPaths.length === 1 ? "isn't" : "aren't"} linked: <span className="font-mono"><SlashBreaks text={shown.inventedPaths.join(", ")} /></span>
         </p>
       )}
       <footer className="flex flex-col gap-1.5 border-t border-border px-4 py-3 text-[11px] text-fg-muted">

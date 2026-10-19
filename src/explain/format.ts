@@ -152,15 +152,3 @@ export function pathMatcher(paths: Iterable<string>): PathMatcher {
     return out;
   };
 }
-
-const PATH_LIKE = /(?<![\w./@-])(?:[\w@.()[\]+-]+\/)+[\w@.()[\]+-]+\.[cm]?[jt]sx?(?![\w/])/g;
-
-/**
- * Source-file paths the text names that aren't among `known`. An answer
- * should name only what it was handed; these are the ones it didn't.
- */
-export function unknownPaths(text: string, known: ReadonlySet<string>): string[] {
-  const found = new Set<string>();
-  for (const match of text.matchAll(PATH_LIKE)) if (!known.has(match[0])) found.add(match[0]);
-  return [...found].sort();
-}

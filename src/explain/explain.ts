@@ -2,13 +2,14 @@ import "server-only";
 
 import { createHash } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { AiError, annotateRun, generateObject, generateText, MODEL, traced, tracingStatus } from "@/ai/client";
+import { AiError, annotateRun, MODEL, recordFeedback, traced, tracingStatus } from "@/ai/client";
 import type { Database } from "@/lib/supabase/database.types";
 import { isClassifiableRole, type ClassifiableRole } from "@/parser/taxonomy";
 import { PipelineError } from "@/pipeline/errors";
 import { fetchRawFile, headCommit, LOOKUP_TIMEOUT_MS, type RepoRef } from "@/pipeline/github";
-import { unknownPaths } from "./format";
-import { CLASSIFY_SCHEMA, classifies, filePrompt, folderPrompt, handedPaths, PROMPT_VERSION, type FileSubject, type Subject } from "./prompts";
+import { askAboutFile, askAboutFolder } from "./ask";
+import { INVENTED_PATHS_KEY, inventedPaths } from "./invented";
+import { handedPaths, PROMPT_VERSION, type FileSubject, type Subject } from "./prompts";
 import { loadFileSubject, loadFolderSubject } from "./subject";
 import type { ExplainResult, ExplainTarget, Staleness } from "./types";
 
@@ -29,6 +30,8 @@ interface Answer {
   role: ClassifiableRole | null;
   rationale: string | null;
   cached: boolean;
+  /** Paths the answer named that it wasn't shown. */
+  invented: string[];
 }
 
 /**
@@ -60,7 +63,7 @@ export async function explain(ctx: AnalysisContext, target: ExplainTarget): Prom
     console.error("[explain] failed:", answer.error);
     return { ok: false, error: "The explanation couldn't be written. The server log has the details." };
   }
-  const { body, role, rationale, cached } = answer.value;
+  const { body, role, rationale, cached, invented } = answer.value;
 
   // Recorded on the analysis's file even on a cache hit: a re-run replaces
   // the file rows, and the role with them, while the cache entry lives on.
@@ -71,7 +74,6 @@ export async function explain(ctx: AnalysisContext, target: ExplainTarget): Prom
     if (error) console.warn(`[explain] couldn't record the role of ${subject.kind === "file" ? subject.path : ""}: ${error.message}`);
   }
 
-  const paths = handedPaths(subject);
   return {
     ok: true,
     explanation: {
@@ -79,8 +81,8 @@ export async function explain(ctx: AnalysisContext, target: ExplainTarget): Prom
       body,
       model: MODEL,
       cached,
-      paths,
-      unknownPaths: unknownPaths(body, new Set(paths)),
+      paths: handedPaths(subject),
+      inventedPaths: invented,
       role: role ? { role, rationale } : null,
       analysedCommit: ctx.commitSha,
       staleness,
@@ -89,8 +91,12 @@ export async function explain(ctx: AnalysisContext, target: ExplainTarget): Prom
   };
 }
 
-/** Keyed on everything the prompt is built from, and on the model and the prompt itself. */
-function cacheKey(subject: Subject): string {
+/**
+ * Keyed on everything the prompt is built from, and on the model and the
+ * prompt itself. Exported so the evals can tell which subject a cached
+ * answer was written about.
+ */
+export function cacheKey(subject: Subject): string {
   return createHash("sha256").update(JSON.stringify({ prompt: PROMPT_VERSION, model: MODEL, subject })).digest("hex");
 }
 
@@ -111,27 +117,43 @@ function answerFor(ctx: AnalysisContext, subject: Subject): Promise<Answer> {
 
   const run = traced(subject.kind === "file" ? "explain file" : "explain folder", async (input: { analysisId: string; key: string; subject: Subject }) => {
     const hit = await lookup(input.key);
+    let answer: Omit<Answer, "cached" | "invented">;
     if (hit) {
       annotateRun({ cache: "hit" });
-      return { body: hit.body, role: isClassifiableRole(hit.role) ? hit.role : null, rationale: hit.rationale, cached: true };
+      answer = { body: hit.body, role: isClassifiableRole(hit.role) ? hit.role : null, rationale: hit.rationale };
+    } else {
+      annotateRun({ cache: "miss" });
+      answer = input.subject.kind === "file" ? await fileAnswer(ctx, input.subject) : await askAboutFolder(input.subject, ctx.repo.name);
+      const { error } = await ctx.db
+        .from("explanation_cache")
+        .upsert(
+          { org_id: ctx.orgId, key: input.key, kind: input.subject.kind, model: MODEL, body: answer.body, role: answer.role, rationale: answer.rationale },
+          { onConflict: "org_id,key", ignoreDuplicates: true },
+        );
+      if (error) console.warn(`[explain] couldn't cache the explanation: ${error.message}`);
     }
-    annotateRun({ cache: "miss" });
 
-    const answer = input.subject.kind === "file" ? await askAboutFile(ctx, input.subject) : await askAboutFolder(ctx, input.subject);
-    const { error } = await ctx.db
-      .from("explanation_cache")
-      .upsert(
-        { org_id: ctx.orgId, key: input.key, kind: input.subject.kind, model: MODEL, body: answer.body, role: answer.role, rationale: answer.rationale },
-        { onConflict: "org_id,key", ignoreDuplicates: true },
-      );
-    if (error) console.warn(`[explain] couldn't cache the explanation: ${error.message}`);
-    return { ...answer, cached: false };
+    // The live evaluator: every answer served, cached or fresh, is checked
+    // against exactly the paths its prompt handed over, and the result is
+    // recorded on this run.
+    const invented = inventedPaths(answer.body, handedPaths(input.subject));
+    annotateRun({ invented_paths: invented.length });
+    recordFeedback(
+      {
+        key: INVENTED_PATHS_KEY,
+        score: invented.length === 0 ? 1 : 0,
+        value: invented.length,
+        comment: invented.length === 0 ? "Every path it named was one it was shown." : `Named paths it wasn't shown: ${invented.join(", ")}`,
+      },
+      { evaluator: "invented-paths", deterministic: true, cache: hit ? "hit" : "miss" },
+    );
+    return { ...answer, cached: Boolean(hit), invented };
   });
 
   return run({ analysisId: ctx.analysisId, key, subject });
 }
 
-async function askAboutFile(ctx: AnalysisContext, subject: FileSubject): Promise<Omit<Answer, "cached">> {
+async function fileAnswer(ctx: AnalysisContext, subject: FileSubject): Promise<Omit<Answer, "cached" | "invented">> {
   // The bytes at the analysed commit: what the parser read, so what the
   // neighbour lists describe.
   let source: string | null = null;
@@ -144,23 +166,7 @@ async function askAboutFile(ctx: AnalysisContext, subject: FileSubject): Promise
   } catch (error) {
     console.warn(`[explain] couldn't read ${subject.path} from GitHub: ${error instanceof Error ? error.message : String(error)}`);
   }
-  const prompt = filePrompt(subject, source);
-
-  if (!classifies(subject)) return { body: await generateText(prompt), role: null, rationale: null };
-
-  const answer = await generateObject(prompt, CLASSIFY_SCHEMA, "explain_and_classify");
-  const body = typeof answer.explanation === "string" ? answer.explanation.trim() : "";
-  if (!body) throw new AiError("The model returned an empty answer.");
-  // The schema already limits the role to the list; this is the check that
-  // doesn't depend on the model obeying it. Anything else is dropped.
-  const role = isClassifiableRole(answer.role) ? answer.role : null;
-  if (!role) console.warn(`[explain] discarded role ${JSON.stringify(answer.role)} for ${subject.path}: not a classifiable role`);
-  const rationale = role && typeof answer.rationale === "string" && answer.rationale.trim() ? answer.rationale.trim() : null;
-  return { body, role, rationale };
-}
-
-async function askAboutFolder(ctx: AnalysisContext, subject: Subject & { kind: "folder" }): Promise<Omit<Answer, "cached">> {
-  return { body: await generateText(folderPrompt(subject, ctx.repo.name)), role: null, rationale: null };
+  return askAboutFile(subject, source);
 }
 
 // ---------------------------------------------------------------------------

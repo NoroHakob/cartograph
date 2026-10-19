@@ -1,0 +1,731 @@
+[
+  {
+    "inputs": {
+      "origin": {
+        "repo": "brocoders/nestjs-boilerplate",
+        "commit": "9620f159eefe38f47747d02ab162852367c5472c",
+        "framework": "nestjs"
+      },
+      "subject": {
+        "kind": "file",
+        "path": "src/auth/auth.service.ts",
+        "language": "ts",
+        "lineCount": 645,
+        "hash": "23766ecd3996921b483162dbc3d46b5411a2f95da48bc8f1d334812fb4326746",
+        "role": "other",
+        "imports": [
+          {
+            "path": "src/auth/auth-providers.enum.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "src/auth/dto/auth-email-login.dto.ts",
+            "role": "dto",
+            "typeOnly": false
+          },
+          {
+            "path": "src/auth/dto/auth-register-login.dto.ts",
+            "role": "dto",
+            "typeOnly": false
+          },
+          {
+            "path": "src/auth/dto/auth-update.dto.ts",
+            "role": "dto",
+            "typeOnly": false
+          },
+          {
+            "path": "src/auth/dto/login-response.dto.ts",
+            "role": "dto",
+            "typeOnly": false
+          },
+          {
+            "path": "src/auth/strategies/types/jwt-payload.type.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "src/auth/strategies/types/jwt-refresh-payload.type.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "src/config/config.type.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "src/mail/mail.service.ts",
+            "role": "service",
+            "typeOnly": false
+          },
+          {
+            "path": "src/roles/roles.enum.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "src/session/domain/session.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "src/session/session.service.ts",
+            "role": "service",
+            "typeOnly": false
+          },
+          {
+            "path": "src/social/interfaces/social.interface.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "src/statuses/statuses.enum.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "src/users/domain/user.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "src/users/users.service.ts",
+            "role": "service",
+            "typeOnly": false
+          },
+          {
+            "path": "src/utils/types/nullable.type.ts",
+            "role": "other",
+            "typeOnly": false
+          }
+        ],
+        "importedBy": [
+          {
+            "path": "src/auth-apple/auth-apple.controller.ts",
+            "role": "controller",
+            "typeOnly": false
+          },
+          {
+            "path": "src/auth-facebook/auth-facebook.controller.ts",
+            "role": "controller",
+            "typeOnly": false
+          },
+          {
+            "path": "src/auth-google/auth-google.controller.ts",
+            "role": "controller",
+            "typeOnly": false
+          },
+          {
+            "path": "src/auth/auth.controller.ts",
+            "role": "controller",
+            "typeOnly": false
+          },
+          {
+            "path": "src/auth/auth.module.ts",
+            "role": "module",
+            "typeOnly": false
+          }
+        ]
+      },
+      "source": "import {\n  HttpStatus,\n  Injectable,\n  NotFoundException,\n  UnauthorizedException,\n  UnprocessableEntityException,\n} from '@nestjs/common';\nimport ms from 'ms';\nimport crypto from 'crypto';\nimport { randomStringGenerator } from '@nestjs/common/utils/random-string-generator.util';\nimport { JwtService } from '@nestjs/jwt';\nimport bcrypt from 'bcryptjs';\nimport { AuthEmailLoginDto } from './dto/auth-email-login.dto';\nimport { AuthUpdateDto } from './dto/auth-update.dto';\nimport { AuthProvidersEnum } from './auth-providers.enum';\nimport { SocialInterface } from '../social/interfaces/social.interface';\nimport { AuthRegisterLoginDto } from './dto/auth-register-login.dto';\nimport { NullableType } from '../utils/types/nullable.type';\nimport { LoginResponseDto } from './dto/login-response.dto';\nimport { ConfigService } from '@nestjs/config';\nimport { JwtRefreshPayloadType } from './strategies/types/jwt-refresh-payload.type';\nimport { JwtPayloadType } from './strategies/types/jwt-payload.type';\nimport { UsersService } from '../users/users.service';\nimport { AllConfigType } from '../config/config.type';\nimport { MailService } from '../mail/mail.service';\nimport { RoleEnum } from '../roles/roles.enum';\nimport { Session } from '../session/domain/session';\nimport { SessionService } from '../session/session.service';\nimport { StatusEnum } from '../statuses/statuses.enum';\nimport { User } from '../users/domain/user';\n\n@Injectable()\nexport class AuthService {\n  constructor(\n    private readonly jwtService: JwtService,\n    private readonly usersService: UsersService,\n    private readonly sessionService: SessionService,\n    private readonly mailService: MailService,\n    private readonly configService: ConfigService<AllConfigType>,\n  ) {}\n\n  async validateLogin(loginDto: AuthEmailLoginDto): Promise<LoginResponseDto> {\n    const user = await this.usersService.findByEmail(loginDto.email);\n\n    if (!user) {\n      throw this.invalidLoginException({\n        email: 'notFound',\n      });\n    }\n\n    if (user.provider !== AuthProvidersEnum.email) {\n      throw this.invalidLoginException({\n        email: `needLoginViaProvider:${user.provider}`,\n      });\n    }\n\n    if (!user.password) {\n      throw this.invalidLoginException({\n        password: 'incorrectPassword',\n      });\n    }\n\n    const isValidPassword = await bcrypt.compare(\n      loginDto.password,\n      user.password,\n    );\n\n    if (!isValidPassword) {\n      throw this.invalidLoginException({\n        password: 'incorrectPassword',\n      });\n    }\n\n    const hash = crypto\n      .createHash('sha256')\n      .update(randomStringGenerator())\n      .digest('hex');\n\n    const session = await this.sessionService.create({\n      user,\n      hash,\n    });\n\n    const { token, refreshToken, tokenExpires } = await this.getTokensData({\n      id: user.id,\n      role: user.role,\n      sessionId: session.id,\n      hash,\n    });\n\n    return {\n      refreshToken,\n      token,\n      tokenExpires,\n      user,\n    };\n  }\n\n  async validateSocialLogin(\n    authProvider: string,\n    socialData: SocialInterface,\n  ): Promise<LoginResponseDto> {\n    let user: NullableType<User> = null;\n    const socialEmail = socialData.email?.toLowerCase();\n    let userByEmail: NullableType<User> = null;\n\n    if (socialEmail && !socialData.emailVerified) {\n      throw new UnprocessableEntityException({\n        status: HttpStatus.UNPROCESSABLE_ENTITY,\n        errors: {\n          email: 'emailNotVerified',\n        },\n      });\n    }\n\n    if (socialEmail) {\n      userByEmail = await this.usersService.findByEmail(socialEmail);\n    }\n\n    if (socialData.id) {\n      user = await this.usersService.findBySocialIdAndProvider({\n        socialId: socialData.id,\n        provider: authProvider,\n      });\n    }\n\n    if (user) {\n      if (socialEmail && !userByEmail) {\n        user.email = socialEmail;\n      }\n      await this.usersService.update(user.id, user);\n    } else if (userByEmail) {\n      user = userByEmail;\n\n      if (user.status?.id?.toString() === StatusEnum.inactive.toString()) {\n        user.provider = authProvider;\n        user.socialId = socialData.id;\n\n        await this.usersService.update(user.id, user);\n      }\n    } else if (socialData.id) {\n      const role = {\n        id: RoleEnum.user,\n      };\n      const status = {\n        id: StatusEnum.active,\n      };\n\n      user = await this.usersService.create({\n        email: socialEmail ?? null,\n        firstName: socialData.firstName ?? null,\n        lastName: socialData.lastName ?? null,\n        socialId: socialData.id,\n        provider: authProvider,\n        role,\n        status,\n      });\n\n      user = await this.usersService.findById(user.id);\n    }\n\n    if (!user) {\n      throw new UnprocessableEntityException({\n        status: HttpStatus.UNPROCESSABLE_ENTITY,\n        errors: {\n          user: 'userNotFound',\n        },\n      });\n    }\n\n    const hash = crypto\n      .createHash('sha256')\n      .update(randomStringGenerator())\n      .digest('hex');\n\n    const session = await this.sessionService.create({\n      user,\n      hash,\n    });\n\n    const {\n      token: jwtToken,\n      refreshToken,\n      tokenExpires,\n    } = await this.getTokensData({\n      id: user.id,\n      role: user.role,\n      sessionId: session.id,\n      hash,\n    });\n\n    return {\n      refreshToken,\n      token: jwtToken,\n      tokenExpires,\n      user,\n    };\n  }\n\n  async register(dto: AuthRegisterLoginDto): Promise<void> {\n    const user = await this.usersService.create({\n      ...dto,\n      email: dto.email,\n      role: {\n        id: RoleEnum.user,\n      },\n      status: {\n        id: StatusEnum.inactive,\n      },\n    });\n\n    const hash = await this.jwtService.signAsync(\n      {\n        confirmEmailUserId: user.id,\n      },\n      {\n        secret: this.configService.getOrThrow('auth.confirmEmailSecret', {\n          infer: true,\n        }),\n        expiresIn: this.configService.getOrThrow('auth.confirmEmailExpires', {\n          infer: true,\n        }),\n      },\n    );\n\n    await this.mailService.userSignUp({\n      to: dto.email,\n      data: {\n        hash,\n      },\n    });\n  }\n\n  async confirmEmail(hash: string): Promise<void> {\n    let userId: User['id'];\n\n    try {\n      const jwtData = await this.jwtService.verifyAsync<{\n        confirmEmailUserId: User['id'];\n      }>(hash, {\n        secret: this.configService.getOrThrow('auth.confirmEmailSecret', {\n          infer: true,\n        }),\n        algorithms: ['HS256'],\n      });\n\n      userId = jwtData.confirmEmailUserId;\n    } catch {\n      throw new UnprocessableEntityException({\n        status: HttpStatus.UNPROCESSABLE_ENTITY,\n        errors: {\n          hash: `invalidHash`,\n        },\n      });\n    }\n\n    const user = await this.usersService.findById(userId);\n\n    if (\n      !user ||\n      user?.status?.id?.toString() !== StatusEnum.inactive.toString()\n    ) {\n      throw new NotFoundException({\n        status: HttpStatus.NOT_FOUND,\n        error: `notFound`,\n      });\n    }\n\n    user.status = {\n      id: StatusEnum.active,\n    };\n\n    await this.usersService.update(user.id, user);\n  }\n\n  async confirmNewEmail(hash: string): Promise<void> {\n    let userId: User['id'];\n    let newEmail: User['email'];\n\n    try {\n      const jwtData = await this.jwtService.verifyAsync<{\n        confirmEmailUserId: User['id'];\n        newEmail: User['email'];\n      }>(hash, {\n        secret: this.configService.getOrThrow('auth.confirmEmailSecret', {\n          infer: true,\n        }),\n        algorithms: ['HS256'],\n      });\n\n      userId = jwtData.confirmEmailUserId;\n      newEmail = jwtData.newEmail;\n    } catch {\n      throw new UnprocessableEntityException({\n        status: HttpStatus.UNPROCESSABLE_ENTITY,\n        errors: {\n          hash: `invalidHash`,\n        },\n      });\n    }\n\n    const user = await this.usersService.findById(userId);\n\n    if (!user) {\n      throw new NotFoundException({\n        status: HttpStatus.NOT_FOUND,\n        error: `notFound`,\n      });\n    }\n\n    user.email = newEmail;\n    user.status = {\n      id: StatusEnum.active,\n    };\n\n    await this.usersService.update(user.id, user);\n  }\n\n  async forgotPassword(email: string): Promise<void> {\n    const user = await this.usersService.findByEmail(email);\n\n    if (!user) {\n      const uniformErrors = this.configService.getOrThrow(\n        'auth.uniformErrors',\n        { infer: true },\n      );\n\n      // With uniform errors enabled we do not reveal whether the email is\n      // registered: respond exactly like the success case and skip the mail.\n      if (uniformErrors) {\n        return;\n      }\n\n      throw new UnprocessableEntityException({\n        status: HttpStatus.UNPROCESSABLE_ENTITY,\n        errors: {\n          email: 'emailNotExists',\n        },\n      });\n    }\n\n    const tokenExpiresIn = this.configService.getOrThrow('auth.forgotExpires', {\n      infer: true,\n    });\n\n    const tokenExpires = Date.now() + ms(tokenExpiresIn);\n\n    const hash = await this.jwtService.signAsync(\n      {\n        forgotUserId: user.id,\n      },\n      {\n        secret: this.getForgotSecret(user),\n        expiresIn: tokenExpiresIn,\n      },\n    );\n\n    await this.mailService.forgotPassword({\n      to: email,\n      data: {\n        hash,\n        tokenExpires,\n      },\n    });\n  }\n\n  async resetPassword(hash: string, password: string): Promise<void> {\n    let userId: User['id'] | undefined;\n\n    try {\n      const jwtData = this.jwtService.decode<{\n        forgotUserId?: User['id'];\n      } | null>(hash);\n\n      userId = jwtData?.forgotUserId;\n    } catch {\n      userId = undefined;\n    }\n\n    let user: NullableType<User> = null;\n\n    if (userId !== undefined && userId !== null) {\n      try {\n        user = await this.usersService.findById(userId);\n      } catch {\n        user = null;\n      }\n    }\n\n    if (!user) {\n      throw new UnprocessableEntityException({\n        status: HttpStatus.UNPROCESSABLE_ENTITY,\n        errors: {\n          hash: `invalidHash`,\n        },\n      });\n    }\n\n    try {\n      await this.jwtService.verifyAsync(hash, {\n        secret: this.getForgotSecret(user),\n        algorithms: ['HS256'],\n      });\n    } catch {\n      throw new UnprocessableEntityException({\n        status: HttpStatus.UNPROCESSABLE_ENTITY,\n        errors: {\n          hash: `invalidHash`,\n        },\n      });\n    }\n\n    user.password = password;\n\n    await this.sessionService.deleteByUserId({\n      userId: user.id,\n    });\n\n    await this.usersService.update(user.id, user);\n  }\n\n  async me(userJwtPayload: JwtPayloadType): Promise<NullableType<User>> {\n    return this.usersService.findById(userJwtPayload.id);\n  }\n\n  async update(\n    userJwtPayload: JwtPayloadType,\n    userDto: AuthUpdateDto,\n  ): Promise<NullableType<User>> {\n    const currentUser = await this.usersService.findById(userJwtPayload.id);\n\n    if (!currentUser) {\n      throw new UnprocessableEntityException({\n        status: HttpStatus.UNPROCESSABLE_ENTITY,\n        errors: {\n          user: 'userNotFound',\n        },\n      });\n    }\n\n    if (userDto.password) {\n      if (!userDto.oldPassword) {\n        throw new UnprocessableEntityException({\n          status: HttpStatus.UNPROCESSABLE_ENTITY,\n          errors: {\n            oldPassword: 'missingOldPassword',\n          },\n        });\n      }\n\n      if (!currentUser.password) {\n        throw new UnprocessableEntityException({\n          status: HttpStatus.UNPROCESSABLE_ENTITY,\n          errors: {\n            oldPassword: 'incorrectOldPassword',\n          },\n        });\n      }\n\n      const isValidOldPassword = await bcrypt.compare(\n        userDto.oldPassword,\n        currentUser.password,\n      );\n\n      if (!isValidOldPassword) {\n        throw new UnprocessableEntityException({\n          status: HttpStatus.UNPROCESSABLE_ENTITY,\n          errors: {\n            oldPassword: 'incorrectOldPassword',\n          },\n        });\n      } else {\n        await this.sessionService.deleteByUserIdWithExclude({\n          userId: currentUser.id,\n          excludeSessionId: userJwtPayload.sessionId,\n        });\n      }\n    }\n\n    if (userDto.email && userDto.email !== currentUser.email) {\n      const userByEmail = await this.usersService.findByEmail(userDto.email);\n\n      if (userByEmail && userByEmail.id !== currentUser.id) {\n        throw new UnprocessableEntityException({\n          status: HttpStatus.UNPROCESSABLE_ENTITY,\n          errors: {\n            email: 'emailExists',\n          },\n        });\n      }\n\n      const hash = await this.jwtService.signAsync(\n        {\n          confirmEmailUserId: currentUser.id,\n          newEmail: userDto.email,\n        },\n        {\n          secret: this.configService.getOrThrow('auth.confirmEmailSecret', {\n            infer: true,\n          }),\n          expiresIn: this.configService.getOrThrow('auth.confirmEmailExpires', {\n            infer: true,\n          }),\n        },\n      );\n\n      await this.mailService.confirmNewEmail({\n        to: userDto.email,\n        data: {\n          hash,\n        },\n      });\n    }\n\n    delete userDto.email;\n    delete userDto.oldPassword;\n\n    await this.usersService.update(userJwtPayload.id, userDto);\n\n    return this.usersService.findById(userJwtPayload.id);\n  }\n\n  async refreshToken(\n    data: Pick<JwtRefreshPayloadType, 'sessionId' | 'hash'>,\n  ): Promise<Omit<LoginResponseDto, 'user'>> {\n    const hash = crypto\n      .createHash('sha256')\n      .update(randomStringGenerator())\n      .digest('hex');\n\n    const session = await this.sessionService.updateByHash(\n      { id: data.sessionId, hash: data.hash },\n      { hash },\n    );\n\n    if (!session) {\n      throw new UnauthorizedException();\n    }\n\n    const user = await this.usersService.findById(session.user.id);\n\n    if (!user?.role) {\n      throw new UnauthorizedException();\n    }\n\n    const { token, refreshToken, tokenExpires } = await this.getTokensData({\n      id: session.user.id,\n      role: {\n        id: user.role.id,\n      },\n      sessionId: session.id,\n      hash,\n    });\n\n    return {\n      token,\n      refreshToken,\n      tokenExpires,\n    };\n  }\n\n  async softDelete(userJwtPayload: JwtPayloadType): Promise<void> {\n    await this.usersService.remove(userJwtPayload.id);\n  }\n\n  async logout(data: Pick<JwtPayloadType, 'sessionId'>) {\n    return this.sessionService.deleteById(data.sessionId);\n  }\n\n  private invalidLoginException(\n    errors: Record<string, string>,\n  ): UnprocessableEntityException {\n    const uniformErrors = this.configService.getOrThrow('auth.uniformErrors', {\n      infer: true,\n    });\n\n    return new UnprocessableEntityException({\n      status: HttpStatus.UNPROCESSABLE_ENTITY,\n      errors: uniformErrors\n        ? {\n            email: 'incorrectEmailOrPassword',\n            password: 'incorrectEmailOrPassword',\n          }\n        : errors,\n    });\n  }\n\n  private getForgotSecret(user: User): string {\n    // The secret embeds the current password hash, so every outstanding\n    // reset link stops verifying as soon as the password changes — this is\n    // what makes reset links single-use without storing anything extra.\n    const forgotSecret = this.configService.getOrThrow('auth.forgotSecret', {\n      infer: true,\n    });\n\n    return `${forgotSecret}${user.password ?? ''}`;\n  }\n\n  private async getTokensData(data: {\n    id: User['id'];\n    role: User['role'];\n    sessionId: Session['id'];\n    hash: Session['hash'];\n  }) {\n    const tokenExpiresIn = this.configService.getOrThrow('auth.expires', {\n      infer: true,\n    });\n\n    const tokenExpires = Date.now() + ms(tokenExpiresIn);\n\n    const [token, refreshToken] = await Promise.all([\n      await this.jwtService.signAsync(\n        {\n          id: data.id,\n          role: data.role,\n          sessionId: data.sessionId,\n        },\n        {\n          secret: this.configService.getOrThrow('auth.secret', { infer: true }),\n          expiresIn: tokenExpiresIn,\n        },\n      ),\n      await this.jwtService.signAsync(\n        {\n          sessionId: data.sessionId,\n          hash: data.hash,\n        },\n        {\n          secret: this.configService.getOrThrow('auth.refreshSecret', {\n            infer: true,\n          }),\n          expiresIn: this.configService.getOrThrow('auth.refreshExpires', {\n            infer: true,\n          }),\n        },\n      ),\n    ]);\n\n    return {\n      token,\n      refreshToken,\n      tokenExpires,\n    };\n  }\n}\n"
+    },
+    "outputs": {
+      "role": "service"
+    }
+  },
+  {
+    "inputs": {
+      "origin": {
+        "repo": "hagopj13/node-express-boilerplate",
+        "commit": "179ae84efec61b14206d0305d941daed6c6d07f9",
+        "framework": "express"
+      },
+      "subject": {
+        "kind": "file",
+        "path": "src/services/token.service.js",
+        "language": "js",
+        "lineCount": 123,
+        "hash": "63d240b22b8c6fffd1ed737f0628bdafb8117ae31b818068a7151a6019998e22",
+        "role": "other",
+        "imports": [
+          {
+            "path": "src/config/config.js",
+            "role": "config",
+            "typeOnly": false
+          },
+          {
+            "path": "src/config/tokens.js",
+            "role": "config",
+            "typeOnly": false
+          },
+          {
+            "path": "src/models/index.js",
+            "role": "model",
+            "typeOnly": false
+          },
+          {
+            "path": "src/services/user.service.js",
+            "role": "service",
+            "typeOnly": false
+          },
+          {
+            "path": "src/utils/ApiError.js",
+            "role": "other",
+            "typeOnly": false
+          }
+        ],
+        "importedBy": [
+          {
+            "path": "src/services/auth.service.js",
+            "role": "service",
+            "typeOnly": false
+          },
+          {
+            "path": "src/services/index.js",
+            "role": "service",
+            "typeOnly": false
+          },
+          {
+            "path": "tests/fixtures/token.fixture.js",
+            "role": "test",
+            "typeOnly": false
+          }
+        ]
+      },
+      "source": "const jwt = require('jsonwebtoken');\nconst moment = require('moment');\nconst httpStatus = require('http-status');\nconst config = require('../config/config');\nconst userService = require('./user.service');\nconst { Token } = require('../models');\nconst ApiError = require('../utils/ApiError');\nconst { tokenTypes } = require('../config/tokens');\n\n/**\n * Generate token\n * @param {ObjectId} userId\n * @param {Moment} expires\n * @param {string} type\n * @param {string} [secret]\n * @returns {string}\n */\nconst generateToken = (userId, expires, type, secret = config.jwt.secret) => {\n  const payload = {\n    sub: userId,\n    iat: moment().unix(),\n    exp: expires.unix(),\n    type,\n  };\n  return jwt.sign(payload, secret);\n};\n\n/**\n * Save a token\n * @param {string} token\n * @param {ObjectId} userId\n * @param {Moment} expires\n * @param {string} type\n * @param {boolean} [blacklisted]\n * @returns {Promise<Token>}\n */\nconst saveToken = async (token, userId, expires, type, blacklisted = false) => {\n  const tokenDoc = await Token.create({\n    token,\n    user: userId,\n    expires: expires.toDate(),\n    type,\n    blacklisted,\n  });\n  return tokenDoc;\n};\n\n/**\n * Verify token and return token doc (or throw an error if it is not valid)\n * @param {string} token\n * @param {string} type\n * @returns {Promise<Token>}\n */\nconst verifyToken = async (token, type) => {\n  const payload = jwt.verify(token, config.jwt.secret);\n  const tokenDoc = await Token.findOne({ token, type, user: payload.sub, blacklisted: false });\n  if (!tokenDoc) {\n    throw new Error('Token not found');\n  }\n  return tokenDoc;\n};\n\n/**\n * Generate auth tokens\n * @param {User} user\n * @returns {Promise<Object>}\n */\nconst generateAuthTokens = async (user) => {\n  const accessTokenExpires = moment().add(config.jwt.accessExpirationMinutes, 'minutes');\n  const accessToken = generateToken(user.id, accessTokenExpires, tokenTypes.ACCESS);\n\n  const refreshTokenExpires = moment().add(config.jwt.refreshExpirationDays, 'days');\n  const refreshToken = generateToken(user.id, refreshTokenExpires, tokenTypes.REFRESH);\n  await saveToken(refreshToken, user.id, refreshTokenExpires, tokenTypes.REFRESH);\n\n  return {\n    access: {\n      token: accessToken,\n      expires: accessTokenExpires.toDate(),\n    },\n    refresh: {\n      token: refreshToken,\n      expires: refreshTokenExpires.toDate(),\n    },\n  };\n};\n\n/**\n * Generate reset password token\n * @param {string} email\n * @returns {Promise<string>}\n */\nconst generateResetPasswordToken = async (email) => {\n  const user = await userService.getUserByEmail(email);\n  if (!user) {\n    throw new ApiError(httpStatus.NOT_FOUND, 'No users found with this email');\n  }\n  const expires = moment().add(config.jwt.resetPasswordExpirationMinutes, 'minutes');\n  const resetPasswordToken = generateToken(user.id, expires, tokenTypes.RESET_PASSWORD);\n  await saveToken(resetPasswordToken, user.id, expires, tokenTypes.RESET_PASSWORD);\n  return resetPasswordToken;\n};\n\n/**\n * Generate verify email token\n * @param {User} user\n * @returns {Promise<string>}\n */\nconst generateVerifyEmailToken = async (user) => {\n  const expires = moment().add(config.jwt.verifyEmailExpirationMinutes, 'minutes');\n  const verifyEmailToken = generateToken(user.id, expires, tokenTypes.VERIFY_EMAIL);\n  await saveToken(verifyEmailToken, user.id, expires, tokenTypes.VERIFY_EMAIL);\n  return verifyEmailToken;\n};\n\nmodule.exports = {\n  generateToken,\n  saveToken,\n  verifyToken,\n  generateAuthTokens,\n  generateResetPasswordToken,\n  generateVerifyEmailToken,\n};\n"
+    },
+    "outputs": {
+      "role": "service"
+    }
+  },
+  {
+    "inputs": {
+      "origin": {
+        "repo": "brocoders/nestjs-boilerplate",
+        "commit": "9620f159eefe38f47747d02ab162852367c5472c",
+        "framework": "nestjs"
+      },
+      "subject": {
+        "kind": "file",
+        "path": "src/files/infrastructure/persistence/file.repository.ts",
+        "language": "ts",
+        "lineCount": 10,
+        "hash": "470ec7fe1c26f9819614b29efb301ff41955827443dd3020a5d82d95ef740e8a",
+        "role": "other",
+        "imports": [
+          {
+            "path": "src/files/domain/file.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "src/utils/types/nullable.type.ts",
+            "role": "other",
+            "typeOnly": false
+          }
+        ],
+        "importedBy": [
+          {
+            "path": "src/files/files.service.ts",
+            "role": "service",
+            "typeOnly": false
+          },
+          {
+            "path": "src/files/infrastructure/persistence/document/document-persistence.module.ts",
+            "role": "module",
+            "typeOnly": false
+          },
+          {
+            "path": "src/files/infrastructure/persistence/document/repositories/file.repository.ts",
+            "role": "repository",
+            "typeOnly": false
+          },
+          {
+            "path": "src/files/infrastructure/persistence/relational/relational-persistence.module.ts",
+            "role": "module",
+            "typeOnly": false
+          },
+          {
+            "path": "src/files/infrastructure/persistence/relational/repositories/file.repository.ts",
+            "role": "repository",
+            "typeOnly": false
+          },
+          {
+            "path": "src/files/infrastructure/uploader/local/files.service.ts",
+            "role": "service",
+            "typeOnly": false
+          },
+          {
+            "path": "src/files/infrastructure/uploader/s3-presigned/files.service.ts",
+            "role": "service",
+            "typeOnly": false
+          },
+          {
+            "path": "src/files/infrastructure/uploader/s3/files.service.ts",
+            "role": "service",
+            "typeOnly": false
+          }
+        ]
+      },
+      "source": "import { NullableType } from '../../../utils/types/nullable.type';\nimport { FileType } from '../../domain/file';\n\nexport abstract class FileRepository {\n  abstract create(data: Omit<FileType, 'id'>): Promise<FileType>;\n\n  abstract findById(id: FileType['id']): Promise<NullableType<FileType>>;\n\n  abstract findByIds(ids: FileType['id'][]): Promise<FileType[]>;\n}\n"
+    },
+    "outputs": {
+      "role": "repository"
+    }
+  },
+  {
+    "inputs": {
+      "origin": {
+        "repo": "brocoders/nestjs-boilerplate",
+        "commit": "9620f159eefe38f47747d02ab162852367c5472c",
+        "framework": "nestjs"
+      },
+      "subject": {
+        "kind": "file",
+        "path": "src/users/infrastructure/persistence/user.repository.ts",
+        "language": "ts",
+        "lineCount": 40,
+        "hash": "c81c83dfd3d1a737b978aaa915f182ce85ffaf0312f28f59ccacf6b0afbe273e",
+        "role": "other",
+        "imports": [
+          {
+            "path": "src/users/domain/user.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "src/users/dto/query-user.dto.ts",
+            "role": "dto",
+            "typeOnly": false
+          },
+          {
+            "path": "src/utils/types/deep-partial.type.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "src/utils/types/nullable.type.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "src/utils/types/pagination-options.ts",
+            "role": "other",
+            "typeOnly": false
+          }
+        ],
+        "importedBy": [
+          {
+            "path": "src/users/infrastructure/persistence/document/document-persistence.module.ts",
+            "role": "module",
+            "typeOnly": false
+          },
+          {
+            "path": "src/users/infrastructure/persistence/document/repositories/user.repository.ts",
+            "role": "repository",
+            "typeOnly": false
+          },
+          {
+            "path": "src/users/infrastructure/persistence/relational/relational-persistence.module.ts",
+            "role": "module",
+            "typeOnly": false
+          },
+          {
+            "path": "src/users/infrastructure/persistence/relational/repositories/user.repository.ts",
+            "role": "repository",
+            "typeOnly": false
+          },
+          {
+            "path": "src/users/users.service.ts",
+            "role": "service",
+            "typeOnly": false
+          }
+        ]
+      },
+      "source": "import { DeepPartial } from '../../../utils/types/deep-partial.type';\nimport { NullableType } from '../../../utils/types/nullable.type';\nimport { IPaginationOptions } from '../../../utils/types/pagination-options';\nimport { User } from '../../domain/user';\n\nimport { FilterUserDto, SortUserDto } from '../../dto/query-user.dto';\n\nexport abstract class UserRepository {\n  abstract create(\n    data: Omit<User, 'id' | 'createdAt' | 'deletedAt' | 'updatedAt'>,\n  ): Promise<User>;\n\n  abstract findManyWithPagination({\n    filterOptions,\n    sortOptions,\n    paginationOptions,\n  }: {\n    filterOptions?: FilterUserDto | null;\n    sortOptions?: SortUserDto[] | null;\n    paginationOptions: IPaginationOptions;\n  }): Promise<User[]>;\n\n  abstract findById(id: User['id']): Promise<NullableType<User>>;\n  abstract findByIds(ids: User['id'][]): Promise<User[]>;\n  abstract findByEmail(email: User['email']): Promise<NullableType<User>>;\n  abstract findBySocialIdAndProvider({\n    socialId,\n    provider,\n  }: {\n    socialId: User['socialId'];\n    provider: User['provider'];\n  }): Promise<NullableType<User>>;\n\n  abstract update(\n    id: User['id'],\n    payload: DeepPartial<User>,\n  ): Promise<User | null>;\n\n  abstract remove(id: User['id']): Promise<void>;\n}\n"
+    },
+    "outputs": {
+      "role": "repository"
+    }
+  },
+  {
+    "inputs": {
+      "origin": {
+        "repo": "hagopj13/node-express-boilerplate",
+        "commit": "179ae84efec61b14206d0305d941daed6c6d07f9",
+        "framework": "express"
+      },
+      "subject": {
+        "kind": "file",
+        "path": "src/models/token.model.js",
+        "language": "js",
+        "lineCount": 44,
+        "hash": "6acb332640c5eec02c864f502038ee1004c6df2728641dd584a6337a560dc74a",
+        "role": "other",
+        "imports": [
+          {
+            "path": "src/config/tokens.js",
+            "role": "config",
+            "typeOnly": false
+          },
+          {
+            "path": "src/models/plugins/index.js",
+            "role": "model",
+            "typeOnly": false
+          }
+        ],
+        "importedBy": [
+          {
+            "path": "src/models/index.js",
+            "role": "model",
+            "typeOnly": false
+          },
+          {
+            "path": "src/services/auth.service.js",
+            "role": "service",
+            "typeOnly": false
+          }
+        ]
+      },
+      "source": "const mongoose = require('mongoose');\nconst { toJSON } = require('./plugins');\nconst { tokenTypes } = require('../config/tokens');\n\nconst tokenSchema = mongoose.Schema(\n  {\n    token: {\n      type: String,\n      required: true,\n      index: true,\n    },\n    user: {\n      type: mongoose.SchemaTypes.ObjectId,\n      ref: 'User',\n      required: true,\n    },\n    type: {\n      type: String,\n      enum: [tokenTypes.REFRESH, tokenTypes.RESET_PASSWORD, tokenTypes.VERIFY_EMAIL],\n      required: true,\n    },\n    expires: {\n      type: Date,\n      required: true,\n    },\n    blacklisted: {\n      type: Boolean,\n      default: false,\n    },\n  },\n  {\n    timestamps: true,\n  }\n);\n\n// add plugin that converts mongoose to json\ntokenSchema.plugin(toJSON);\n\n/**\n * @typedef Token\n */\nconst Token = mongoose.model('Token', tokenSchema);\n\nmodule.exports = Token;\n"
+    },
+    "outputs": {
+      "role": "model"
+    }
+  },
+  {
+    "inputs": {
+      "origin": {
+        "repo": "hagopj13/node-express-boilerplate",
+        "commit": "179ae84efec61b14206d0305d941daed6c6d07f9",
+        "framework": "express"
+      },
+      "subject": {
+        "kind": "file",
+        "path": "src/models/user.model.js",
+        "language": "js",
+        "lineCount": 91,
+        "hash": "f0f36b37a1160e3888d1933aa67266d2386fe5715dbda5c74c6de2893bfde9e8",
+        "role": "other",
+        "imports": [
+          {
+            "path": "src/config/roles.js",
+            "role": "config",
+            "typeOnly": false
+          },
+          {
+            "path": "src/models/plugins/index.js",
+            "role": "model",
+            "typeOnly": false
+          }
+        ],
+        "importedBy": [
+          {
+            "path": "src/models/index.js",
+            "role": "model",
+            "typeOnly": false
+          },
+          {
+            "path": "tests/fixtures/user.fixture.js",
+            "role": "test",
+            "typeOnly": false
+          }
+        ]
+      },
+      "source": "const mongoose = require('mongoose');\nconst validator = require('validator');\nconst bcrypt = require('bcryptjs');\nconst { toJSON, paginate } = require('./plugins');\nconst { roles } = require('../config/roles');\n\nconst userSchema = mongoose.Schema(\n  {\n    name: {\n      type: String,\n      required: true,\n      trim: true,\n    },\n    email: {\n      type: String,\n      required: true,\n      unique: true,\n      trim: true,\n      lowercase: true,\n      validate(value) {\n        if (!validator.isEmail(value)) {\n          throw new Error('Invalid email');\n        }\n      },\n    },\n    password: {\n      type: String,\n      required: true,\n      trim: true,\n      minlength: 8,\n      validate(value) {\n        if (!value.match(/\\d/) || !value.match(/[a-zA-Z]/)) {\n          throw new Error('Password must contain at least one letter and one number');\n        }\n      },\n      private: true, // used by the toJSON plugin\n    },\n    role: {\n      type: String,\n      enum: roles,\n      default: 'user',\n    },\n    isEmailVerified: {\n      type: Boolean,\n      default: false,\n    },\n  },\n  {\n    timestamps: true,\n  }\n);\n\n// add plugin that converts mongoose to json\nuserSchema.plugin(toJSON);\nuserSchema.plugin(paginate);\n\n/**\n * Check if email is taken\n * @param {string} email - The user's email\n * @param {ObjectId} [excludeUserId] - The id of the user to be excluded\n * @returns {Promise<boolean>}\n */\nuserSchema.statics.isEmailTaken = async function (email, excludeUserId) {\n  const user = await this.findOne({ email, _id: { $ne: excludeUserId } });\n  return !!user;\n};\n\n/**\n * Check if password matches the user's password\n * @param {string} password\n * @returns {Promise<boolean>}\n */\nuserSchema.methods.isPasswordMatch = async function (password) {\n  const user = this;\n  return bcrypt.compare(password, user.password);\n};\n\nuserSchema.pre('save', async function (next) {\n  const user = this;\n  if (user.isModified('password')) {\n    user.password = await bcrypt.hash(user.password, 8);\n  }\n  next();\n});\n\n/**\n * @typedef User\n */\nconst User = mongoose.model('User', userSchema);\n\nmodule.exports = User;\n"
+    },
+    "outputs": {
+      "role": "model"
+    }
+  },
+  {
+    "inputs": {
+      "origin": {
+        "repo": "brocoders/nestjs-boilerplate",
+        "commit": "9620f159eefe38f47747d02ab162852367c5472c",
+        "framework": "nestjs"
+      },
+      "subject": {
+        "kind": "file",
+        "path": "src/database/config/database.config.ts",
+        "language": "ts",
+        "lineCount": 99,
+        "hash": "e7f717c65785736beec303ed3f98f2c59d8e48b3a4060d3c3dff8bfbdacd5125",
+        "role": "other",
+        "imports": [
+          {
+            "path": "src/database/config/database-config.type.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "src/utils/validate-config.ts",
+            "role": "other",
+            "typeOnly": false
+          }
+        ],
+        "importedBy": [
+          {
+            "path": "src/app.module.ts",
+            "role": "module",
+            "typeOnly": false
+          },
+          {
+            "path": "src/database/seeds/document/seed.module.ts",
+            "role": "module",
+            "typeOnly": false
+          },
+          {
+            "path": "src/database/seeds/relational/seed.module.ts",
+            "role": "module",
+            "typeOnly": false
+          },
+          {
+            "path": "src/files/files.module.ts",
+            "role": "module",
+            "typeOnly": false
+          },
+          {
+            "path": "src/files/infrastructure/uploader/local/files.module.ts",
+            "role": "module",
+            "typeOnly": false
+          },
+          {
+            "path": "src/files/infrastructure/uploader/s3-presigned/files.module.ts",
+            "role": "module",
+            "typeOnly": false
+          },
+          {
+            "path": "src/files/infrastructure/uploader/s3/files.module.ts",
+            "role": "module",
+            "typeOnly": false
+          },
+          {
+            "path": "src/roles/domain/role.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "src/session/session.module.ts",
+            "role": "module",
+            "typeOnly": false
+          },
+          {
+            "path": "src/statuses/domain/status.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "src/users/domain/user.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "src/users/users.module.ts",
+            "role": "module",
+            "typeOnly": false
+          }
+        ]
+      },
+      "source": "import { registerAs } from '@nestjs/config';\n\nimport {\n  IsOptional,\n  IsInt,\n  Min,\n  Max,\n  IsString,\n  ValidateIf,\n  IsBoolean,\n} from 'class-validator';\nimport validateConfig from '../../utils/validate-config';\nimport { DatabaseConfig } from './database-config.type';\n\nclass EnvironmentVariablesValidator {\n  @ValidateIf((envValues) => envValues.DATABASE_URL)\n  @IsString()\n  DATABASE_URL: string;\n\n  @ValidateIf((envValues) => !envValues.DATABASE_URL)\n  @IsString()\n  DATABASE_TYPE: string;\n\n  @ValidateIf((envValues) => !envValues.DATABASE_URL)\n  @IsString()\n  DATABASE_HOST: string;\n\n  @ValidateIf((envValues) => !envValues.DATABASE_URL)\n  @IsInt()\n  @Min(0)\n  @Max(65535)\n  DATABASE_PORT: number;\n\n  @ValidateIf((envValues) => !envValues.DATABASE_URL)\n  @IsString()\n  DATABASE_PASSWORD: string;\n\n  @ValidateIf((envValues) => !envValues.DATABASE_URL)\n  @IsString()\n  DATABASE_NAME: string;\n\n  @ValidateIf((envValues) => !envValues.DATABASE_URL)\n  @IsString()\n  DATABASE_USERNAME: string;\n\n  @IsBoolean()\n  @IsOptional()\n  DATABASE_SYNCHRONIZE: boolean;\n\n  @IsInt()\n  @IsOptional()\n  DATABASE_MAX_CONNECTIONS: number;\n\n  @IsBoolean()\n  @IsOptional()\n  DATABASE_SSL_ENABLED: boolean;\n\n  @IsBoolean()\n  @IsOptional()\n  DATABASE_REJECT_UNAUTHORIZED: boolean;\n\n  @IsString()\n  @IsOptional()\n  DATABASE_CA: string;\n\n  @IsString()\n  @IsOptional()\n  DATABASE_KEY: string;\n\n  @IsString()\n  @IsOptional()\n  DATABASE_CERT: string;\n}\n\nexport default registerAs<DatabaseConfig>('database', () => {\n  validateConfig(process.env, EnvironmentVariablesValidator);\n\n  return {\n    isDocumentDatabase: ['mongodb'].includes(process.env.DATABASE_TYPE ?? ''),\n    url: process.env.DATABASE_URL,\n    type: process.env.DATABASE_TYPE,\n    host: process.env.DATABASE_HOST,\n    port: process.env.DATABASE_PORT\n      ? parseInt(process.env.DATABASE_PORT, 10)\n      : 5432,\n    password: process.env.DATABASE_PASSWORD,\n    name: process.env.DATABASE_NAME,\n    username: process.env.DATABASE_USERNAME,\n    synchronize: process.env.DATABASE_SYNCHRONIZE === 'true',\n    maxConnections: process.env.DATABASE_MAX_CONNECTIONS\n      ? parseInt(process.env.DATABASE_MAX_CONNECTIONS, 10)\n      : 100,\n    sslEnabled: process.env.DATABASE_SSL_ENABLED === 'true',\n    rejectUnauthorized: process.env.DATABASE_REJECT_UNAUTHORIZED === 'true',\n    ca: process.env.DATABASE_CA,\n    key: process.env.DATABASE_KEY,\n    cert: process.env.DATABASE_CERT,\n  };\n});\n"
+    },
+    "outputs": {
+      "role": "config"
+    }
+  },
+  {
+    "inputs": {
+      "origin": {
+        "repo": "alan2207/bulletproof-react",
+        "commit": "9506629ed003a561c6627735480cce4994244bb4",
+        "framework": "nextjs"
+      },
+      "subject": {
+        "kind": "file",
+        "path": "apps/nextjs-app/src/lib/auth.tsx",
+        "language": "tsx",
+        "lineCount": 107,
+        "hash": "a1109d1438dfb7759dd85ca6a86c9dfbb07c9e2348741b59904db15f1809403f",
+        "role": "other",
+        "imports": [
+          {
+            "path": "apps/nextjs-app/src/lib/api-client.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "apps/nextjs-app/src/types/api.ts",
+            "role": "other",
+            "typeOnly": false
+          }
+        ],
+        "importedBy": [
+          {
+            "path": "apps/nextjs-app/src/app/app/_components/dashboard-info.tsx",
+            "role": "client-component",
+            "typeOnly": false
+          },
+          {
+            "path": "apps/nextjs-app/src/app/app/_components/dashboard-layout.tsx",
+            "role": "client-component",
+            "typeOnly": false
+          },
+          {
+            "path": "apps/nextjs-app/src/app/app/profile/_components/profile.tsx",
+            "role": "client-component",
+            "typeOnly": false
+          },
+          {
+            "path": "apps/nextjs-app/src/app/app/users/_components/admin-guard.tsx",
+            "role": "client-component",
+            "typeOnly": false
+          },
+          {
+            "path": "apps/nextjs-app/src/app/auth/_components/auth-layout.tsx",
+            "role": "client-component",
+            "typeOnly": false
+          },
+          {
+            "path": "apps/nextjs-app/src/app/layout.tsx",
+            "role": "layout",
+            "typeOnly": false
+          },
+          {
+            "path": "apps/nextjs-app/src/features/auth/components/login-form.tsx",
+            "role": "client-component",
+            "typeOnly": false
+          },
+          {
+            "path": "apps/nextjs-app/src/features/auth/components/register-form.tsx",
+            "role": "client-component",
+            "typeOnly": false
+          },
+          {
+            "path": "apps/nextjs-app/src/features/comments/components/comments-list.tsx",
+            "role": "client-component",
+            "typeOnly": false
+          },
+          {
+            "path": "apps/nextjs-app/src/features/discussions/components/create-discussion.tsx",
+            "role": "client-component",
+            "typeOnly": false
+          },
+          {
+            "path": "apps/nextjs-app/src/features/discussions/components/delete-discussion.tsx",
+            "role": "client-component",
+            "typeOnly": false
+          },
+          {
+            "path": "apps/nextjs-app/src/features/discussions/components/update-discussion.tsx",
+            "role": "client-component",
+            "typeOnly": false
+          },
+          {
+            "path": "apps/nextjs-app/src/features/users/api/update-profile.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "apps/nextjs-app/src/features/users/components/delete-user.tsx",
+            "role": "client-component",
+            "typeOnly": false
+          },
+          {
+            "path": "apps/nextjs-app/src/features/users/components/update-profile.tsx",
+            "role": "client-component",
+            "typeOnly": false
+          }
+        ]
+      },
+      "source": "import {\n  queryOptions,\n  useMutation,\n  useQuery,\n  useQueryClient,\n} from '@tanstack/react-query';\nimport { z } from 'zod';\n\nimport { AuthResponse, User } from '@/types/api';\n\nimport { api } from './api-client';\n\n// api call definitions for auth (types, schemas, requests):\n// these are not part of features as this is a module shared across features\n\nexport const getUser = async (): Promise<User> => {\n  const response = (await api.get('/auth/me')) as { data: User };\n\n  return response.data;\n};\n\nconst userQueryKey = ['user'];\n\nexport const getUserQueryOptions = () => {\n  return queryOptions({\n    queryKey: userQueryKey,\n    queryFn: getUser,\n  });\n};\n\nexport const useUser = () => useQuery(getUserQueryOptions());\n\nexport const useLogin = ({ onSuccess }: { onSuccess?: () => void }) => {\n  const queryClient = useQueryClient();\n  return useMutation({\n    mutationFn: loginWithEmailAndPassword,\n    onSuccess: (data) => {\n      queryClient.setQueryData(userQueryKey, data.user);\n      onSuccess?.();\n    },\n  });\n};\n\nexport const useRegister = ({ onSuccess }: { onSuccess?: () => void }) => {\n  const queryClient = useQueryClient();\n  return useMutation({\n    mutationFn: registerWithEmailAndPassword,\n    onSuccess: (data) => {\n      queryClient.setQueryData(userQueryKey, data.user);\n      onSuccess?.();\n    },\n  });\n};\n\nexport const useLogout = ({ onSuccess }: { onSuccess?: () => void }) => {\n  const queryClient = useQueryClient();\n  return useMutation({\n    mutationFn: logout,\n    onSuccess: () => {\n      queryClient.removeQueries({ queryKey: userQueryKey });\n      onSuccess?.();\n    },\n  });\n};\n\nconst logout = (): Promise<void> => {\n  return api.post('/auth/logout');\n};\n\nexport const loginInputSchema = z.object({\n  email: z.string().min(1, 'Required').email('Invalid email'),\n  password: z.string().min(5, 'Required'),\n});\n\nexport type LoginInput = z.infer<typeof loginInputSchema>;\nconst loginWithEmailAndPassword = (data: LoginInput): Promise<AuthResponse> => {\n  return api.post('/auth/login', data);\n};\n\nexport const registerInputSchema = z\n  .object({\n    email: z.string().min(1, 'Required'),\n    firstName: z.string().min(1, 'Required'),\n    lastName: z.string().min(1, 'Required'),\n    password: z.string().min(5, 'Required'),\n  })\n  .and(\n    z\n      .object({\n        teamId: z.string().min(1, 'Required'),\n        teamName: z.null().default(null),\n      })\n      .or(\n        z.object({\n          teamName: z.string().min(1, 'Required'),\n          teamId: z.null().default(null),\n        }),\n      ),\n  );\n\nexport type RegisterInput = z.infer<typeof registerInputSchema>;\n\nconst registerWithEmailAndPassword = (\n  data: RegisterInput,\n): Promise<AuthResponse> => {\n  return api.post('/auth/register', data);\n};\n"
+    },
+    "outputs": {
+      "role": "component"
+    }
+  },
+  {
+    "inputs": {
+      "origin": {
+        "repo": "jgudo/ecommerce-react",
+        "commit": "8d37028200dc1475d78f27d3b352a4d0384a4ab1",
+        "framework": "react"
+      },
+      "subject": {
+        "kind": "file",
+        "path": "src/components/common/Navigation.jsx",
+        "language": "jsx",
+        "lineCount": 138,
+        "hash": "d769eac68c756f9db85bb612c1ce6ae9b5c3b4eb119433f4dfcb249cf3b118fe",
+        "role": "other",
+        "imports": [
+          {
+            "path": "src/components/basket/BasketToggle.jsx",
+            "role": "component",
+            "typeOnly": false
+          },
+          {
+            "path": "src/components/common/Badge.jsx",
+            "role": "component",
+            "typeOnly": false
+          },
+          {
+            "path": "src/components/common/FiltersToggle.jsx",
+            "role": "component",
+            "typeOnly": false
+          },
+          {
+            "path": "src/components/common/MobileNavigation.jsx",
+            "role": "component",
+            "typeOnly": false
+          },
+          {
+            "path": "src/components/common/SearchBar.jsx",
+            "role": "component",
+            "typeOnly": false
+          }
+        ],
+        "importedBy": [
+          {
+            "path": "src/components/common/index.js",
+            "role": "other",
+            "typeOnly": false
+          }
+        ]
+      },
+      "source": "/* eslint-disable indent */\nimport { FilterOutlined, ShoppingOutlined } from '@ant-design/icons';\nimport * as ROUTE from '@/constants/routes';\nimport logo from '@/images/logo-full.png';\nimport React, { useEffect, useRef } from 'react';\nimport { useSelector } from 'react-redux';\nimport {\n  Link, NavLink, useLocation\n} from 'react-router-dom';\nimport UserAvatar from '@/views/account/components/UserAvatar';\nimport BasketToggle from '../basket/BasketToggle';\nimport Badge from './Badge';\nimport FiltersToggle from './FiltersToggle';\nimport MobileNavigation from './MobileNavigation';\nimport SearchBar from './SearchBar';\n\nconst Navigation = () => {\n  const navbar = useRef(null);\n  const { pathname } = useLocation();\n\n  const store = useSelector((state) => ({\n    basketLength: state.basket.length,\n    user: state.auth,\n    isAuthenticating: state.app.isAuthenticating,\n    isLoading: state.app.loading\n  }));\n\n  const scrollHandler = () => {\n    if (navbar.current && window.screen.width > 480) {\n      if (window.pageYOffset >= 70) {\n        navbar.current.classList.add('is-nav-scrolled');\n      } else {\n        navbar.current.classList.remove('is-nav-scrolled');\n      }\n    }\n  };\n\n  useEffect(() => {\n    window.addEventListener('scroll', scrollHandler);\n    return () => window.removeEventListener('scroll', scrollHandler);\n  }, []);\n\n  const onClickLink = (e) => {\n    if (store.isAuthenticating) e.preventDefault();\n  };\n\n  // disable the basket toggle to these pathnames\n  const basketDisabledpathnames = [\n    ROUTE.CHECKOUT_STEP_1,\n    ROUTE.CHECKOUT_STEP_2,\n    ROUTE.CHECKOUT_STEP_3,\n    ROUTE.SIGNIN,\n    ROUTE.SIGNUP,\n    ROUTE.FORGOT_PASSWORD\n  ];\n\n  if (store.user && store.user.role === 'ADMIN') {\n    return null;\n  } if (window.screen.width <= 800) {\n    return (\n      <MobileNavigation\n        // eslint-disable-next-line react/jsx-props-no-spreading\n        {...store}\n        disabledPaths={basketDisabledpathnames}\n        pathname={pathname}\n      />\n    );\n  }\n  return (\n    <nav className=\"navigation\" ref={navbar}>\n      <div className=\"logo\">\n        <Link onClick={onClickLink} to=\"/\"><img alt=\"Logo\" src={logo} /></Link>\n      </div>\n      <ul className=\"navigation-menu-main\">\n        <li><NavLink activeClassName=\"navigation-menu-active\" exact to={ROUTE.HOME}>Home</NavLink></li>\n        <li><NavLink activeClassName=\"navigation-menu-active\" to={ROUTE.SHOP}>Shop</NavLink></li>\n        <li><NavLink activeClassName=\"navigation-menu-active\" to={ROUTE.FEATURED_PRODUCTS}>Featured</NavLink></li>\n        <li><NavLink activeClassName=\"navigation-menu-active\" to={ROUTE.RECOMMENDED_PRODUCTS}>Recommended</NavLink></li>\n      </ul>\n      {(pathname === ROUTE.SHOP || pathname === ROUTE.SEARCH) && (\n        <FiltersToggle>\n          <button className=\"button-muted button-small\" type=\"button\">\n            Filters &nbsp;\n            <FilterOutlined />\n          </button>\n        </FiltersToggle>\n      )}\n      <SearchBar />\n      <ul className=\"navigation-menu\">\n        <li className=\"navigation-menu-item\">\n          <BasketToggle>\n            {({ onClickToggle }) => (\n              <button\n                className=\"button-link navigation-menu-link basket-toggle\"\n                disabled={basketDisabledpathnames.includes(pathname)}\n                onClick={onClickToggle}\n                type=\"button\"\n              >\n\n                <Badge count={store.basketLength}>\n                  <ShoppingOutlined style={{ fontSize: '2.4rem' }} />\n                </Badge>\n              </button>\n            )}\n          </BasketToggle>\n        </li>\n        {store.user ? (\n          <li className=\"navigation-menu-item\">\n            <UserAvatar />\n          </li>\n        ) : (\n          <li className=\"navigation-action\">\n            {pathname !== ROUTE.SIGNUP && (\n              <Link\n                className=\"button button-small\"\n                onClick={onClickLink}\n                to={ROUTE.SIGNUP}\n              >\n                Sign Up\n              </Link>\n            )}\n            {pathname !== ROUTE.SIGNIN && (\n              <Link\n                className=\"button button-small button-muted margin-left-s\"\n                onClick={onClickLink}\n                to={ROUTE.SIGNIN}\n              >\n                Sign In\n              </Link>\n            )}\n          </li>\n        )}\n      </ul>\n    </nav>\n  );\n};\n\nexport default Navigation;\n"
+    },
+    "outputs": {
+      "role": "component"
+    }
+  },
+  {
+    "inputs": {
+      "origin": {
+        "repo": "jgudo/ecommerce-react",
+        "commit": "8d37028200dc1475d78f27d3b352a4d0384a4ab1",
+        "framework": "react"
+      },
+      "subject": {
+        "kind": "file",
+        "path": "src/hooks/useBasket.js",
+        "language": "js",
+        "lineCount": 24,
+        "hash": "55169f523539f410cc3ac707dc80519c20dd2d22818686796f8f2b83d000fd6c",
+        "role": "other",
+        "imports": [],
+        "importedBy": [
+          {
+            "path": "src/hooks/index.js",
+            "role": "other",
+            "typeOnly": false
+          }
+        ]
+      },
+      "source": "import { displayActionMessage } from '@/helpers/utils';\nimport { useDispatch, useSelector } from 'react-redux';\nimport { addToBasket as dispatchAddToBasket, removeFromBasket } from '@/redux/actions/basketActions';\n\nconst useBasket = () => {\n  const { basket } = useSelector((state) => ({ basket: state.basket }));\n  const dispatch = useDispatch();\n\n  const isItemOnBasket = (id) => !!basket.find((item) => item.id === id);\n\n  const addToBasket = (product) => {\n    if (isItemOnBasket(product.id)) {\n      dispatch(removeFromBasket(product.id));\n      displayActionMessage('Item removed from basket', 'info');\n    } else {\n      dispatch(dispatchAddToBasket(product));\n      displayActionMessage('Item added to basket', 'success');\n    }\n  };\n\n  return { basket, isItemOnBasket, addToBasket };\n};\n\nexport default useBasket;\n"
+    },
+    "outputs": {
+      "role": "hook"
+    }
+  }
+]

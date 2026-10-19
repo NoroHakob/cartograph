@@ -1,0 +1,487 @@
+[
+  {
+    "inputs": {
+      "origin": {
+        "repo": "brocoders/nestjs-boilerplate",
+        "commit": "9620f159eefe38f47747d02ab162852367c5472c",
+        "framework": "nestjs"
+      },
+      "subject": {
+        "kind": "file",
+        "path": "src/app.module.ts",
+        "language": "ts",
+        "lineCount": 97,
+        "hash": "649e56928649eb920ac01760525d7e0b6dbec640e496568cee167ffb87f524aa",
+        "role": "module",
+        "imports": [
+          {
+            "path": "src/auth-apple/auth-apple.module.ts",
+            "role": "module",
+            "typeOnly": false
+          },
+          {
+            "path": "src/auth-apple/config/apple.config.ts",
+            "role": "config",
+            "typeOnly": false
+          },
+          {
+            "path": "src/auth-facebook/auth-facebook.module.ts",
+            "role": "module",
+            "typeOnly": false
+          },
+          {
+            "path": "src/auth-facebook/config/facebook.config.ts",
+            "role": "config",
+            "typeOnly": false
+          },
+          {
+            "path": "src/auth-google/auth-google.module.ts",
+            "role": "module",
+            "typeOnly": false
+          },
+          {
+            "path": "src/auth-google/config/google.config.ts",
+            "role": "config",
+            "typeOnly": false
+          },
+          {
+            "path": "src/auth/auth.module.ts",
+            "role": "module",
+            "typeOnly": false
+          },
+          {
+            "path": "src/auth/config/auth.config.ts",
+            "role": "config",
+            "typeOnly": false
+          },
+          {
+            "path": "src/config/app.config.ts",
+            "role": "config",
+            "typeOnly": false
+          },
+          {
+            "path": "src/config/config.type.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "src/database/config/database-config.type.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "src/database/config/database.config.ts",
+            "role": "config",
+            "typeOnly": false
+          },
+          {
+            "path": "src/database/mongoose-config.service.ts",
+            "role": "service",
+            "typeOnly": false
+          },
+          {
+            "path": "src/database/typeorm-config.service.ts",
+            "role": "service",
+            "typeOnly": false
+          },
+          {
+            "path": "src/files/config/file.config.ts",
+            "role": "config",
+            "typeOnly": false
+          },
+          {
+            "path": "src/files/files.module.ts",
+            "role": "module",
+            "typeOnly": false
+          },
+          {
+            "path": "src/home/home.module.ts",
+            "role": "module",
+            "typeOnly": false
+          },
+          {
+            "path": "src/mail/config/mail.config.ts",
+            "role": "config",
+            "typeOnly": false
+          },
+          {
+            "path": "src/mail/mail.module.ts",
+            "role": "module",
+            "typeOnly": false
+          },
+          {
+            "path": "src/mailer/mailer.module.ts",
+            "role": "module",
+            "typeOnly": false
+          },
+          {
+            "path": "src/session/session.module.ts",
+            "role": "module",
+            "typeOnly": false
+          },
+          {
+            "path": "src/users/users.module.ts",
+            "role": "module",
+            "typeOnly": false
+          }
+        ],
+        "importedBy": [
+          {
+            "path": "src/main.ts",
+            "role": "other",
+            "typeOnly": false
+          }
+        ]
+      },
+      "source": "import { Module } from '@nestjs/common';\nimport { UsersModule } from './users/users.module';\nimport { FilesModule } from './files/files.module';\nimport { AuthModule } from './auth/auth.module';\nimport databaseConfig from './database/config/database.config';\nimport authConfig from './auth/config/auth.config';\nimport appConfig from './config/app.config';\nimport mailConfig from './mail/config/mail.config';\nimport fileConfig from './files/config/file.config';\nimport facebookConfig from './auth-facebook/config/facebook.config';\nimport googleConfig from './auth-google/config/google.config';\nimport appleConfig from './auth-apple/config/apple.config';\nimport path from 'path';\nimport { ConfigModule, ConfigService } from '@nestjs/config';\nimport { TypeOrmModule } from '@nestjs/typeorm';\nimport { AuthAppleModule } from './auth-apple/auth-apple.module';\nimport { AuthFacebookModule } from './auth-facebook/auth-facebook.module';\nimport { AuthGoogleModule } from './auth-google/auth-google.module';\nimport { HeaderResolver, I18nModule } from 'nestjs-i18n';\nimport { TypeOrmConfigService } from './database/typeorm-config.service';\nimport { MailModule } from './mail/mail.module';\nimport { HomeModule } from './home/home.module';\nimport { DataSource, DataSourceOptions } from 'typeorm';\nimport { AllConfigType } from './config/config.type';\nimport { SessionModule } from './session/session.module';\nimport { MailerModule } from './mailer/mailer.module';\nimport { MongooseModule } from '@nestjs/mongoose';\nimport { MongooseConfigService } from './database/mongoose-config.service';\nimport { DatabaseConfig } from './database/config/database-config.type';\n\n// <database-block>\nconst infrastructureDatabaseModule = (databaseConfig() as DatabaseConfig)\n  .isDocumentDatabase\n  ? MongooseModule.forRootAsync({\n      useClass: MongooseConfigService,\n    })\n  : TypeOrmModule.forRootAsync({\n      useClass: TypeOrmConfigService,\n      dataSourceFactory: async (options: DataSourceOptions) => {\n        return new DataSource(options).initialize();\n      },\n    });\n// </database-block>\n\n@Module({\n  imports: [\n    ConfigModule.forRoot({\n      isGlobal: true,\n      load: [\n        databaseConfig,\n        authConfig,\n        appConfig,\n        mailConfig,\n        fileConfig,\n        facebookConfig,\n        googleConfig,\n        appleConfig,\n      ],\n      envFilePath: ['.env'],\n    }),\n    infrastructureDatabaseModule,\n    I18nModule.forRootAsync({\n      useFactory: (configService: ConfigService<AllConfigType>) => ({\n        fallbackLanguage: configService.getOrThrow('app.fallbackLanguage', {\n          infer: true,\n        }),\n        loaderOptions: { path: path.join(__dirname, '/i18n/'), watch: true },\n      }),\n      resolvers: [\n        {\n          use: HeaderResolver,\n          useFactory: (configService: ConfigService<AllConfigType>) => {\n            return [\n              configService.get('app.headerLanguage', {\n                infer: true,\n              }),\n            ];\n          },\n          inject: [ConfigService],\n        },\n      ],\n      imports: [ConfigModule],\n      inject: [ConfigService],\n    }),\n    UsersModule,\n    FilesModule,\n    AuthModule,\n    AuthFacebookModule,\n    AuthGoogleModule,\n    AuthAppleModule,\n    SessionModule,\n    MailModule,\n    MailerModule,\n    HomeModule,\n  ],\n})\nexport class AppModule {}\n"
+    },
+    "outputs": {}
+  },
+  {
+    "inputs": {
+      "origin": {
+        "repo": "hagopj13/node-express-boilerplate",
+        "commit": "179ae84efec61b14206d0305d941daed6c6d07f9",
+        "framework": "express"
+      },
+      "subject": {
+        "kind": "file",
+        "path": "src/config/logger.js",
+        "language": "js",
+        "lineCount": 26,
+        "hash": "17ae31e023766e13fbf059d9fa8d68c4a1ccee676bd25f3202cbf143164374e9",
+        "role": "config",
+        "imports": [
+          {
+            "path": "src/config/config.js",
+            "role": "config",
+            "typeOnly": false
+          }
+        ],
+        "importedBy": [
+          {
+            "path": "src/config/morgan.js",
+            "role": "config",
+            "typeOnly": false
+          },
+          {
+            "path": "src/index.js",
+            "role": "entry",
+            "typeOnly": false
+          },
+          {
+            "path": "src/middlewares/error.js",
+            "role": "middleware",
+            "typeOnly": false
+          },
+          {
+            "path": "src/services/email.service.js",
+            "role": "service",
+            "typeOnly": false
+          },
+          {
+            "path": "tests/unit/middlewares/error.test.js",
+            "role": "test",
+            "typeOnly": false
+          }
+        ]
+      },
+      "source": "const winston = require('winston');\nconst config = require('./config');\n\nconst enumerateErrorFormat = winston.format((info) => {\n  if (info instanceof Error) {\n    Object.assign(info, { message: info.stack });\n  }\n  return info;\n});\n\nconst logger = winston.createLogger({\n  level: config.env === 'development' ? 'debug' : 'info',\n  format: winston.format.combine(\n    enumerateErrorFormat(),\n    config.env === 'development' ? winston.format.colorize() : winston.format.uncolorize(),\n    winston.format.splat(),\n    winston.format.printf(({ level, message }) => `${level}: ${message}`)\n  ),\n  transports: [\n    new winston.transports.Console({\n      stderrLevels: ['error'],\n    }),\n  ],\n});\n\nmodule.exports = logger;\n"
+    },
+    "outputs": {}
+  },
+  {
+    "inputs": {
+      "origin": {
+        "repo": "alan2207/bulletproof-react",
+        "commit": "9506629ed003a561c6627735480cce4994244bb4",
+        "framework": "nextjs"
+      },
+      "subject": {
+        "kind": "file",
+        "path": "apps/react-vite/src/testing/test-utils.tsx",
+        "language": "tsx",
+        "lineCount": 97,
+        "hash": "039bf98b5d80473ceeef456c5c2406f34c3d5e26c9c27dedf2882c35c292264c",
+        "role": "component",
+        "imports": [
+          {
+            "path": "apps/react-vite/src/app/provider.tsx",
+            "role": "component",
+            "typeOnly": false
+          },
+          {
+            "path": "apps/react-vite/src/testing/data-generators.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "apps/react-vite/src/testing/mocks/db.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "apps/react-vite/src/testing/mocks/utils.ts",
+            "role": "other",
+            "typeOnly": false
+          }
+        ],
+        "importedBy": [
+          {
+            "path": "apps/react-vite/src/app/routes/app/discussions/__tests__/discussion.test.tsx",
+            "role": "test",
+            "typeOnly": false
+          },
+          {
+            "path": "apps/react-vite/src/app/routes/app/discussions/__tests__/discussions.test.tsx",
+            "role": "test",
+            "typeOnly": false
+          },
+          {
+            "path": "apps/react-vite/src/components/seo/__tests__/head.test.tsx",
+            "role": "test",
+            "typeOnly": false
+          },
+          {
+            "path": "apps/react-vite/src/components/ui/dialog/__tests__/dialog.test.tsx",
+            "role": "test",
+            "typeOnly": false
+          },
+          {
+            "path": "apps/react-vite/src/components/ui/dialog/confirmation-dialog/__tests__/confirmation-dialog.test.tsx",
+            "role": "test",
+            "typeOnly": false
+          },
+          {
+            "path": "apps/react-vite/src/components/ui/drawer/__tests__/drawer.test.tsx",
+            "role": "test",
+            "typeOnly": false
+          },
+          {
+            "path": "apps/react-vite/src/components/ui/form/__tests__/form.test.tsx",
+            "role": "test",
+            "typeOnly": false
+          },
+          {
+            "path": "apps/react-vite/src/features/auth/components/__tests__/login-form.test.tsx",
+            "role": "test",
+            "typeOnly": false
+          },
+          {
+            "path": "apps/react-vite/src/features/auth/components/__tests__/register-form.test.tsx",
+            "role": "test",
+            "typeOnly": false
+          },
+          {
+            "path": "apps/react-vite/src/lib/__tests__/authorization.test.tsx",
+            "role": "test",
+            "typeOnly": false
+          }
+        ]
+      },
+      "source": "import {\n  render as rtlRender,\n  screen,\n  waitForElementToBeRemoved,\n} from '@testing-library/react';\nimport userEvent from '@testing-library/user-event';\nimport Cookies from 'js-cookie';\nimport { RouterProvider, createMemoryRouter } from 'react-router';\n\nimport { AppProvider } from '@/app/provider';\n\nimport {\n  createDiscussion as generateDiscussion,\n  createUser as generateUser,\n} from './data-generators';\nimport { db } from './mocks/db';\nimport { AUTH_COOKIE, authenticate, hash } from './mocks/utils';\n\nexport const createUser = async (userProperties?: any) => {\n  const user = generateUser(userProperties) as any;\n  await db.user.create({ ...user, password: hash(user.password) });\n  return user;\n};\n\nexport const createDiscussion = async (discussionProperties?: any) => {\n  const discussion = generateDiscussion(discussionProperties);\n  const res = await db.discussion.create(discussion);\n  return res;\n};\n\nexport const loginAsUser = async (user: any) => {\n  const authUser = await authenticate(user);\n  Cookies.set(AUTH_COOKIE, authUser.jwt);\n  return authUser;\n};\n\nexport const waitForLoadingToFinish = () =>\n  waitForElementToBeRemoved(\n    () => [\n      ...screen.queryAllByTestId(/loading/i),\n      ...screen.queryAllByText(/loading/i),\n    ],\n    { timeout: 4000 },\n  );\n\nconst initializeUser = async (user: any) => {\n  if (typeof user === 'undefined') {\n    const newUser = await createUser();\n    return loginAsUser(newUser);\n  } else if (user) {\n    return loginAsUser(user);\n  } else {\n    return null;\n  }\n};\n\nexport const renderApp = async (\n  ui: any,\n  { user, url = '/', path = '/', ...renderOptions }: Record<string, any> = {},\n) => {\n  // if you want to render the app unauthenticated then pass \"null\" as the user\n  const initializedUser = await initializeUser(user);\n\n  const router = createMemoryRouter(\n    [\n      {\n        path: path,\n        element: ui,\n      },\n    ],\n    {\n      initialEntries: url ? ['/', url] : ['/'],\n      initialIndex: url ? 1 : 0,\n    },\n  );\n\n  const returnValue = {\n    ...rtlRender(ui, {\n      wrapper: () => {\n        return (\n          <AppProvider>\n            <RouterProvider router={router} />\n          </AppProvider>\n        );\n      },\n      ...renderOptions,\n    }),\n    user: initializedUser,\n  };\n\n  await waitForLoadingToFinish();\n\n  return returnValue;\n};\n\nexport * from '@testing-library/react';\nexport { userEvent, rtlRender };\n"
+    },
+    "outputs": {}
+  },
+  {
+    "inputs": {
+      "origin": {
+        "repo": "jgudo/ecommerce-react",
+        "commit": "8d37028200dc1475d78f27d3b352a4d0384a4ab1",
+        "framework": "react"
+      },
+      "subject": {
+        "kind": "file",
+        "path": "src/components/common/FiltersToggle.jsx",
+        "language": "jsx",
+        "lineCount": 45,
+        "hash": "3cfb57413ef0215d9b3b93d09301d03018347b66ac0ec14969cdd7b9dc06bdfe",
+        "role": "component",
+        "imports": [
+          {
+            "path": "src/components/common/Filters.jsx",
+            "role": "component",
+            "typeOnly": false
+          },
+          {
+            "path": "src/components/common/Modal.jsx",
+            "role": "component",
+            "typeOnly": false
+          }
+        ],
+        "importedBy": [
+          {
+            "path": "src/components/common/MobileNavigation.jsx",
+            "role": "component",
+            "typeOnly": false
+          },
+          {
+            "path": "src/components/common/Navigation.jsx",
+            "role": "component",
+            "typeOnly": false
+          },
+          {
+            "path": "src/components/common/index.js",
+            "role": "other",
+            "typeOnly": false
+          }
+        ]
+      },
+      "source": "import { useModal } from '@/hooks';\nimport PropType from 'prop-types';\nimport React from 'react';\nimport Filters from './Filters';\nimport Modal from './Modal';\n\nconst FiltersToggle = ({ children }) => {\n  const { isOpenModal, onOpenModal, onCloseModal } = useModal();\n\n  return (\n    <>\n      <div\n        className=\"filters-toggle\"\n        onClick={onOpenModal}\n        role=\"presentation\"\n      >\n        {children}\n      </div>\n      <Modal\n        isOpen={isOpenModal}\n        onRequestClose={onCloseModal}\n      >\n        <div className=\"filters-toggle-sub\">\n          <Filters closeModal={onCloseModal} />\n        </div>\n        <button\n          className=\"modal-close-button\"\n          onClick={onCloseModal}\n          type=\"button\"\n        >\n          <i className=\"fa fa-times-circle\" />\n        </button>\n      </Modal>\n    </>\n  );\n};\n\nFiltersToggle.propTypes = {\n  children: PropType.oneOfType([\n    PropType.arrayOf(PropType.node),\n    PropType.node\n  ]).isRequired\n};\n\nexport default FiltersToggle;\n"
+    },
+    "outputs": {}
+  },
+  {
+    "inputs": {
+      "origin": {
+        "repo": "brocoders/nestjs-boilerplate",
+        "commit": "9620f159eefe38f47747d02ab162852367c5472c",
+        "framework": "nestjs"
+      },
+      "subject": {
+        "kind": "file",
+        "path": "src/config/config.type.ts",
+        "language": "ts",
+        "lineCount": 19,
+        "hash": "4b5b73a1442ad24eff763174fc27bb726bb2ec67761529663e047add49454e4c",
+        "role": "other",
+        "imports": [
+          {
+            "path": "src/auth-apple/config/apple-config.type.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "src/auth-facebook/config/facebook-config.type.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "src/auth-google/config/google-config.type.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "src/auth/config/auth-config.type.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "src/config/app-config.type.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "src/database/config/database-config.type.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "src/files/config/file-config.type.ts",
+            "role": "other",
+            "typeOnly": false
+          },
+          {
+            "path": "src/mail/config/mail-config.type.ts",
+            "role": "other",
+            "typeOnly": false
+          }
+        ],
+        "importedBy": [
+          {
+            "path": "src/app.module.ts",
+            "role": "module",
+            "typeOnly": false
+          },
+          {
+            "path": "src/auth-apple/auth-apple.service.ts",
+            "role": "service",
+            "typeOnly": false
+          },
+          {
+            "path": "src/auth-facebook/auth-facebook.service.ts",
+            "role": "service",
+            "typeOnly": false
+          },
+          {
+            "path": "src/auth-google/auth-google.service.ts",
+            "role": "service",
+            "typeOnly": false
+          },
+          {
+            "path": "src/auth/auth.service.ts",
+            "role": "service",
+            "typeOnly": false
+          },
+          {
+            "path": "src/auth/strategies/jwt-refresh.strategy.ts",
+            "role": "strategy",
+            "typeOnly": false
+          },
+          {
+            "path": "src/auth/strategies/jwt.strategy.ts",
+            "role": "strategy",
+            "typeOnly": false
+          },
+          {
+            "path": "src/database/mongoose-config.service.ts",
+            "role": "service",
+            "typeOnly": false
+          },
+          {
+            "path": "src/database/typeorm-config.service.ts",
+            "role": "service",
+            "typeOnly": false
+          },
+          {
+            "path": "src/files/infrastructure/uploader/local/files.module.ts",
+            "role": "module",
+            "typeOnly": false
+          },
+          {
+            "path": "src/files/infrastructure/uploader/local/files.service.ts",
+            "role": "service",
+            "typeOnly": false
+          },
+          {
+            "path": "src/files/infrastructure/uploader/s3-presigned/files.module.ts",
+            "role": "module",
+            "typeOnly": false
+          },
+          {
+            "path": "src/files/infrastructure/uploader/s3-presigned/files.service.ts",
+            "role": "service",
+            "typeOnly": false
+          },
+          {
+            "path": "src/files/infrastructure/uploader/s3/files.module.ts",
+            "role": "module",
+            "typeOnly": false
+          },
+          {
+            "path": "src/home/home.service.ts",
+            "role": "service",
+            "typeOnly": false
+          },
+          {
+            "path": "src/mail/mail.service.ts",
+            "role": "service",
+            "typeOnly": false
+          },
+          {
+            "path": "src/mailer/mailer.service.ts",
+            "role": "service",
+            "typeOnly": false
+          },
+          {
+            "path": "src/main.ts",
+            "role": "other",
+            "typeOnly": false
+          }
+        ]
+      },
+      "source": "import { AppConfig } from './app-config.type';\nimport { AppleConfig } from '../auth-apple/config/apple-config.type';\nimport { AuthConfig } from '../auth/config/auth-config.type';\nimport { DatabaseConfig } from '../database/config/database-config.type';\nimport { FacebookConfig } from '../auth-facebook/config/facebook-config.type';\nimport { FileConfig } from '../files/config/file-config.type';\nimport { GoogleConfig } from '../auth-google/config/google-config.type';\nimport { MailConfig } from '../mail/config/mail-config.type';\n\nexport type AllConfigType = {\n  app: AppConfig;\n  apple: AppleConfig;\n  auth: AuthConfig;\n  database: DatabaseConfig;\n  facebook: FacebookConfig;\n  file: FileConfig;\n  google: GoogleConfig;\n  mail: MailConfig;\n};\n"
+    },
+    "outputs": {}
+  }
+]

@@ -6,9 +6,10 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   // One wrapped model client: src/ai/client.ts constructs it, traces it, and
-  // is the only file that may import the model SDK or the tracer.
+  // is the only file that may import the model SDK or the tracer. The evals
+  // and scripts are held to the same rule: experiments go through it too.
   {
-    files: ["src/**"],
+    files: ["src/**", "evals/**", "scripts/**"],
     ignores: ["src/ai/client.ts"],
     rules: {
       "no-restricted-imports": [

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
-import { parseExplanation, parseInline, pathMatcher, unknownPaths, type Block, type Inline } from "./format";
+import { parseExplanation, parseInline, pathMatcher, type Block, type Inline } from "./format";
 
 /** Everything that would reach the screen as characters. */
 const visible = (blocks: Block[]): string => {
@@ -93,10 +93,5 @@ describe("paths in prose", () => {
 
   test("brackets in paths are literal", () => {
     assert.deepEqual(match("(app/[slug]/page.tsx)").map((s) => s.kind), ["text", "path", "text"]);
-  });
-
-  test("source paths the answer wasn't handed are reported", () => {
-    const known = new Set(["src/a.ts"]);
-    assert.deepEqual(unknownPaths("src/a.ts imports src/made/up.ts, not `src/other.tsx`.", known), ["src/made/up.ts", "src/other.tsx"]);
   });
 });

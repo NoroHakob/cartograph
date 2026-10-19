@@ -29,8 +29,8 @@ export interface Explanation {
   cached: boolean;
   /** Every path handed to the model: the only ones the answer may name. */
   paths: string[];
-  /** Source paths the answer named that it wasn't handed. Shown, never linked. */
-  unknownPaths: string[];
+  /** Paths the answer named that it wasn't handed, by the invented-path check. Shown, never linked. */
+  inventedPaths: string[];
   /** Set when the file was unidentified and this explanation classified it. */
   role: { role: ClassifiableRole; rationale: string | null } | null;
   /** The commit the explanation is about. */

@@ -12,7 +12,11 @@
     "test:pipeline": "tsx --conditions=react-server --test src/pipeline/**/*.test.ts",
     "test:parser": "tsx --test src/parser/**/*.test.ts",
     "test:map": "tsx --test src/map/**/*.test.ts",
-    "test:explain": "tsx --test src/explain/**/*.test.ts"
+    "test:explain": "tsx --test src/explain/**/*.test.ts",
+    "eval:build": "node --env-file=.env.local scripts/eval-build.mjs",
+    "eval:roles": "node --env-file=.env.local scripts/eval-roles.mjs",
+    "eval:prompts": "node --env-file=.env.local scripts/eval-prompts.mjs",
+    "eval:paths": "node --env-file=.env.local scripts/eval-paths.mjs"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.9.16",
