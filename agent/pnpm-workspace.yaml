@@ -1,0 +1,2 @@
+# Its own pnpm root: the agent is a separate service, not part of the app.
+packages: []

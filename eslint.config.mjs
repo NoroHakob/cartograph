@@ -55,6 +55,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // The Ask agent is its own service with its own package and model client.
+    "agent/**",
   ]),
 ]);
 

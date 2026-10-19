@@ -11,7 +11,7 @@ Next.js 16 App Router, React 19, TypeScript (strict). ts-morph for parsing. Reac
 ## Rules
 
 - The parser is the source of truth. Never let the AI add, remove or rename files, folders or imports on the map.
-- All model calls go through the single wrapped client in `src/ai/client.ts`. Never import the model SDK or langsmith anywhere else (ESLint enforces it).
+- All model calls go through the single wrapped client in `src/ai/client.ts`. Never import the model SDK or langsmith anywhere else (ESLint enforces it). The one exception is the agent service in `agent/`: it runs separately and can't import app code, so its model is constructed once in `agent/model.ts`, matching the app's pinned model and settings.
 - Every AI answer must reference only nodes and edges the parser produced.
 - Supabase tables use row-level security. Never bypass it with the service role key in client code.
 - Keep secrets in `.env.local`. Never commit them.
