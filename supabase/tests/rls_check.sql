@@ -3,7 +3,10 @@
 
 -- 1. Every table in public has row-level security on and at least one policy,
 --    and signed-out (anon) requests can't select from any of them.
---    Expect every row: rls_enabled = true, policies >= 1, anon_can_select = false.
+--    Expect every row: rls_enabled = true, policies >= 1, anon_can_select = false,
+--    except analyses, projects, files, edges, routes and file_roles: since the
+--    Ask credential migration anon may select those, and RLS shows it rows only
+--    with a valid credential. Section 4 checks that.
 select c.relname as "table",
        c.relrowsecurity as rls_enabled,
        (select count(*) from pg_policies p
@@ -86,5 +89,64 @@ create temp table not_ours on commit drop as select exists (select 1 from realti
 select (select visible from own_channel) as own_channel,
        (select visible from other_channel) as other_channel,
        (select visible from not_ours) as not_ours;
+
+rollback;
+
+-- 4. Ask credentials (after the ask_credential migration). A member mints a
+--    credential for their own organization's analysis and not another's; anon
+--    with that credential sees that one analysis and nothing else; a tampered,
+--    expired or missing credential sees nothing.
+--    Expect: own_minted = true, other_refused = true, then for each "as" row
+--    analyses = 1 and files = files_total for 'credential', and every count 0
+--    for 'tampered', 'expired' and 'none'.
+begin;
+
+create temp table pick on commit drop as
+select
+  (select id from public.analyses where org_id = 'org_3KlcDKciHUKQRTAaaO8suJIjkYg' and status = 'complete' limit 1) as own,
+  (select id from public.analyses where org_id = 'org_3Kmj3beZ8qWs6bNnIiGYXAPlQwJ' limit 1) as other;
+create temp table minted (credential text, other_refused boolean) on commit drop;
+grant select, insert, update on pick, minted to authenticated, anon;
+
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"user_check","role":"authenticated","o":{"id":"org_3KlcDKciHUKQRTAaaO8suJIjkYg"}}';
+insert into minted (credential) select public.mint_ask_credential(own) from pick;
+do $$
+begin
+  perform public.mint_ask_credential((select other from pick));
+  update minted set other_refused = false;
+exception when others then
+  update minted set other_refused = true;
+end $$;
+
+-- An expired credential, signed with the real key: built as the owner.
+reset role;
+create temp table expired on commit drop as
+select p || '.' || private.ask_sign(p) as credential
+from (select private.b64url(convert_to(jsonb_build_object('a', own, 'o', 'org_3KlcDKciHUKQRTAaaO8suJIjkYg', 'exp', 1)::text, 'UTF8')) as p from pick) x;
+grant select on expired to anon;
+
+set local role anon;
+create temp table seen ("as" text, analyses bigint, files bigint, edges bigint, foreign_files bigint) on commit drop;
+
+select set_config('request.headers', json_build_object('x-ask-credential', credential)::text, true) from minted;
+insert into seen select 'credential', (select count(*) from public.analyses), (select count(*) from public.files), (select count(*) from public.edges),
+  (select count(*) from public.files where analysis_id <> (select own from pick));
+
+select set_config('request.headers', json_build_object('x-ask-credential', credential || 'x')::text, true) from minted;
+insert into seen select 'tampered', (select count(*) from public.analyses), (select count(*) from public.files), (select count(*) from public.edges), 0;
+
+select set_config('request.headers', json_build_object('x-ask-credential', credential)::text, true) from expired;
+insert into seen select 'expired', (select count(*) from public.analyses), (select count(*) from public.files), (select count(*) from public.edges), 0;
+
+select set_config('request.headers', '{}', true);
+insert into seen select 'none', (select count(*) from public.analyses), (select count(*) from public.files), (select count(*) from public.edges), 0;
+
+reset role;
+select (select credential is not null from minted) as own_minted,
+       (select other_refused from minted) as other_refused,
+       s.*,
+       (select count(*) from public.files where analysis_id = (select own from pick)) as files_total
+from seen s;
 
 rollback;

@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@langchain/core": "1.2.18",
     "@langchain/google": "0.2.11",
     "langchain": "^1.5.12",
     "managed-deepagents": "0.9.4-dev.14",

@@ -191,11 +191,19 @@ function StaleNotice({
 
 /** The three permitted constructs, with every handed path that's on the map turned into a link. */
 function Body({ explanation, links }: { explanation: Explanation; links: PathLinks }) {
-  const blocks = useMemo(() => parseExplanation(explanation.body), [explanation.body]);
-  // Only paths the model was handed, and only those the map can move to.
+  return <LinkedProse text={explanation.body} paths={explanation.paths} links={links} />;
+}
+
+/**
+ * Model prose with its paths made into links on the map. Only `paths` link:
+ * the paths the model was handed or looked up, and only those the map can
+ * move to.
+ */
+export function LinkedProse({ text, paths, links }: { text: string; paths: readonly string[]; links: PathLinks }) {
+  const blocks = useMemo(() => parseExplanation(text), [text]);
   const match = useMemo(
-    () => pathMatcher(explanation.paths.filter((p) => links.files.has(p) || links.folders.has(p))),
-    [explanation.paths, links.files, links.folders],
+    () => pathMatcher(paths.filter((p) => links.files.has(p) || links.folders.has(p))),
+    [paths, links.files, links.folders],
   );
   return (
     <div className="flex flex-col gap-2.5 text-sm leading-6">

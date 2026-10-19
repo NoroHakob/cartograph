@@ -4,8 +4,9 @@
 // localhost, so the agent can be run and watched before the real surface
 // exists. Defaults to the preview's checked-in hono fixture. No sign-in, no
 // database, no credential: it binds to 127.0.0.1 and holds nothing but the
-// file it was given. The app's credentialed surface replaces it; the request
-// and response shapes stay the same.
+// file it was given. The app's credentialed surface (/api/ask/tools) is the
+// real one; the request and response shapes are the same. Point the agent here
+// with CARTOGRAPH_TOOLS_URL=http://127.0.0.1:3999/tools.
 //
 //   POST /tools/<name>   body: the tool's JSON arguments   → 200 JSON result
 //                                                          → 400 { error, ... }

@@ -49,6 +49,7 @@ async function StoredMap({ params }: { params: PageProps<"/o/[slug]/analyses/[id
           facts={explorer.facts}
           explain={explainTarget.bind(null, id)}
           reanalyse={reanalyse.bind(null, id)}
+          analysisId={id}
         />
       </div>
     </div>

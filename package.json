@@ -18,7 +18,8 @@
     "eval:build": "node --env-file=.env.local scripts/eval-build.mjs",
     "eval:roles": "node --env-file=.env.local scripts/eval-roles.mjs",
     "eval:prompts": "node --env-file=.env.local scripts/eval-prompts.mjs",
-    "eval:paths": "node --env-file=.env.local scripts/eval-paths.mjs"
+    "eval:paths": "node --env-file=.env.local scripts/eval-paths.mjs",
+    "eval:ask": "node --env-file=.env.local scripts/eval-ask.mjs"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.9.16",

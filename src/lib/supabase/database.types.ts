@@ -559,6 +559,7 @@ export type Database = {
     Functions: {
       analysis_id_from_topic: { Args: { p_topic: string }; Returns: string }
       analysis_topic: { Args: { p_analysis_id: string }; Returns: string }
+      mint_ask_credential: { Args: { p_analysis_id: string }; Returns: string }
       start_analysis: {
         Args: { p_default_branch: string; p_name: string; p_owner: string }
         Returns: {

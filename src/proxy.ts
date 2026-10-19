@@ -10,9 +10,13 @@ const isPublicRoute = createRouteMatcher(["/sign-in(.*)", "/sign-up(.*)"]);
 // exists in development; the page itself 404s in production.
 const isPreviewRoute = createRouteMatcher(["/preview(.*)"]);
 
+// The agent's tool surface has no session: it is called by the agent service
+// with an Ask credential, which RLS checks on every read.
+const isAskToolRoute = createRouteMatcher(["/api/ask/tools/(.*)"]);
+
 export default clerkMiddleware(
   async (auth, req) => {
-    if (isPublicRoute(req)) return;
+    if (isPublicRoute(req) || isAskToolRoute(req)) return;
     if (process.env.NODE_ENV !== "production" && isPreviewRoute(req)) return;
 
     // "/" is the landing page for a signed-out visitor. Every sign-in method

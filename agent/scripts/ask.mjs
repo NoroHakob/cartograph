@@ -1,11 +1,18 @@
-// Usage: node scripts/ask.mjs "first question" ["follow-up" ...]
+// Usage: MDA_INGRESS_SECRET=... [ASK_CREDENTIAL=...] node scripts/ask.mjs "first question" ["follow-up" ...]
 //
-// Asks the running agent (mda dev, default http://localhost:2024) one or more
+// Asks the running agent (default http://localhost:2024) one or more
 // questions on a single thread and prints each lookup the moment it's made,
-// then the answer. Development only: a stand-in for the chat panel.
+// then the answer. Development only: a stand-in for the chat panel, calling
+// the agent the way the app's /api/ask does. ASK_CREDENTIAL is passed as run
+// context; without one, lookups against the app's tool surface fail.
 
 const URL_BASE = (process.env.AGENT_URL ?? "http://localhost:2024").replace(/\/+$/, "");
-const headers = { "content-type": "application/json", ...(process.env.LANGSMITH_API_KEY && { "x-api-key": process.env.LANGSMITH_API_KEY }) };
+const headers = {
+  "content-type": "application/json",
+  "x-mda-ingress-secret": process.env.MDA_INGRESS_SECRET ?? "",
+  "x-mda-user-id": process.env.ASK_USER_ID ?? "dev",
+};
+const context = process.env.ASK_CREDENTIAL ? { askCredential: process.env.ASK_CREDENTIAL } : {};
 
 const questions = process.argv.slice(2);
 if (questions.length === 0) {
@@ -22,7 +29,7 @@ for (const question of questions) {
   const response = await fetch(`${URL_BASE}/threads/${thread.thread_id}/runs/stream`, {
     method: "POST",
     headers,
-    body: JSON.stringify({ assistant_id: "cartograph", input: { messages: [{ role: "user", content: question }] }, stream_mode: ["updates"] }),
+    body: JSON.stringify({ assistant_id: "cartograph", input: { messages: [{ role: "user", content: question }] }, context, stream_mode: ["updates"] }),
   });
   if (!response.ok) throw new Error(`${response.status} ${await response.text()}`);
 

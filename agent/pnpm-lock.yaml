@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@langchain/core':
+        specifier: 1.2.18
+        version: 1.2.18
       '@langchain/google':
         specifier: 0.2.11
         version: 0.2.11(@langchain/core@1.2.18)
