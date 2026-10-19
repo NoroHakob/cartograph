@@ -1,3 +1,9 @@
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
+
+# A flat node_modules, like npm's. The parse worker loads ts-morph at runtime
+# from outside the bundle, so next.config.ts copies those packages into the
+# deployed function by path; pnpm's default symlinked layout doesn't survive
+# being copied that way (ts-morph can't find its own dependencies).
+nodeLinker: hoisted
