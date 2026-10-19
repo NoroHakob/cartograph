@@ -1,16 +1,38 @@
 "use client";
 
-import { useActionState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useActionState, useEffect, useRef } from "react";
 import { startAnalysis, type StartState } from "./actions";
 
 const initialState: StartState = { status: "idle" };
 
-export function AnalyzeForm() {
+/**
+ * The form with whatever the landing page sent: a repository in ?repo= is
+ * filled in and submitted as soon as the form mounts, so a visitor who
+ * pasted a URL before signing in goes straight on to its analysis.
+ */
+export function LinkedAnalyzeForm() {
+  const repo = useSearchParams().get("repo") ?? undefined;
+  return <AnalyzeForm repo={repo} />;
+}
+
+export function AnalyzeForm({ repo }: { repo?: string }) {
   const [state, formAction, pending] = useActionState(startAnalysis, initialState);
   const failed = state.status === "error";
+  const formRef = useRef<HTMLFormElement>(null);
+  const submitted = useRef(false);
+
+  useEffect(() => {
+    if (!repo || submitted.current) return;
+    submitted.current = true;
+    // Drop ?repo= from the address bar, so reloading after an error doesn't
+    // submit again.
+    window.history.replaceState(null, "", window.location.pathname);
+    formRef.current?.requestSubmit();
+  }, [repo]);
 
   return (
-    <form action={formAction} className="mt-8 flex flex-col gap-2">
+    <form ref={formRef} action={formAction} className="mt-8 flex flex-col gap-2">
       <label htmlFor="repository-url" className="text-sm font-medium">
         Map a repository
       </label>
@@ -24,7 +46,7 @@ export function AnalyzeForm() {
           autoComplete="off"
           spellCheck={false}
           // Keeps what was typed when the action returns an error.
-          defaultValue={failed ? state.url : undefined}
+          defaultValue={failed ? state.url : repo}
           key={failed ? state.url : "idle"}
           placeholder="https://github.com/owner/repository"
           aria-invalid={failed || undefined}

@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { getIdentity } from "@/lib/identity";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { Analyses, AnalysesSkeleton } from "./analyses";
-import { AnalyzeForm } from "./analyze-form";
+import { AnalyzeForm, LinkedAnalyzeForm } from "./analyze-form";
 
 export default function WorkspacePage() {
   return (
@@ -12,7 +12,10 @@ export default function WorkspacePage() {
         <WorkspaceHeader />
       </Suspense>
 
-      <AnalyzeForm />
+      {/* Reading ?repo= is client-side, so the form in the static shell stands in until it's read. */}
+      <Suspense fallback={<AnalyzeForm />}>
+        <LinkedAnalyzeForm />
+      </Suspense>
 
       <section aria-labelledby="analyses-heading">
         <h2 id="analyses-heading" className="sr-only">
